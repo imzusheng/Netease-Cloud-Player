@@ -8,12 +8,35 @@
         </div>
         <subTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
         <div class="avatar">
-          <img :src="userInfo.profile.avatarUrl" alt="" />
+          <img :src="$store.getters.userInfo.profile.avatarUrl" alt="" />
           <!-- <span>{{ userInfo.profile.nickname }}</span> -->
         </div>
       </nav>
     </header>
     <main>
+      <!-- 热门歌曲 -->
+      <section class="section-common">
+        <div class="section-common-title">
+          <div>
+            <p>为你准备的新曲</p>
+            <h2>专属推荐</h2>
+          </div>
+          <div>
+            <a href="#">查看更多</a>
+          </div>
+        </div>
+        <ul class="section-newSong-list">
+          <li v-for="rmdItem in listData.recommendPerson" :key="rmdItem.id">
+            <figure>
+              <img :src="rmdItem.picUrl" alt="" />
+              <div class="section-newSong-desc">
+                <p>{{ rmdItem.name }}</p>
+                <p>{{ pickUpName(rmdItem.song.artists) }}</p>
+              </div>
+            </figure>
+          </li>
+        </ul>
+      </section>
       <!-- 模板 -->
       <section
         class="section-common"
@@ -92,8 +115,7 @@
 
 <script>
 import subTabs from '@/components/sub-tabs'
-
-const API_ROOT = 'http://localhost:3000'
+import API from '@/config/api'
 
 export default {
   name: 'HomeView',
@@ -102,14 +124,6 @@ export default {
   },
   data () {
     return {
-      API: {
-        GET_RECOMMENDS: `${API_ROOT}/personalized?limit=6`,
-        GET_COMMUNITY: `${API_ROOT}/top/playlist?limit=6`,
-        GET_RECORDS: `${API_ROOT}/user/record?type=1`,
-        GET_PERSON_NEWSONG: `${API_ROOT}/personalized/newsong?limit=6`,
-        GET_RECOMMENDS_MV: `${API_ROOT}/personalized/mv`,
-        GET_HOT_ARTISTS: `${API_ROOT}/top/artists?offset=0&limit=6`
-      },
       sectionData: [
         {
           id: 'section-tj',
@@ -142,17 +156,6 @@ export default {
             class: 'section-common-item',
             source: 'records',
             join: '-'
-          }
-        },
-        {
-          id: 'section-xq',
-          title: '专属推荐',
-          subTitle: '为你准备的新曲',
-          moreUrl: '',
-          li: {
-            class: 'section-common-item',
-            source: 'recommendPerson',
-            join: '•'
           }
         },
         {
@@ -245,65 +248,6 @@ export default {
           }
         }
       },
-      userInfo: {
-        code: 200,
-        account: {
-          id: 86087017,
-          userName: '1_********875',
-          type: 1,
-          status: 0,
-          whitelistAuthority: 0,
-          createTime: 1439569209151,
-          tokenVersion: 4,
-          ban: 0,
-          baoyueVersion: 1,
-          donateVersion: 0,
-          vipType: 0,
-          anonimousUser: false,
-          paidFee: false
-        },
-        profile: {
-          userId: 86087017,
-          userType: 0,
-          nickname: '没四块腹肌不改ID',
-          avatarImgId: 18723583510950270,
-          avatarUrl:
-            'http://p1.music.126.net/-RUgrsay56NqOXHIYKZjKA==/18723583510950274.jpg',
-          backgroundImgId: 109951164591180050,
-          backgroundUrl:
-            'http://p1.music.126.net/OvebeOTHv3egUOxKTs8h-A==/109951164591180043.jpg',
-          signature: '2016',
-          createTime: 1439569209153,
-          userName: '1_********875',
-          accountType: 1,
-          shortUserName: '********875',
-          birthday: 930240000000,
-          authority: 0,
-          gender: 1,
-          accountStatus: 0,
-          province: 440000,
-          city: 441300,
-          authStatus: 0,
-          description: null,
-          detailDescription: null,
-          defaultAvatar: false,
-          expertTags: null,
-          experts: null,
-          djStatus: 0,
-          locationStatus: 30,
-          vipType: 0,
-          followed: false,
-          mutual: false,
-          authenticated: false,
-          lastLoginTime: 1648380665982,
-          lastLoginIP: '14.150.143.248',
-          remarkName: null,
-          viptypeVersion: 1589299906269,
-          authenticationTypes: 0,
-          avatarDetail: null,
-          anchor: false
-        }
-      },
       listData: {
         dj: [], // 电台
         hotArtists: [], // 热门歌手
@@ -356,18 +300,17 @@ export default {
     },
     // 社区精选
     getCommunity () {
-      this.fetchToJson(this.API.GET_COMMUNITY).then((resJson) => {
+      this.fetchToJson(API.GET_COMMUNITY).then((resJson) => {
         this.listData.community = resJson.playlists.map((v) => {
           v.picUrl = v.coverImgUrl
           v.desc1 = v.trackCount + '首音乐'
           return v
         })
-        // {{ rmdItem.trackCount }}首歌曲
       })
     },
     // 今日推荐
     getRecommend () {
-      this.fetchToJson(this.API.GET_RECOMMENDS).then((resJson) => {
+      this.fetchToJson(API.GET_RECOMMENDS).then((resJson) => {
         this.listData.recommends = resJson.result.map((v) => {
           v.desc1 = this.convertDate(v.trackNumberUpdateTime / 1000)
           v.desc2 = v.trackCount + '首音乐'
@@ -377,7 +320,7 @@ export default {
     },
     // 播放记录/最近播放
     getRecords () {
-      this.fetchToJson(this.API.GET_RECORDS).then((resJson) => {
+      this.fetchToJson(API.AUTH.GET_RECORDS).then((resJson) => {
         this.listData.records = resJson.weekData.map((v) => {
           console.dir(v)
           v.desc1 = this.pickUpName(v.song.ar)
@@ -389,7 +332,7 @@ export default {
     },
     // 播放记录/最近播放
     getNewsong () {
-      this.fetchToJson(this.API.GET_PERSON_NEWSONG).then((resJson) => {
+      this.fetchToJson(API.GET_PERSON_NEWSONG).then((resJson) => {
         this.listData.recommendPerson = resJson.result.map((v) => {
           v.desc1 = v.song.album.type
           v.desc2 = this.pickUpName(v.song.artists)
@@ -399,7 +342,7 @@ export default {
     },
     // 推荐MV
     getMv () {
-      this.fetchToJson(this.API.GET_RECOMMENDS_MV).then((resJson) => {
+      this.fetchToJson(API.GET_RECOMMENDS_MV).then((resJson) => {
         this.listData.recommendMv = resJson.result.map((v) => {
           v.desc1 = v.artistName
           v.desc2 = v.playCount + '万次播放'
@@ -409,7 +352,7 @@ export default {
     },
     // 获取热门歌手
     getHotArtists () {
-      this.fetchToJson(this.API.GET_HOT_ARTISTS).then((resJson) => {
+      this.fetchToJson(API.GET_HOT_ARTISTS).then((resJson) => {
         this.listData.hotArtists = resJson.artists.map((v) => {
           v.picUrl = v.img1v1Url
           v.desc1 = '艺人'
@@ -617,6 +560,7 @@ export default {
       justify-content: flex-start;
     }
 
+    // 列表
     ul[class="section-common-list"] {
       display: flex;
       overflow: hidden;
@@ -720,6 +664,62 @@ export default {
           p {
             text-align: center;
           }
+        }
+      }
+    }
+
+    ul[class="section-newSong-list"] {
+      display: flex;
+      flex-wrap: wrap;
+      li {
+        box-sizing: border-box;
+        width: calc(100% / 3);
+        margin-bottom: 12px;
+        padding: 0 12px;
+        cursor: pointer;
+        figure {
+          padding: 4px;
+          box-sizing: border-box;
+          border-radius: 6px;
+          width: 100%;
+          display: flex;
+          transition: all 0.2s;
+          &:hover {
+            background: #141414;
+          }
+          img {
+            height: 50px;
+            border-radius: 6px;
+            margin-right: 12px;
+          }
+          .section-newSong-desc {
+            flex: 1;
+            overflow: hidden;
+            p {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              height: 50%;
+              display: flex;
+              align-items: center;
+              &:last-child {
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.5);
+              }
+            }
+          }
+        }
+        @media screen and (max-width: 1068px) {
+          padding: 0 10px;
+        }
+
+        @media screen and (max-width: 968px) {
+          padding: 0 8px;
+        }
+
+        @media screen and (max-width: 768px) {
+          padding: 0 8px;
+          width: calc(100% / 2);
         }
       }
     }
