@@ -22,6 +22,7 @@
 }
 
 #app {
+  min-width: 568px;
   width: 100%;
   min-height: 100vh;
   position: relative;
