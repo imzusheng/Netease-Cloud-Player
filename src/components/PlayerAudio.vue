@@ -359,6 +359,7 @@ export default {
     playerProgressRef.addEventListener('mousedown', (e) => {
       this.audioSeeking = true
       this.audioRef.muted = true
+      this.audioRef.pause()
       // 单击切换时间
       progressMousedrag(e)
       document.addEventListener('mousemove', progressMouseEvent)
@@ -367,6 +368,7 @@ export default {
     document.addEventListener('mouseup', () => {
       this.audioSeeking = false
       this.audioRef.muted = false
+      this.audioRef.play()
       document.removeEventListener('mousemove', volumeMouseMove)
       document.removeEventListener('mousemove', progressMouseEvent)
     })
