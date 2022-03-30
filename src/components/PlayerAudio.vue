@@ -9,14 +9,19 @@
           :style="{ left: `${mouseMoveX}px` }"
           >{{ currentTimeFormat }}
         </span>
-        <!-- 滑轨 -->
+        <!-- 滑轨 深灰色-->
         <div class="player-progress-rail">
-          <!-- 滑轨背景 -->
+          <!-- 缓存进度 浅灰色-->
+          <div
+            class="player-progress-cache"
+            :style="{ transform: `translateX(-${100 - getCacheProgress}%)` }"
+          ></div>
+          <!-- 播放进度 红色 -->
           <div
             class="player-progress-bg"
             :style="{ transform: `translateX(-${100 - getPlayProgress}%)` }"
           >
-            <!-- 滑轨小圆点 -->
+            <!-- 小圆点 -->
             <div class="player-progress-point"></div>
           </div>
         </div>
@@ -281,6 +286,7 @@ export default {
       mouseMoveProgress: '', // 鼠标在进度条的位置 0~100
       mouseMoveX: '', // 鼠标在进度条的位置 X轴
       progress: '', // 播放进度 0~100
+      cacheProgress: '', // 已经缓存的进度
       audioLength: '', // 音频总长度
       audioRef: '', // 元素节点引用
       volumeProgress: 30, // 音量 0~100
@@ -289,7 +295,7 @@ export default {
   },
 
   mounted () {
-    console.log('@mounted')
+    console.log('mounted')
     //
     //
     // 监听调整音量
@@ -310,7 +316,6 @@ export default {
     document.addEventListener('mouseup', () => {
       document.removeEventListener('mousemove', volumeMouseMove)
     })
-
     //
     //
     // 监听音频进度
@@ -333,10 +338,6 @@ export default {
       this.mouseMoveX = mouseX // 保存X坐标
     }
     playerProgressRef.addEventListener('mousemove', ProgressMouseMove)
-  },
-
-  activated () {
-    console.log('@activated')
   },
 
   methods: {
@@ -384,7 +385,9 @@ export default {
         console.log('缓冲被打断', 'seeked')
       })
       this.audioRef.addEventListener('progress', (e) => {
-        console.log('progress', this.audioRef.buffered.end(0))
+        // 计算当前缓存进度
+        this.cacheProgress =
+          (this.audioRef.buffered.end(0) / this.audioLength) * 100
       })
       this.audioRef.addEventListener('timeupdate', (e) => {
         // 计算当前播放进度
@@ -405,6 +408,11 @@ export default {
     // 获取播放进度
     getPlayProgress () {
       return this.progress
+    },
+    // 获取缓存进度
+    getCacheProgress () {
+      console.log(this.cacheProgress)
+      return this.cacheProgress
     }
   },
 
@@ -492,16 +500,27 @@ export default {
         --progress-rail-height: 3px;
         width: 100%;
         height: var(--progress-rail-height);
-        background: #535353;
+        background: rgb(40, 40, 40);
+        position: relative;
       }
+      // 缓存进度
+      .player-progress-cache {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 1;
+        background: rgb(69, 69, 69);
+      }
+      // 播放进度
       .player-progress-bg {
         width: 100%;
         height: 100%;
         position: relative;
-        z-index: 1;
+        z-index: 2;
         background: rgba(240, 0, 0, 0.8);
         transform: translateX(-90%);
         transition: transform 0.4s;
+        // 小圆点
         .player-progress-point {
           display: none;
           --progress-point-size: 16px;
@@ -514,7 +533,7 @@ export default {
             (var(--progress-point-size) - var(--progress-rail-height)) / -2
           );
           border-radius: 50%;
-          z-index: 2;
+          z-index: 3;
         }
       }
 
@@ -525,7 +544,6 @@ export default {
         .player-progress-rail {
           width: 100%;
           height: 8px;
-          background: #535353;
           .player-progress-point {
             // display: block;
           }
