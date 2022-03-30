@@ -289,15 +289,13 @@ export default {
       cacheProgress: '', // 已经缓存的进度
       audioLength: '', // 音频总长度
       audioRef: '', // 元素节点引用
-      volumeProgress: 30, // 音量 0~100
+      volumeProgress: 1, // 音量 0~100
       playStatus: false // 音乐是否正在播放
     }
   },
 
   mounted () {
     console.log('mounted')
-    //
-    //
     // 监听调整音量
     const volumeProgressRef = this.$refs['player-volume-progress']
     // 鼠标拖动时计算调整音量
@@ -316,6 +314,7 @@ export default {
     document.addEventListener('mouseup', () => {
       document.removeEventListener('mousemove', volumeMouseMove)
     })
+    //
     //
     //
     // 监听音频进度
@@ -338,9 +337,55 @@ export default {
       this.mouseMoveX = mouseX // 保存X坐标
     }
     playerProgressRef.addEventListener('mousemove', ProgressMouseMove)
+    // 单击切换时间
+    playerProgressRef.addEventListener('mousedown', (e) => {
+      const x = e.clientX / playerProgressRef.offsetWidth
+      const curTime = this.audioLength * x
+      this.audioRef.currentTime = curTime
+    })
   },
 
   methods: {
+    // 创建audio 加载mp3
+    createAudio () {
+      this.audioRef = document.createElement('audio')
+      this.audioRef.controls = 'controls'
+      this.audioRef.preload = 'auto'
+      // this.audioRef.autoplay = 'autoplay'
+      // this.audioRef.muted = 'muted'
+      this.audioRef.src = this.$props.songUrl
+      this.audioRef.load()
+      this.audioRef.addEventListener('canplay', (e) => {
+        console.log('可以播放')
+      })
+      this.audioRef.addEventListener('play', (e) => {
+        // 开始播放
+        this.playStatus = true
+      })
+      this.audioRef.addEventListener('pause', (e) => {
+        // 暂停播放
+        this.playStatus = false
+      })
+      this.audioRef.addEventListener('durationchange', (e) => {
+        // 获取音频总时长
+        this.audioLength = this.audioRef.duration
+      })
+      this.audioRef.addEventListener('progress', (e) => {
+        // 计算当前缓存进度
+        // this.cacheProgress =
+        //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
+        let cacheLength = 0
+        for (let i = 0; i < this.audioRef.buffered.length; i++) {
+          cacheLength +=
+            this.audioRef.buffered.end(i) - this.audioRef.buffered.start(i)
+        }
+        this.cacheProgress = (cacheLength / this.audioLength) * 100
+      })
+      this.audioRef.addEventListener('timeupdate', (e) => {
+        // 计算当前播放进度
+        this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+      })
+    },
     // 开始或暂停播放
     audioPlay () {
       // 如果正在播放
@@ -352,47 +397,13 @@ export default {
         this.audioRef.play()
       }
     },
-    // 调整音量
+    // 调整音量(切换静音)
     switchVolume () {
       if (this.volumeProgress > 0) {
         this.volumeProgress = 0
       } else {
         this.volumeProgress = 30
       }
-    },
-    // 创建audio 加载mp3
-    createAudio () {
-      this.audioRef = document.createElement('audio')
-      this.audioRef.controls = 'controls'
-      // this.audioRef.autoplay = 'autoplay'
-      // this.audioRef.muted = 'muted'
-      this.audioRef.src = this.$props.songUrl
-      this.audioRef.load()
-      this.audioRef.addEventListener('canplay', (e) => {
-        console.log('可以播放')
-      })
-      this.audioRef.addEventListener('play', (e) => {
-        this.playStatus = true
-      })
-      this.audioRef.addEventListener('pause', (e) => {
-        this.playStatus = false
-      })
-      this.audioRef.addEventListener('durationchange', (e) => {
-        // 获取音频总时长
-        this.audioLength = this.audioRef.duration
-      })
-      this.audioRef.addEventListener('seeked', (e) => {
-        console.log('缓冲被打断', 'seeked')
-      })
-      this.audioRef.addEventListener('progress', (e) => {
-        // 计算当前缓存进度
-        this.cacheProgress =
-          (this.audioRef.buffered.end(0) / this.audioLength) * 100
-      })
-      this.audioRef.addEventListener('timeupdate', (e) => {
-        // 计算当前播放进度
-        this.progress = (this.audioRef.currentTime / this.audioLength) * 100
-      })
     }
   },
 
@@ -411,7 +422,6 @@ export default {
     },
     // 获取缓存进度
     getCacheProgress () {
-      console.log(this.cacheProgress)
       return this.cacheProgress
     }
   },
@@ -529,9 +539,8 @@ export default {
           background: #fff;
           position: absolute;
           right: calc(var(--progress-point-size) * -1);
-          top: calc(
-            (var(--progress-point-size) - var(--progress-rail-height)) / -2
-          );
+          top: 50%;
+          transform: translate(-50%, -50%);
           border-radius: 50%;
           z-index: 3;
         }
@@ -545,7 +554,7 @@ export default {
           width: 100%;
           height: 8px;
           .player-progress-point {
-            // display: block;
+            display: block;
           }
         }
       }
