@@ -133,26 +133,30 @@
               ></path>
             </svg>
           </button>
-          <!-- 按钮 循环播放 -->
+          <!-- 按钮 播放模式 -->
           <button
-            style="--button-size: 32px"
-            class="bQY5A9SJfdFiEvBMM6J5"
-            disabled=""
-            role="checkbox"
-            aria-checked="false"
-            aria-label="关闭循环播放"
-            data-testid="control-button-repeat"
-            aria-expanded="false"
+            @click="audioPlayTypeSwitch"
+            :class="`control-button-${audioPlayType}`"
           >
+            <!-- 默认 -->
             <svg
+              v-if="['common', 'list'].includes(audioPlayType)"
               role="img"
               height="16"
               width="16"
               viewBox="0 0 16 16"
-              class="Svg-sc-1bi12j5-0 hDgDGI"
             >
               <path
                 d="M0 4.75A3.75 3.75 0 013.75 1h8.5A3.75 3.75 0 0116 4.75v5a3.75 3.75 0 01-3.75 3.75H9.81l1.018 1.018a.75.75 0 11-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 111.06 1.06L9.811 12h2.439a2.25 2.25 0 002.25-2.25v-5a2.25 2.25 0 00-2.25-2.25h-8.5A2.25 2.25 0 001.5 4.75v5A2.25 2.25 0 003.75 12H5v1.5H3.75A3.75 3.75 0 010 9.75v-5z"
+              ></path>
+            </svg>
+            <!-- 单曲循环 -->
+            <svg v-else role="img" height="16" width="16" viewBox="0 0 16 16">
+              <path
+                d="M0 4.75A3.75 3.75 0 013.75 1h.75v1.5h-.75A2.25 2.25 0 001.5 4.75v5A2.25 2.25 0 003.75 12H5v1.5H3.75A3.75 3.75 0 010 9.75v-5zM12.25 2.5h-.75V1h.75A3.75 3.75 0 0116 4.75v5a3.75 3.75 0 01-3.75 3.75H9.81l1.018 1.018a.75.75 0 11-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 111.06 1.06L9.811 12h2.439a2.25 2.25 0 002.25-2.25v-5a2.25 2.25 0 00-2.25-2.25z"
+              ></path>
+              <path
+                d="M9.12 8V1H7.787c-.128.72-.76 1.293-1.787 1.313V3.36h1.57V8h1.55z"
               ></path>
             </svg>
           </button>
@@ -286,6 +290,7 @@ export default {
 
   data () {
     return {
+      audioPlayType: 'common', // 播放模式 如: repeat(单曲循环), common(不), list(列表播放)
       currentTimeFormat: '', // 鼠标到进度条位置对应的时间 如 3:01
       mouseMoveProgress: '', // 鼠标在进度条的位置 0~100
       mouseMoveX: '', // 鼠标在进度条的位置 X轴
@@ -371,6 +376,7 @@ export default {
       this.audioRef = document.createElement('audio')
       this.audioRef.controls = 'controls'
       this.audioRef.preload = 'auto'
+      this.audioRef.loop = false
       // this.audioRef.autoplay = 'autoplay'
       // this.audioRef.muted = 'muted'
       this.audioRef.src = this.$props.songUrl
@@ -422,6 +428,19 @@ export default {
         this.volumeProgress = 0
       } else {
         this.volumeProgress = 30
+      }
+    },
+    // 切换播放模式
+    audioPlayTypeSwitch () {
+      if (this.audioPlayType === 'common') {
+        this.audioPlayType = 'list'
+        this.audioRef.loop = false
+      } else if (this.audioPlayType === 'list') {
+        this.audioPlayType = 'repeat'
+        this.audioRef.loop = true
+      } else if (this.audioPlayType === 'repeat') {
+        this.audioPlayType = 'common'
+        this.audioRef.loop = false
       }
     }
   },
@@ -652,6 +671,33 @@ export default {
           &:hover {
             background: #ccc;
             transform: scale(1.08);
+          }
+        }
+      }
+      .player-controls-right {
+        position: relative;
+        // 列表播放
+        .control-button-list {
+          &,
+          * {
+            color: rgba(240, 0, 0, 0.8);
+          }
+          &::after {
+            content: "";
+            background-color: currentColor;
+            border-radius: 50%;
+            bottom: 0;
+            display: block;
+            height: 4px;
+            position: absolute;
+            width: 4px;
+          }
+        }
+        // 单曲循环播放
+        .control-button-repeat {
+          &,
+          * {
+            color: rgba(240, 0, 0, 0.8);
           }
         }
       }
