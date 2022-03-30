@@ -438,7 +438,13 @@ export default {
     },
     // 主页菜单切换
     homeTabsChange (val) {
-      console.log(val)
+      const routes = {
+        首页: 'home',
+        探索: 'discovery'
+      }
+      this.$router.push({
+        name: routes[val]
+      })
     },
     // fetch数据转json
     fetchToJson (url) {
