@@ -713,6 +713,11 @@ export default {
         font-size: 28px;
         font-weight: 700;
       }
+
+      a {
+        font-size: 12px;
+        color: rgb(180, 180, 180);
+      }
     }
 
     // 子菜单
