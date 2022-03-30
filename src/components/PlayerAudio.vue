@@ -2,12 +2,21 @@
   <div id="audioPlayerWrap">
     <div class="player-main">
       <!-- 进度条 -->
-      <div class="player-progress">
+      <div class="player-progress" ref="player-progress">
+        <!-- 时间提示 -->
+        <span
+          class="player-progress-hover-tips"
+          :style="{ left: `${mouseMoveX}px` }"
+          >{{ currentTimeFormat }}
+        </span>
+        <!-- 滑轨 -->
         <div class="player-progress-rail">
+          <!-- 滑轨背景 -->
           <div
             class="player-progress-bg"
             :style="{ transform: `translateX(-${100 - getPlayProgress}%)` }"
           >
+            <!-- 滑轨小圆点 -->
             <div class="player-progress-point"></div>
           </div>
         </div>
@@ -233,6 +242,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   name: 'PlayerAudio',
 
@@ -266,6 +277,9 @@ export default {
 
   data () {
     return {
+      currentTimeFormat: '', // 鼠标到进度条位置对应的时间 如 3:01
+      mouseMoveProgress: '', // 鼠标在进度条的位置 0~100
+      mouseMoveX: '', // 鼠标在进度条的位置 X轴
       progress: '', // 播放进度 0~100
       audioLength: '', // 音频总长度
       audioRef: '', // 元素节点引用
@@ -276,6 +290,8 @@ export default {
 
   mounted () {
     console.log('@mounted')
+    //
+    //
     // 监听调整音量
     const volumeProgressRef = this.$refs['player-volume-progress']
     // 鼠标拖动时计算调整音量
@@ -294,6 +310,29 @@ export default {
     document.addEventListener('mouseup', () => {
       document.removeEventListener('mousemove', volumeMouseMove)
     })
+
+    //
+    //
+    // 监听音频进度
+    const playerProgressRef = this.$refs['player-progress']
+    const ProgressMouseMove = (e) => {
+      let x = (e.clientX / playerProgressRef.offsetWidth) * 100 // 鼠标移动的百分比
+      if (x <= 1) x = 0
+      else if (x >= 99) x = 100
+      const _moment = moment.duration(this.audioLength * (x / 100), 'seconds') // moment将秒转换为格式 -> 分钟:秒
+      // 转换格式为 mm:ss
+      this.currentTimeFormat = `${
+        _moment.minutes() < 10 ? `0${_moment.minutes()}` : _moment.minutes()
+      }:${_moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()}`
+      // 获取提示显示的位置，X轴坐标
+      let mouseX = e.clientX
+      const mouseXMin = 30
+      const mouseXmax = playerProgressRef.offsetWidth - 30
+      if (mouseX < mouseXMin) mouseX = mouseXMin
+      else if (mouseX > mouseXmax) mouseX = mouseXmax
+      this.mouseMoveX = mouseX // 保存X坐标
+    }
+    playerProgressRef.addEventListener('mousemove', ProgressMouseMove)
   },
 
   activated () {
@@ -425,20 +464,35 @@ export default {
     position: relative;
     // 进度条
     .player-progress {
+      // 透明区域高度
+      --player-progress-height: 36px;
       width: 100%;
-      height: 24px; // 透明区域，鼠标进入后可以调整进度条
+      // 透明区域，鼠标进入后可以调整进度条
+      height: var(--player-progress-height);
       background: transparent;
       position: absolute;
-      top: -6px;
+      top: calc(var(--player-progress-height) / -2);
       left: 0;
       z-index: 2;
+      display: flex;
+      align-items: center;
       cursor: pointer;
+      .player-progress-hover-tips {
+        display: none;
+        position: absolute;
+        top: 4px;
+        left: 50%;
+        padding: 4px 8px;
+        border-radius: 2px;
+        background: rgb(33, 33, 33);
+        font-size: 12px;
+        transform: translate3d(-50%, -100%, 0);
+      }
       .player-progress-rail {
         --progress-rail-height: 3px;
         width: 100%;
         height: var(--progress-rail-height);
         background: #535353;
-        margin-top: 3px;
       }
       .player-progress-bg {
         width: 100%;
@@ -465,12 +519,13 @@ export default {
       }
 
       &:hover {
+        .player-progress-hover-tips {
+          display: block;
+        }
         .player-progress-rail {
-          --progress-rail-height: 8px;
           width: 100%;
-          height: var(--progress-rail-height);
+          height: 8px;
           background: #535353;
-          margin-top: 1px;
           .player-progress-point {
             // display: block;
           }
