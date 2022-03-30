@@ -3,8 +3,8 @@
     <header>
       <nav>
         <div class="logo">
-          <img src="../assets/logo.png" alt="" />
-          Music
+          <img src="../assets/logo_m.png" alt="" />
+          <h2>Music</h2>
         </div>
         <SubTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
         <div class="avatar">
@@ -626,13 +626,20 @@ export default {
       .logo {
         width: 100px;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         font-weight: bold;
 
         img {
-          height: 34px;
-          width: 34px;
+          max-height: 28px;
+          max-width: 28px;
           margin: 0 4px 0 0;
+        }
+        span {
+          display: inline-block;
+        }
+        h2{
+          font-size: 28px;
+          line-height: 1;
         }
       }
 

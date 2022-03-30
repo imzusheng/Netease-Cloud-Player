@@ -8,7 +8,9 @@ Vue.config.productionTip = false
 
 // fix NavigationDuplicated: Avoided redundant navigation to current location
 const originalPush = VueRouter.prototype.push
-VueRouter.prototype.push = location => originalPush.call(this, location).catch((err) => err)
+VueRouter.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch((err) => err)
+}
 
 new Vue({
   router,
