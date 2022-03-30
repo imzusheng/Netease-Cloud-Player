@@ -2,7 +2,11 @@
   <div id="audioPlayerWrap">
     <div class="player-main">
       <!-- 进度条 -->
-      <div class="player-progress" ref="player-progress">
+      <div
+        class="player-progress"
+        ref="player-progress"
+        :class="{ 'player-seeking': audioSeeking }"
+      >
         <!-- 时间提示 -->
         <span
           class="player-progress-hover-tips"
@@ -289,6 +293,7 @@ export default {
       cacheProgress: '', // 已经缓存的进度
       audioLength: '', // 音频总长度
       audioRef: '', // 元素节点引用
+      audioSeeking: false, // 是否正在调整视频(拖动进度条)
       volumeProgress: 1, // 音量 0~100
       playStatus: false // 音乐是否正在播放
     }
@@ -298,7 +303,7 @@ export default {
     console.log('mounted')
     // 监听调整音量
     const volumeProgressRef = this.$refs['player-volume-progress']
-    // 鼠标拖动时计算调整音量
+    // 事件 -> 鼠标拖动时计算调整音量
     const volumeMouseMove = (e) => {
       let x = e.clientX - volumeProgressRef.offsetLeft
       if (x <= 0) x = 0
@@ -310,16 +315,13 @@ export default {
     volumeProgressRef.addEventListener('mousedown', () => {
       document.addEventListener('mousemove', volumeMouseMove)
     })
-    // 鼠标松开时，停止监听鼠标移动
-    document.addEventListener('mouseup', () => {
-      document.removeEventListener('mousemove', volumeMouseMove)
-    })
     //
     //
     //
     // 监听音频进度
     const playerProgressRef = this.$refs['player-progress']
-    const ProgressMouseMove = (e) => {
+    // 事件 -> 鼠标在进度条上方移动时显示当前时间
+    const progressMousedMove = (e) => {
       let x = (e.clientX / playerProgressRef.offsetWidth) * 100 // 鼠标移动的百分比
       if (x <= 1) x = 0
       else if (x >= 99) x = 100
@@ -336,12 +338,30 @@ export default {
       else if (mouseX > mouseXmax) mouseX = mouseXmax
       this.mouseMoveX = mouseX // 保存X坐标
     }
-    playerProgressRef.addEventListener('mousemove', ProgressMouseMove)
-    // 单击切换时间
-    playerProgressRef.addEventListener('mousedown', (e) => {
+    // 鼠标拖拽进度条时
+    const progressMousedrag = (e) => {
       const x = e.clientX / playerProgressRef.offsetWidth
       const curTime = this.audioLength * x
       this.audioRef.currentTime = curTime
+    }
+    const progressMouseEvent = (e) => {
+      progressMousedMove(e)
+      progressMousedrag(e)
+    }
+    // 鼠标移动时显示鼠标所在的时间点
+    playerProgressRef.addEventListener('mousemove', progressMousedMove)
+    // 在进度条按下鼠标时,监听鼠标移动
+    playerProgressRef.addEventListener('mousedown', (e) => {
+      this.audioSeeking = true
+      // 单击切换时间
+      progressMousedrag(e)
+      document.addEventListener('mousemove', progressMouseEvent)
+    })
+    // 鼠标松开时，停止监听鼠标移动
+    document.addEventListener('mouseup', () => {
+      this.audioSeeking = false
+      document.removeEventListener('mousemove', volumeMouseMove)
+      document.removeEventListener('mousemove', progressMouseEvent)
     })
   },
 
@@ -355,25 +375,24 @@ export default {
       // this.audioRef.muted = 'muted'
       this.audioRef.src = this.$props.songUrl
       this.audioRef.load()
-      this.audioRef.addEventListener('canplay', (e) => {
-        console.log('可以播放')
-      })
+      // 开始播放
       this.audioRef.addEventListener('play', (e) => {
-        // 开始播放
         this.playStatus = true
       })
+      // 暂停播放
       this.audioRef.addEventListener('pause', (e) => {
-        // 暂停播放
         this.playStatus = false
       })
+      // 获取音频总时长
       this.audioRef.addEventListener('durationchange', (e) => {
-        // 获取音频总时长
         this.audioLength = this.audioRef.duration
       })
+      // 计算当前缓存进度
       this.audioRef.addEventListener('progress', (e) => {
-        // 计算当前缓存进度
+        // 方法1
         // this.cacheProgress =
         //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
+        // 方法2
         let cacheLength = 0
         for (let i = 0; i < this.audioRef.buffered.length; i++) {
           cacheLength +=
@@ -381,8 +400,8 @@ export default {
         }
         this.cacheProgress = (cacheLength / this.audioLength) * 100
       })
+      // 计算当前播放进度
       this.audioRef.addEventListener('timeupdate', (e) => {
-        // 计算当前播放进度
         this.progress = (this.audioRef.currentTime / this.audioLength) * 100
       })
     },
@@ -446,6 +465,13 @@ export default {
   height: 72px;
   background: rgba(24, 24, 24, 1);
   box-shadow: 0px 0px 1px rgba(255, 255, 255, 1);
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
   // 通用按钮
   button {
     width: 32px;
@@ -529,7 +555,7 @@ export default {
         z-index: 2;
         background: rgba(240, 0, 0, 0.8);
         transform: translateX(-90%);
-        transition: transform 0.4s;
+        // transition: transform 0.4s;
         // 小圆点
         .player-progress-point {
           display: none;
@@ -556,6 +582,19 @@ export default {
           .player-progress-point {
             display: block;
           }
+        }
+      }
+    }
+    // 正在拖动状态的进度条
+    .player-seeking {
+      .player-progress-hover-tips {
+        display: block;
+      }
+      .player-progress-rail {
+        width: 100%;
+        height: 8px;
+        .player-progress-point {
+          display: block;
         }
       }
     }
