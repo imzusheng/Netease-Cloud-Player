@@ -358,6 +358,7 @@ export default {
     // 在进度条按下鼠标时,监听鼠标移动
     playerProgressRef.addEventListener('mousedown', (e) => {
       this.audioSeeking = true
+      this.audioRef.muted = true
       // 单击切换时间
       progressMousedrag(e)
       document.addEventListener('mousemove', progressMouseEvent)
@@ -365,6 +366,7 @@ export default {
     // 鼠标松开时，停止监听鼠标移动
     document.addEventListener('mouseup', () => {
       this.audioSeeking = false
+      this.audioRef.muted = false
       document.removeEventListener('mousemove', volumeMouseMove)
       document.removeEventListener('mousemove', progressMouseEvent)
     })
