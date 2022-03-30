@@ -290,6 +290,13 @@ export default {
 
   data () {
     return {
+      songInfo: {
+        name: '',
+        artisis: '',
+        pubTime: '',
+        poster: '',
+        songUrl: ''
+      },
       audioPlayType: 'common', // 播放模式 如: repeat(单曲循环), common(不), list(列表播放)
       currentTimeFormat: '', // 鼠标到进度条位置对应的时间 如 3:01
       mouseMoveProgress: '', // 鼠标在进度条的位置 0~100
@@ -299,31 +306,39 @@ export default {
       audioLength: '', // 音频总长度
       audioRef: '', // 元素节点引用
       audioSeeking: false, // 是否正在调整视频(拖动进度条)
-      volumeProgress: 1, // 音量 0~100
+      volumeProgress: 0, // 音量 0~100
       playStatus: false // 音乐是否正在播放
     }
   },
 
   mounted () {
     console.log('mounted')
-    // 监听调整音量
+    /**
+     * 调整音量
+     */
+    this.volumeProgress = localStorage.getItem('volumeProgress') || 50
     const volumeProgressRef = this.$refs['player-volume-progress']
-    // 事件 -> 鼠标拖动时计算调整音量
+    // 1.鼠标拖动时计算调整音量
     const volumeMouseMove = (e) => {
       let x = e.clientX - volumeProgressRef.offsetLeft
       if (x <= 0) x = 0
       else if (x >= 100) x = 100
-      this.audioRef.volume = x / 100
       this.volumeProgress = x // 0~100区间的音量值
+      this.updateVolume()
     }
-    // 鼠标按下时，监听鼠标移动
+    const volumeMouseMoveHandle = (e) => {
+      volumeMouseMove(e)
+      document.removeEventListener('mousemove', volumeMouseMove)
+      document.removeEventListener('mouseup', volumeMouseMoveHandle)
+    }
+    // 2.鼠标按下时，监听鼠标移动 -------------------------------------开始调整进度条
     volumeProgressRef.addEventListener('mousedown', () => {
       document.addEventListener('mousemove', volumeMouseMove)
+      document.addEventListener('mouseup', volumeMouseMoveHandle) // ---------------------------结束调整进度条
     })
-    //
-    //
-    //
-    // 监听音频进度
+    /**
+     * 调整音乐播放进度
+     */
     const playerProgressRef = this.$refs['player-progress']
     // 1.鼠标在进度条上方移动时显示当前时间
     const progressMousedMove = (e) => {
@@ -386,6 +401,8 @@ export default {
       // this.audioRef.muted = 'muted'
       this.audioRef.src = this.$props.songUrl
       this.audioRef.load()
+      // 同步音量
+      this.updateVolume()
       // 开始播放
       this.audioRef.addEventListener('play', (e) => {
         this.playStatus = true
@@ -432,8 +449,14 @@ export default {
       if (this.volumeProgress > 0) {
         this.volumeProgress = 0
       } else {
-        this.volumeProgress = 30
+        this.volumeProgress = localStorage.getItem('volumeProgress') || 50
       }
+      this.updateVolume()
+    },
+    // 更新音量
+    updateVolume () {
+      localStorage.setItem('volumeProgress', this.volumeProgress)
+      this.audioRef.volume = this.volumeProgress / 100
     },
     // 切换播放模式
     audioPlayTypeSwitch () {
@@ -473,7 +496,9 @@ export default {
     // 监听props中url是否传入且不为undefined
     '$props.songUrl': {
       handler (url) {
-        if (url) this.createAudio()
+        if (url) {
+          this.createAudio()
+        }
       }
     }
   }
