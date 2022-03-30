@@ -1,3 +1,12 @@
+<!--
+localStorage:
+1.progress
+2.audioLength
+3.currentTime
+4.volumeProgress
+5.songUrl
+-->
+
 <template>
   <div id="audioPlayerWrap">
     <div class="player-main">
@@ -290,25 +299,28 @@ export default {
 
   data () {
     return {
-      songInfo: {
-        name: '',
-        artisis: '',
-        pubTime: '',
-        poster: '',
-        songUrl: ''
-      },
       audioPlayType: 'common', // 播放模式 如: repeat(单曲循环), common(不), list(列表播放)
       currentTimeFormat: '', // 鼠标到进度条位置对应的时间 如 3:01
       mouseMoveProgress: '', // 鼠标在进度条的位置 0~100
       mouseMoveX: '', // 鼠标在进度条的位置 X轴
       progress: '', // 播放进度 0~100
-      cacheProgress: '', // 已经缓存的进度
       audioLength: '', // 音频总长度
+      cacheProgress: '', // 已经缓存的进度
       audioRef: '', // 元素节点引用
       audioSeeking: false, // 是否正在调整视频(拖动进度条)
       volumeProgress: 0, // 音量 0~100
-      playStatus: false // 音乐是否正在播放
+      playStatus: false, // 音乐是否正在播放
+      currentTime: '' // 刷新时恢复播放进度
     }
+  },
+
+  created () {
+    this.volumeProgress = localStorage.getItem('volumeProgress') || 50
+    this.audioLength = localStorage.getItem('audioLength')
+    this.currentTime = localStorage.getItem('currentTime')
+    this.progress = localStorage.getItem('progress')
+    const songUrlProp = localStorage.getItem('songUrl')
+    if (songUrlProp && !this.audioRef) this.createAudio(songUrlProp)
   },
 
   mounted () {
@@ -316,7 +328,6 @@ export default {
     /**
      * 调整音量
      */
-    this.volumeProgress = localStorage.getItem('volumeProgress') || 50
     const volumeProgressRef = this.$refs['player-volume-progress']
     // 1.鼠标拖动时计算调整音量
     const volumeMouseMove = (e) => {
@@ -392,14 +403,15 @@ export default {
 
   methods: {
     // 创建audio 加载mp3
-    createAudio () {
+    createAudio (url) {
       this.audioRef = document.createElement('audio')
       this.audioRef.controls = 'controls'
       this.audioRef.preload = 'auto'
       this.audioRef.loop = false
       // this.audioRef.autoplay = 'autoplay'
       // this.audioRef.muted = 'muted'
-      this.audioRef.src = this.$props.songUrl
+      this.audioRef.src = url
+      this.audioRef.currentTime = this.currentTime || 0
       this.audioRef.load()
       // 同步音量
       this.updateVolume()
@@ -431,6 +443,10 @@ export default {
       // 计算当前播放进度
       this.audioRef.addEventListener('timeupdate', (e) => {
         this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+        // 保存进度到localStorage
+        localStorage.setItem('progress', this.progress)
+        localStorage.setItem('audioLength', this.audioLength)
+        localStorage.setItem('currentTime', this.audioRef.currentTime)
       })
     },
     // 开始或暂停播放
@@ -448,10 +464,11 @@ export default {
     switchVolume () {
       if (this.volumeProgress > 0) {
         this.volumeProgress = 0
+        this.audioRef.volume = this.volumeProgress / 100
       } else {
         this.volumeProgress = localStorage.getItem('volumeProgress') || 50
+        this.updateVolume()
       }
-      this.updateVolume()
     },
     // 更新音量
     updateVolume () {
@@ -496,8 +513,9 @@ export default {
     // 监听props中url是否传入且不为undefined
     '$props.songUrl': {
       handler (url) {
-        if (url) {
-          this.createAudio()
+        if (url && !this.audioRef) {
+          localStorage.setItem('songUrl', url)
+          this.createAudio(url)
         }
       }
     }
