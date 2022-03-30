@@ -353,6 +353,14 @@ export default {
       progressMousedMove(e)
       progressMousedrag(e)
     }
+    const removeEvents = () => {
+      this.audioSeeking = false
+      this.audioRef.muted = false
+      this.audioRef.play()
+      document.removeEventListener('mousemove', volumeMouseMove)
+      document.removeEventListener('mousemove', progressMouseEvent)
+      document.removeEventListener('mouseup', removeEvents)
+    }
     // 鼠标移动时显示鼠标所在的时间点
     playerProgressRef.addEventListener('mousemove', progressMousedMove)
     // 在进度条按下鼠标时,监听鼠标移动
@@ -363,14 +371,8 @@ export default {
       // 单击切换时间
       progressMousedrag(e)
       document.addEventListener('mousemove', progressMouseEvent)
-    })
-    // 鼠标松开时，停止监听鼠标移动
-    document.addEventListener('mouseup', () => {
-      this.audioSeeking = false
-      this.audioRef.muted = false
-      this.audioRef.play()
-      document.removeEventListener('mousemove', volumeMouseMove)
-      document.removeEventListener('mousemove', progressMouseEvent)
+      // 鼠标松开时，停止监听鼠标移动
+      document.addEventListener('mouseup', removeEvents)
     })
   },
 

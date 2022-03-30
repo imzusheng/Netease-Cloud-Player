@@ -402,12 +402,12 @@ export default {
     }
   },
   created () {
-    // this.getCommunity()
-    // this.getRecommend()
-    // this.getRecords()
-    // this.getNewsong()
-    // this.getMv()
-    // this.getHotArtists()
+    this.getCommunity()
+    this.getRecommend()
+    this.getRecords()
+    this.getNewsong()
+    this.getMv()
+    this.getHotArtists()
     this.getRedirect()
   },
   mounted () {},
