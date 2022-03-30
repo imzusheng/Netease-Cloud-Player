@@ -1,0 +1,590 @@
+<template>
+  <div id="audioPlayerWrap">
+    <div class="player-main">
+      <!-- 进度条 -->
+      <div class="player-progress">
+        <div class="player-progress-rail">
+          <div
+            class="player-progress-bg"
+            :style="{ transform: `translateX(-${100 - getPlayProgress}%)` }"
+          >
+            <div class="player-progress-point"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 歌曲信息 -->
+      <div class="player-song">
+        <div>
+          <img :src="poster" alt="" />
+        </div>
+        <div class="player-song-desc">
+          <p>{{ name }}</p>
+          <p>
+            {{ artisis }} •
+            {{ pubTime }}
+          </p>
+        </div>
+      </div>
+      <!-- 中控 -->
+      <div class="player-controls">
+        <div class="player-controls-left">
+          <button
+            style="--button-size: 32px"
+            role="switch"
+            aria-checked="false"
+            aria-label="开启随机播放"
+            data-testid="control-button-shuffle"
+            aria-expanded="false"
+          >
+            <svg
+              role="img"
+              height="16"
+              width="16"
+              viewBox="0 0 16 16"
+              class="Svg-sc-1bi12j5-0 hDgDGI"
+            >
+              <path
+                d="M13.151.922a.75.75 0 10-1.06 1.06L13.109 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5H0V14h.391a3.75 3.75 0 002.873-1.34l6.173-7.356a2.25 2.25 0 011.724-.804h1.947l-1.017 1.018a.75.75 0 001.06 1.06L15.98 3.75 13.15.922zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 00.39 3.5z"
+              ></path>
+              <path
+                d="M7.5 10.723l.98-1.167.957 1.14a2.25 2.25 0 001.724.804h1.947l-1.017-1.018a.75.75 0 111.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 11-1.06-1.06L13.109 13H11.16a3.75 3.75 0 01-2.873-1.34l-.787-.938z"
+              ></path>
+            </svg>
+          </button>
+          <button
+            style="--button-size: 32px"
+            class="FKTganvAaWqgK6MUhbkx"
+            disabled=""
+            aria-label="上一首"
+            aria-expanded="false"
+          >
+            <svg
+              role="img"
+              height="16"
+              width="16"
+              viewBox="0 0 16 16"
+              class="Svg-sc-1bi12j5-0 hDgDGI"
+            >
+              <path
+                d="M3.3 1a.7.7 0 01.7.7v5.15l9.95-5.744a.7.7 0 011.05.606v12.575a.7.7 0 01-1.05.607L4 9.149V14.3a.7.7 0 01-.7.7H1.7a.7.7 0 01-.7-.7V1.7a.7.7 0 01.7-.7h1.6z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="player-controls-center">
+          <button @click="audioPlay">
+            <!-- 开始 -->
+            <svg
+              v-if="getPlayStatus"
+              role="img"
+              height="16"
+              width="16"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M2.7 1a.7.7 0 00-.7.7v12.6a.7.7 0 00.7.7h2.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7H2.7zm8 0a.7.7 0 00-.7.7v12.6a.7.7 0 00.7.7h2.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-2.6z"
+              ></path>
+            </svg>
+            <!-- 暂停 -->
+            <svg v-else role="img" height="16" width="16" viewBox="0 0 16 16">
+              <path
+                d="M3 1.713a.7.7 0 011.05-.607l10.89 6.288a.7.7 0 010 1.212L4.05 14.894A.7.7 0 013 14.288V1.713z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="player-controls-right">
+          <!-- 按钮 下一首 -->
+          <button
+            style="--button-size: 32px"
+            class="ARtnAVxkbmzyEjniZXVO"
+            disabled=""
+            aria-label="下一首"
+            data-testid="control-button-skip-forward"
+            aria-expanded="false"
+          >
+            <svg
+              role="img"
+              height="16"
+              width="16"
+              viewBox="0 0 16 16"
+              class="Svg-sc-1bi12j5-0 hDgDGI"
+            >
+              <path
+                d="M12.7 1a.7.7 0 00-.7.7v5.15L2.05 1.107A.7.7 0 001 1.712v12.575a.7.7 0 001.05.607L12 9.149V14.3a.7.7 0 00.7.7h1.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-1.6z"
+              ></path>
+            </svg>
+          </button>
+          <!-- 按钮 循环播放 -->
+          <button
+            style="--button-size: 32px"
+            class="bQY5A9SJfdFiEvBMM6J5"
+            disabled=""
+            role="checkbox"
+            aria-checked="false"
+            aria-label="关闭循环播放"
+            data-testid="control-button-repeat"
+            aria-expanded="false"
+          >
+            <svg
+              role="img"
+              height="16"
+              width="16"
+              viewBox="0 0 16 16"
+              class="Svg-sc-1bi12j5-0 hDgDGI"
+            >
+              <path
+                d="M0 4.75A3.75 3.75 0 013.75 1h8.5A3.75 3.75 0 0116 4.75v5a3.75 3.75 0 01-3.75 3.75H9.81l1.018 1.018a.75.75 0 11-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 111.06 1.06L9.811 12h2.439a2.25 2.25 0 002.25-2.25v-5a2.25 2.25 0 00-2.25-2.25h-8.5A2.25 2.25 0 001.5 4.75v5A2.25 2.25 0 003.75 12H5v1.5H3.75A3.75 3.75 0 010 9.75v-5z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- 调整音量 -->
+      <div class="player-volume">
+        <div>
+          <!-- 单击切换静音 -->
+          <button @click="switchVolume">
+            <!-- 静音icon -->
+            <svg
+              v-if="volumeProgress === 0"
+              role="presentation"
+              height="16"
+              width="16"
+              aria-label="Volume off"
+              id="volume-icon"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M13.86 5.47a.75.75 0 00-1.061 0l-1.47 1.47-1.47-1.47A.75.75 0 008.8 6.53L10.269 8l-1.47 1.47a.75.75 0 101.06 1.06l1.47-1.47 1.47 1.47a.75.75 0 001.06-1.06L12.39 8l1.47-1.47a.75.75 0 000-1.06z"
+              ></path>
+              <path
+                d="M10.116 1.5A.75.75 0 008.991.85l-6.925 4a3.642 3.642 0 00-1.33 4.967 3.639 3.639 0 001.33 1.332l6.925 4a.75.75 0 001.125-.649v-1.906a4.73 4.73 0 01-1.5-.694v1.3L2.817 9.852a2.141 2.141 0 01-.781-2.92c.187-.324.456-.594.78-.782l5.8-3.35v1.3c.45-.313.956-.55 1.5-.694V1.5z"
+              ></path>
+            </svg>
+            <!-- 低音量icon -->
+            <svg
+              v-else-if="volumeProgress <= 25"
+              role="presentation"
+              height="16"
+              width="16"
+              aria-label="Volume low"
+              id="volume-icon"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"
+              ></path>
+            </svg>
+            <!-- 中音量icon -->
+            <svg
+              v-else-if="volumeProgress <= 75"
+              role="presentation"
+              height="16"
+              width="16"
+              aria-label="Volume medium"
+              id="volume-icon"
+              viewBox="0 0 16 16"
+              class="Svg-sc-1bi12j5-0 hDgDGI"
+            >
+              <path
+                d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 6.087a4.502 4.502 0 000-8.474v1.65a2.999 2.999 0 010 5.175v1.649z"
+              ></path>
+            </svg>
+            <!-- 高音量icon -->
+            <svg
+              v-else
+              role="presentation"
+              height="16"
+              width="16"
+              aria-label="Volume high"
+              id="volume-icon"
+              viewBox="0 0 16 16"
+              class="Svg-sc-1bi12j5-0 hDgDGI"
+            >
+              <path
+                d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"
+              ></path>
+              <path
+                d="M11.5 13.614a5.752 5.752 0 000-11.228v1.55a4.252 4.252 0 010 8.127v1.55z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <!-- 音量调整滑轨 -->
+        <div class="player-volume-progress" ref="player-volume-progress">
+          <!-- 滑轨小圆点 -->
+          <div
+            class="player-volume-point"
+            :style="{ transform: `translateX(${getVolumeProgress})` }"
+          ></div>
+          <!-- 滑轨背景 s -->
+          <div class="player-progress-bg">
+            <!-- 滑轨前景 s -->
+            <div
+              class="player-progress-fg"
+              :style="{ transform: `translateX(${getVolumeProgress})` }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'PlayerAudio',
+
+  props: {
+    name: {
+      // 歌曲名
+      type: String,
+      required: true
+    },
+    poster: {
+      // 封面url
+      type: String,
+      required: true
+    },
+    artisis: {
+      // 作者
+      type: String,
+      required: true
+    },
+    pubTime: {
+      // 发布时间
+      type: [String, Number],
+      required: true
+    },
+    songUrl: {
+      // MP3链接
+      type: String,
+      required: true
+    }
+  },
+
+  data () {
+    return {
+      progress: '', // 播放进度 0~100
+      audioLength: '', // 音频总长度
+      audioRef: '', // 元素节点引用
+      volumeProgress: 30, // 音量 0~100
+      playStatus: false // 音乐是否正在播放
+    }
+  },
+
+  mounted () {
+    console.log('@mounted')
+    // 监听调整音量
+    const volumeProgressRef = this.$refs['player-volume-progress']
+    // 鼠标拖动时计算调整音量
+    const volumeMouseMove = (e) => {
+      let x = e.clientX - volumeProgressRef.offsetLeft
+      if (x <= 0) x = 0
+      else if (x >= 100) x = 100
+      this.audioRef.volume = x / 100
+      this.volumeProgress = x // 0~100区间的音量值
+    }
+    // 鼠标按下时，监听鼠标移动
+    volumeProgressRef.addEventListener('mousedown', () => {
+      document.addEventListener('mousemove', volumeMouseMove)
+    })
+    // 鼠标松开时，停止监听鼠标移动
+    document.addEventListener('mouseup', () => {
+      document.removeEventListener('mousemove', volumeMouseMove)
+    })
+  },
+
+  activated () {
+    console.log('@activated')
+  },
+
+  methods: {
+    // 开始或暂停播放
+    audioPlay () {
+      // 如果正在播放
+      if (this.playStatus) {
+        this.playStatus = false
+        this.audioRef.pause()
+      } else {
+        this.playStatus = true
+        this.audioRef.play()
+      }
+    },
+    // 调整音量
+    switchVolume () {
+      if (this.volumeProgress > 0) {
+        this.volumeProgress = 0
+      } else {
+        this.volumeProgress = 30
+      }
+    },
+    // 创建audio 加载mp3
+    createAudio () {
+      this.audioRef = document.createElement('audio')
+      this.audioRef.controls = 'controls'
+      // this.audioRef.autoplay = 'autoplay'
+      // this.audioRef.muted = 'muted'
+      this.audioRef.src = this.$props.songUrl
+      this.audioRef.load()
+      this.audioRef.addEventListener('canplay', (e) => {
+        console.log('可以播放')
+      })
+      this.audioRef.addEventListener('play', (e) => {
+        this.playStatus = true
+      })
+      this.audioRef.addEventListener('pause', (e) => {
+        this.playStatus = false
+      })
+      this.audioRef.addEventListener('durationchange', (e) => {
+        // 获取音频总时长
+        this.audioLength = this.audioRef.duration
+      })
+      this.audioRef.addEventListener('seeked', (e) => {
+        console.log('缓冲被打断', 'seeked')
+      })
+      this.audioRef.addEventListener('progress', (e) => {
+        console.log('progress', this.audioRef.buffered.end(0))
+      })
+      this.audioRef.addEventListener('timeupdate', (e) => {
+        // 计算当前播放进度
+        this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+      })
+    }
+  },
+
+  computed: {
+    // 获取音量值
+    getVolumeProgress () {
+      return `${this.volumeProgress - 100}px`
+    },
+    // 获取播放状态
+    getPlayStatus () {
+      return this.playStatus
+    },
+    // 获取播放进度
+    getPlayProgress () {
+      return this.progress
+    }
+  },
+
+  watch: {
+    // 监听props中url是否传入且不为undefined
+    '$props.songUrl': {
+      handler (url) {
+        if (url) this.createAudio()
+      }
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+#audioPlayerWrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: rgba(24, 24, 24, 1);
+  box-shadow: 0px 0px 1px rgba(255, 255, 255, 1);
+  // 通用按钮
+  button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 8px;
+    cursor: pointer;
+    * {
+      color: #535353;
+      transition: color 0.2s;
+    }
+    svg {
+      fill: currentcolor;
+      height: 16px;
+      width: 16px;
+    }
+    &:hover {
+      * {
+        color: #ccc;
+      }
+    }
+  }
+  .player-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 24px 0 12px;
+    box-sizing: border-box;
+    position: relative;
+    // 进度条
+    .player-progress {
+      width: 100%;
+      height: 24px; // 透明区域，鼠标进入后可以调整进度条
+      background: transparent;
+      position: absolute;
+      top: -6px;
+      left: 0;
+      z-index: 2;
+      cursor: pointer;
+      .player-progress-rail {
+        --progress-rail-height: 3px;
+        width: 100%;
+        height: var(--progress-rail-height);
+        background: #535353;
+        margin-top: 3px;
+      }
+      .player-progress-bg {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 1;
+        background: rgba(240, 0, 0, 0.8);
+        transform: translateX(-90%);
+        transition: transform 0.4s;
+        .player-progress-point {
+          display: none;
+          --progress-point-size: 16px;
+          height: var(--progress-point-size);
+          width: var(--progress-point-size);
+          background: #fff;
+          position: absolute;
+          right: calc(var(--progress-point-size) * -1);
+          top: calc(
+            (var(--progress-point-size) - var(--progress-rail-height)) / -2
+          );
+          border-radius: 50%;
+          z-index: 2;
+        }
+      }
+
+      &:hover {
+        .player-progress-rail {
+          --progress-rail-height: 8px;
+          width: 100%;
+          height: var(--progress-rail-height);
+          background: #535353;
+          margin-top: 1px;
+          .player-progress-point {
+            // display: block;
+          }
+        }
+      }
+    }
+    // 歌曲信息
+    .player-song {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      > div {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        img {
+          height: 48px;
+          border-radius: 3px;
+          margin-right: 12px;
+          cursor: pointer;
+        }
+        &[class="player-song-desc"] {
+          p:hover {
+            cursor: pointer;
+            text-decoration: underline;
+          }
+          p:first-child {
+            font-size: 14px;
+          }
+          p:last-child {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+          }
+        }
+      }
+    }
+    // 控制按钮
+    .player-controls {
+      display: flex;
+      justify-content: center;
+      flex: 1;
+      > div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &[class="player-controls-center"] {
+          border-radius: 50%;
+          background: #535353;
+          margin: 0 12px;
+          transition: all 0.2s;
+          * {
+            color: #141414;
+          }
+          button {
+            margin: 0;
+          }
+          &:hover {
+            background: #ccc;
+            transform: scale(1.08);
+          }
+        }
+      }
+    }
+    // 音量控制
+    .player-volume {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      .player-volume-progress {
+        height: 12px;
+        width: 100px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        .hidden-label {
+          visibility: hidden;
+          width: 0;
+          height: 0;
+        }
+        .player-volume-point {
+          height: 12px;
+          width: 12px;
+          background: #f2f2f2;
+          border-radius: 50%;
+          position: absolute;
+          right: -6px;
+          left: 94px;
+          z-index: 100;
+          cursor: pointer;
+        }
+        .player-progress-bg {
+          width: 100px;
+          height: 4px;
+          border-radius: 4px;
+          position: relative;
+          background: #535353;
+          overflow: hidden;
+          .player-progress-fg {
+            height: 100%;
+            width: 100%;
+            transform: translateX(-100%);
+            background: #ffffff;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
