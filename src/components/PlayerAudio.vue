@@ -325,7 +325,7 @@ export default {
     //
     // 监听音频进度
     const playerProgressRef = this.$refs['player-progress']
-    // 事件 -> 鼠标在进度条上方移动时显示当前时间
+    // 1.鼠标在进度条上方移动时显示当前时间
     const progressMousedMove = (e) => {
       let x = (e.clientX / playerProgressRef.offsetWidth) * 100 // 鼠标移动的百分比
       if (x <= 1) x = 0
@@ -343,36 +343,35 @@ export default {
       else if (mouseX > mouseXmax) mouseX = mouseXmax
       this.mouseMoveX = mouseX // 保存X坐标
     }
-    // 鼠标拖拽进度条时
+    // 2.鼠标拖拽进度条时
     const progressMousedrag = (e) => {
       const x = e.clientX / playerProgressRef.offsetWidth
       const curTime = this.audioLength * x
       this.audioRef.currentTime = curTime
     }
-    const progressMouseEvent = (e) => {
+    // 3.鼠标移动时调用(1)显示当前事件
+    playerProgressRef.addEventListener('mousemove', progressMousedMove)
+    // 4.一起调用,因为拖动的同时还要显示当前事件
+    const mousemoveHandle = (e) => {
       progressMousedMove(e)
       progressMousedrag(e)
     }
-    const removeEvents = () => {
-      this.audioSeeking = false
-      this.audioRef.muted = false
-      this.audioRef.play()
-      document.removeEventListener('mousemove', volumeMouseMove)
-      document.removeEventListener('mousemove', progressMouseEvent)
-      document.removeEventListener('mouseup', removeEvents)
-    }
-    // 鼠标移动时显示鼠标所在的时间点
-    playerProgressRef.addEventListener('mousemove', progressMousedMove)
-    // 在进度条按下鼠标时,监听鼠标移动
-    playerProgressRef.addEventListener('mousedown', (e) => {
-      this.audioSeeking = true
-      this.audioRef.muted = true
-      this.audioRef.pause()
-      // 单击切换时间
-      progressMousedrag(e)
-      document.addEventListener('mousemove', progressMouseEvent)
-      // 鼠标松开时，停止监听鼠标移动
-      document.addEventListener('mouseup', removeEvents)
+    // 5.在进度条按下鼠标时 -------------------------------------开始调整进度条
+    playerProgressRef.addEventListener('mousedown', () => {
+      const paused = !!this.audioRef.paused // 视频是否正在暂停状态,用来保存当前状态.调整完成后恢复为当前状态
+      const mouseupHandle = (e) => {
+        progressMousedrag(e) // 单击时触发,因为单击没有触发mousemove
+        document.removeEventListener('mousemove', mousemoveHandle)
+        document.removeEventListener('mouseup', mouseupHandle)
+        this.audioSeeking = false
+        this.audioRef.muted = false
+        if (!paused) this.audioRef.play() // 如果调整前时播放状态,那就继续播放
+      }
+      this.audioSeeking = true // 调整时标记状态为调整中(seeking)
+      this.audioRef.muted = true // 静音
+      this.audioRef.pause() // 暂停歌曲
+      document.addEventListener('mousemove', mousemoveHandle) // 监听鼠标移动
+      document.addEventListener('mouseup', mouseupHandle) // 监听鼠标松开 ---------------------------结束调整进度条
     })
   },
 
