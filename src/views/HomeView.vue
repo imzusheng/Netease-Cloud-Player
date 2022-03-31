@@ -26,8 +26,8 @@
     <!-- 模板 -->
     <section
       class="section-common"
-      v-for="sectionItem in sectionScreen"
-      :key="`section-${sectionItem.id}`"
+      v-for="(sectionItem, sectionIndex) in sectionScreen"
+      :key="`section-${sectionIndex}`"
     >
       <div class="section-common-title">
         <div>
@@ -41,8 +41,9 @@
       <ul class="section-common-list">
         <li
           v-for="(listItem, listKey) in listData[sectionItem.li.source]"
-          :key="`${sectionItem.id}-${listKey}`"
+          :key="`${sectionIndex}-${listKey}`"
           :class="`${sectionItem.li.class}`"
+          @click="toPlaylistDetail(listItem.payload)"
         >
           <figure>
             <span><img :src="listItem.picUrl" alt="" /></span>
@@ -249,11 +250,7 @@ export default {
   },
 
   mounted () {
-    console.log('mounted')
-  },
-
-  activated () {
-    console.log('activated')
+    this.subTabsChange('推荐')
   },
 
   methods: {
@@ -267,6 +264,16 @@ export default {
           curApi.key.forEach((path) => (data = data[path]))
           this.listData.dj = data
         })
+      })
+    },
+    // 点击歌单
+    toPlaylistDetail (payload) {
+      this.$router.push({
+        name: 'playlist',
+        query: {
+          type: 'playlist',
+          id: payload
+        }
       })
     }
   },
@@ -282,7 +289,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .section-common {
   padding: 32px 40px 56px;
 

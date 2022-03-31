@@ -1,7 +1,11 @@
 <!-- 大标题下的tabs组件 -->
 <template>
   <ul class="sub-tabs">
-    <li v-for="(item, index) in sourceData.list" :key="`tabs${index}`">
+    <li
+      v-for="(item, index) in sourceData.list"
+      :key="`tabs${index}`"
+      @click="tabsChange(item.title)"
+    >
       <input
         type="radio"
         :id="item.id"
@@ -24,11 +28,12 @@ export default {
   },
   props: ['sourceData'],
   mounted () {
+    // 默认选中
     this.tabsChecked = this.$props.sourceData.checked
   },
-  watch: {
-    tabsChecked (newVal) {
-      this.$emit('change', newVal)
+  methods: {
+    tabsChange (payload) {
+      this.$emit('change', payload)
     }
   }
 }

@@ -8,6 +8,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    loading: false, // 全局加载动画
     userInfo: {
       code: 200,
       account: {
@@ -195,11 +196,17 @@ export default new Vuex.Store({
         '很想当天的一切能回味',
         '想<b>你</b>想<b>你</b>苦<b>痛</b>'
       ]
-    }
+    },
+    curPlaylistColor: '0, 0, 0, 1', // 当前主题颜色
+    curPlaylist: {}
   },
   getters: {
     userInfo: state => state.userInfo,
-    songUrl: state => state.curSong.songUrl
+    songUrl: state => state.curSong.songUrl,
+    playlistName: state => state.curPlaylist.name,
+    playlistPicUrl: state => state.curPlaylist.coverImgUrl,
+    playlistCreatorName: state => state.curPlaylist.creator?.nickname ?? '',
+    playlistTags: state => state.curPlaylist.tags ? state.curPlaylist.tags.join(' • ') : ''
   },
   mutations: {},
   actions: {
@@ -216,6 +223,7 @@ export default new Vuex.Store({
           resolve(resJson.playlists.map((v) => {
             v.picUrl = v.coverImgUrl
             v.desc1 = v.trackCount + '首音乐'
+            v.payload = v.id
             return v
           }))
         })
@@ -228,6 +236,7 @@ export default new Vuex.Store({
           resolve(resJson.result.map((v) => {
             v.desc1 = moment(v.trackNumberUpdateTime).format('M月DD日')
             v.desc2 = v.trackCount + '首音乐'
+            v.payload = v.id
             return v
           }))
         })
@@ -281,6 +290,14 @@ export default new Vuex.Store({
             return v
           }))
         })
+      })
+    },
+    // 获取歌单详情
+    getPlaylistDetail ({ state }, id) {
+      state.loading = true
+      fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
+        Vue.set(state, 'curPlaylist', resJson.playlist)
+        state.loading = false
       })
     }
   },

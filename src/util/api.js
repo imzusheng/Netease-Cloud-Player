@@ -11,6 +11,8 @@ export default {
   GET_RECOMMENDS_MV: `${API_ROOT}/personalized/mv`,
   // 热门歌手
   GET_HOT_ARTISTS: `${API_ROOT}/top/artists?offset=0&limit=6`,
+  // 歌单详情
+  GET_PLAYLIST_DETAIL: `${API_ROOT}/playlist/detail`,
   // 需要登录
   AUTH: {
     GET_RECORDS: `${API_ROOT}/user/record?type=1`

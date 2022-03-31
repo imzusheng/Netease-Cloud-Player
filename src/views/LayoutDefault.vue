@@ -1,5 +1,8 @@
 <template>
-  <div id="layout-default">
+  <div
+    id="layout-default"
+    :style="{ '--color-playlist': $store.state.curPlaylistColor }"
+  >
     <header>
       <nav>
         <div class="logo">
@@ -12,7 +15,10 @@
           <!-- <span>{{ userInfo.profile.nickname }}</span> -->
         </div>
       </nav>
+      <div class="header-mask"></div>
+      <div class="header-bg-mask"></div>
     </header>
+    <GlobalLoading v-if="$store.state.loading" />
     <router-view></router-view>
     <PlayerAudio
       :name="$store.state.curSong.name"
@@ -27,6 +33,7 @@
 <script>
 import SubTabs from '@/components/SubTabs'
 import PlayerAudio from '@/components/PlayerAudio'
+import GlobalLoading from '@/components/GlobalLoading'
 import { pickUpName } from '@/util'
 import moment from 'moment'
 
@@ -35,7 +42,8 @@ export default {
 
   components: {
     SubTabs,
-    PlayerAudio
+    PlayerAudio,
+    GlobalLoading
   },
 
   data () {
@@ -98,31 +106,58 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 #layout-default {
+  --color-playlist: "0, 0, 0, 1";
   width: 100%;
   min-height: 100vh;
   position: relative;
-  background-color: rgba(0, 0, 0, 1);
+  background-color: rgba(var(--color-playlist));
+  transition: background 0.65s;
+  // background: rgb(8, 64, 64);
+  // background: rgb(152, 64, 64);
+
   header {
     height: 52px;
     padding: 8px 16px;
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: #000;
+    transition: background 0.65s;
 
-    &::after {
-      content: "";
+    .header-mask {
       position: absolute;
-      top: 68px;
+      top: 0;
       left: 0;
-      height: 1px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      z-index: 2;
-      transform: scaleY(0.25);
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      background-color: rgba(0, 0, 0, 0.6);
+      opacity: 0;
     }
+
+    .header-bg-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -2;
+      background-color: rgba(var(--color-playlist));
+    }
+
+    // 头部导航栏下的白边
+    // &::after {
+    //   content: "";
+    //   position: absolute;
+    //   top: 68px;
+    //   left: 0;
+    //   height: 1px;
+    //   width: 100%;
+    //   background: rgba(255, 255, 255, 0.4);
+    //   z-index: 2;
+    //   transform: scaleY(0.25);
+    // }
 
     nav {
       width: 100%;
