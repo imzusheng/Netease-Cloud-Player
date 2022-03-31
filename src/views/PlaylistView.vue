@@ -23,6 +23,23 @@
       <div class="playlist-content-mask" ref="playlist-content-mask"></div>
       <!-- 歌单列表 -->
       <div class="playlist-content-main">
+        <div class="playlist-content-action">
+          <div>
+            <button>
+              <svg
+                role="img"
+                height="28"
+                width="28"
+                viewBox="0 0 24 24"
+                class="Svg-sc-1bi12j5-0 jgfuCe"
+              >
+                <path
+                  d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
         <!-- 列表标题 -->
         <div class="playlist-table-title" ref="playlist-table-title">
           <div>#</div>
@@ -277,10 +294,35 @@ export default {
       height: 232px;
       transition: background 0.65s;
       background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgb(18, 18, 18));
-      //   z-index: -1;
+      z-index: -1;
     }
     .playlist-content-main {
       min-height: 300px;
+      .playlist-content-action {
+        box-sizing: border-box;
+        padding: 32px 52px;
+        * {
+          color: rgba(240, 240, 240, 1);
+        }
+        > div {
+          button {
+            width: 56px;
+            height: 56px;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(240, 0, 0, 1);
+            > svg {
+              fill: currentColor;
+            }
+          }
+        }
+      }
       .playlist-table-title {
         position: sticky;
         top: 67px;

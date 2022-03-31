@@ -240,6 +240,7 @@ export default {
     this.$store.dispatch('getHotArtists').then((res) => {
       this.listData.hotArtists = res
     })
+    // TODO promise.all
     // this.$store.dispatch(
     //   'getRedirect',
     //   'https://music.163.com/song/media/outer/url?id=190360.mp3'
