@@ -15,11 +15,11 @@
           <!-- <span>{{ userInfo.profile.nickname }}</span> -->
         </div>
       </nav>
-      <div class="header-mask"></div>
+      <div class="header-mask" ref="main-header-mask"></div>
       <div class="header-bg-mask"></div>
     </header>
     <GlobalLoading v-if="$store.state.loading" />
-    <router-view></router-view>
+    <router-view v-show="!$store.state.loading"></router-view>
     <PlayerAudio
       :name="$store.state.curSong.name"
       :poster="$store.state.curSong.al.picUrl"
@@ -124,6 +124,7 @@ export default {
     top: 0;
     z-index: 1;
     transition: background 0.65s;
+    // background-color: rgba(var(--color-playlist));
 
     .header-mask {
       position: absolute;
@@ -143,6 +144,7 @@ export default {
       right: 0;
       bottom: 0;
       z-index: -2;
+      transition: background 0.65s;
       background-color: rgba(var(--color-playlist));
     }
 

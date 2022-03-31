@@ -297,6 +297,7 @@ export default new Vuex.Store({
       state.loading = true
       fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
         Vue.set(state, 'curPlaylist', resJson.playlist)
+        console.dir(resJson.playlist.tracks)
         state.loading = false
       })
     }

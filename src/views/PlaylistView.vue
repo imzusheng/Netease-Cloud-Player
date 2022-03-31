@@ -1,6 +1,7 @@
 <template>
   <div id="playlist">
-    <div class="playlist-banner">
+    <!-- 歌曲信息 banner -->
+    <div class="playlist-banner" ref="playlist-banner">
       <div class="playlist-banner-content">
         <div class="playlist-banner-poster">
           <img :src="$store.getters.playlistPicUrl" alt="" />
@@ -18,23 +19,85 @@
       </div>
     </div>
     <div class="playlist-content">
-      <div class="playlist-content-mask"></div>
-      <di class="playlist-content-main">123321</di>
+      <!-- 颜色过渡遮罩 -->
+      <div class="playlist-content-mask" ref="playlist-content-mask"></div>
+      <!-- 歌单列表 -->
+      <div class="playlist-content-main">
+        <!-- 列表标题 -->
+        <div class="playlist-table-title" ref="playlist-table-title">
+          <div>#</div>
+          <div>标题</div>
+          <div>专辑</div>
+          <div>发布时间</div>
+          <div>时长</div>
+        </div>
+        <!-- 表格 -->
+        <ul class="playlist-table-content">
+          <li
+            v-for="(listItem, listIndex) in $store.state.curPlaylist.tracks"
+            :key="`playlist${listIndex}`"
+          >
+            <div>{{ listIndex + 1 }}</div>
+            <div class="table-cell-desc">
+              <img :src="listItem.al.picUrl" alt="" />
+              <div>
+                <div>{{ listItem.name }}</div>
+                <div>{{ getName(listItem.ar) }}</div>
+              </div>
+            </div>
+            <div>{{ listItem.al.name }}</div>
+            <div>{{ getPubTime(listItem.publishTime) }}</div>
+            <div>{{ getSongDt(listItem.dt) }}</div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { pickUpName } from '@/util'
+import moment from 'moment'
+
+let playlistMaskRef
+let playlistBannerRef
+let headerMaskRef
+let playlistTitleRef
+let targetHeight
+// 卸载外面是为了退出页面时移除监听 removeEventListener
+const scrollHandle = () => {
+  const curScrollTop = document.documentElement.scrollTop
+  let curValue, curBgColor
+  if (targetHeight > curScrollTop) {
+    curValue = 1 - (targetHeight - curScrollTop) / targetHeight
+    curBgColor = `rgba(24,24,24,${curValue})`
+  } else {
+    curValue = 1
+    curBgColor = `rgba(24,24,24,${1})`
+  }
+  headerMaskRef.style.opacity = curValue
+  playlistTitleRef.style.backgroundColor = curBgColor
+}
+
 export default {
   name: 'PlaylistView',
 
   data () {
     return {}
   },
-
   mounted () {
     const { id } = this.$route.query
     this.$store.dispatch('getPlaylistDetail', id)
+
+    playlistMaskRef = this.$refs['playlist-content-mask']
+    playlistBannerRef = this.$refs['playlist-banner']
+    headerMaskRef = this.$parent.$refs['main-header-mask']
+    playlistTitleRef = this.$refs['playlist-table-title']
+    // 动画长度 = banner区域高度 + 遮罩高度 - 顶部栏高度
+    targetHeight =
+      playlistBannerRef.clientHeight + playlistMaskRef.clientHeight - 68
+    // 监听滚动条事件 目的为了驱动header遮罩透明度变化
+    document.addEventListener('scroll', scrollHandle)
   },
 
   methods: {
@@ -59,6 +122,30 @@ export default {
         i += 4
       }
       return color
+    }
+  },
+
+  computed: {
+    getName () {
+      return function (name) {
+        return pickUpName(name)
+      }
+    },
+    getPubTime () {
+      return function (time) {
+        if (!time) return '未知'
+        else return moment(time).format('YYYY')
+      }
+    },
+    getSongDt () {
+      return function (time) {
+        const _moment = moment.duration(time)
+        return `${
+          _moment.minutes() < 10 ? `0${_moment.minutes()}` : _moment.minutes()
+        }:${
+          _moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
+        }`
+      }
     }
   },
 
@@ -103,6 +190,7 @@ export default {
   beforeRouteLeave (to, from, next) {
     this.$store.state.curPlaylistColor = '0, 0, 0, 1'
     this.$store.state.curPlaylist = {}
+    document.removeEventListener('scroll', scrollHandle)
     next()
   }
 }
@@ -177,9 +265,9 @@ export default {
   }
   .playlist-content {
     width: 100%;
-    min-height: 1000px;
+    padding-bottom: 16px;
     position: relative;
-    background: #121212;
+    background: rgb(18, 18, 18);
     .playlist-content-mask {
       position: absolute;
       top: 0;
@@ -188,14 +276,87 @@ export default {
       background-color: rgba(var(--color-playlist));
       height: 232px;
       transition: background 0.65s;
-      background-image: linear-gradient(rgba(0, 0, 0, 0.6), #121212);
-      //   background-color: rgb(8, 64, 64);
-      //   background-color: rgb(152, 64, 64);
+      background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgb(18, 18, 18));
+      //   z-index: -1;
     }
     .playlist-content-main {
-      position: sticky;
-      top: 68px;
-      z-index: 2;
+      min-height: 300px;
+      .playlist-table-title {
+        position: sticky;
+        top: 67px;
+        display: grid;
+        grid-gap: 16px;
+        grid-template-columns:
+          [index] 16px
+          [first] 6fr
+          [var1] 4fr
+          [var2] 3fr
+          [last] minmax(120px, 1fr);
+        background: transparent;
+        z-index: 2;
+        padding: 0 68px;
+        border-bottom: 1px solid rgba(200, 200, 200, 0.2);
+        > div {
+          padding: 12px 0;
+          color: #b3b3b3;
+          font-size: 16px;
+          &:last-child {
+            text-align: right;
+            margin-right: 32px;
+          }
+        }
+      }
+      .playlist-table-content {
+        padding: 0 52px;
+        > li {
+          * {
+            color: #b3b3b3;
+          }
+          display: grid;
+          grid-gap: 16px;
+          grid-template-columns:
+            [index] 16px
+            [first] 6fr
+            [var1] 4fr
+            [var2] 3fr
+            [last] minmax(120px, 1fr);
+          padding: 0 16px;
+          > div {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            &:last-child {
+              justify-content: flex-end;
+              margin-right: 32px;
+            }
+          }
+          // 歌曲信息
+          .table-cell-desc {
+            img {
+              height: 54px;
+              width: 54px;
+              margin-right: 18px;
+            }
+            > div {
+              display: grid;
+              grid-template: "title title" "badges subtitle" / auto 1fr;
+              > div {
+                &:first-child {
+                  grid-area: title;
+                  font-size: 16px;
+                  color: #fff;
+                }
+                &:last-child {
+                  grid-column-start: badges;
+                  grid-area: subtitle;
+                  font-size: 15px;
+                  color: #b3b3b3;
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
