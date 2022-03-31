@@ -1,137 +1,109 @@
 <template>
-  <div id="home">
-    <header>
-      <nav>
-        <div class="logo">
-          <img src="../assets/logo_m.png" alt="" />
-          <h2>Music</h2>
+  <main id="home">
+    <!-- 热门歌曲 -->
+    <section class="section-common">
+      <div class="section-common-title">
+        <div>
+          <p>为你准备的新曲</p>
+          <h2>专属推荐</h2>
         </div>
-        <SubTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
-        <div class="avatar">
-          <img :src="$store.getters.userInfo.profile.avatarUrl" alt="" />
-          <!-- <span>{{ userInfo.profile.nickname }}</span> -->
+        <div>
+          <a href="#">查看更多</a>
         </div>
-      </nav>
-    </header>
-    <main>
-      <!-- 热门歌曲 -->
-      <section class="section-common">
-        <div class="section-common-title">
-          <div>
-            <p>为你准备的新曲</p>
-            <h2>专属推荐</h2>
-          </div>
-          <div>
-            <a href="#">查看更多</a>
-          </div>
+      </div>
+      <ul class="section-newSong-list">
+        <li v-for="rmdItem in listData.recommendPerson" :key="rmdItem.id">
+          <figure>
+            <img :src="rmdItem.picUrl" alt="" />
+            <div class="section-newSong-desc">
+              <p>{{ rmdItem.name }}</p>
+              <p>{{ rmdItem.desc2 }}</p>
+            </div>
+          </figure>
+        </li>
+      </ul>
+    </section>
+    <!-- 模板 -->
+    <section
+      class="section-common"
+      v-for="sectionItem in sectionScreen"
+      :key="`section-${sectionItem.id}`"
+    >
+      <div class="section-common-title">
+        <div>
+          <p>{{ sectionItem.subTitle }}</p>
+          <h2>{{ sectionItem.title }}</h2>
         </div>
-        <ul class="section-newSong-list">
-          <li v-for="rmdItem in listData.recommendPerson" :key="rmdItem.id">
-            <figure>
+        <div>
+          <a href="#">查看更多</a>
+        </div>
+      </div>
+      <ul class="section-common-list">
+        <li
+          v-for="(listItem, listKey) in listData[sectionItem.li.source]"
+          :key="`${sectionItem.id}-${listKey}`"
+          :class="`${sectionItem.li.class}`"
+        >
+          <figure>
+            <span><img :src="listItem.picUrl" alt="" /></span>
+            <p>{{ listItem.name }}</p>
+            <p>
+              {{ listItem.desc1 }}
+              {{ listItem.desc2 ? ` ${sectionItem.li.join} ` : "" }}
+              {{ listItem.desc2 || "" }}
+            </p>
+          </figure>
+        </li>
+      </ul>
+    </section>
+    <!-- 电台 -->
+    <section class="section-common">
+      <div class="section-common-title sub-title">
+        <div>
+          <h2>电台</h2>
+        </div>
+        <div>
+          <SubTabs :sourceData="config.dj.djTabsData" @change="subTabsChange" />
+        </div>
+      </div>
+      <ul class="section-common-list">
+        <li v-for="rmdItem in listData.dj" :key="rmdItem.id">
+          <figure v-if="config.dj.type === '推荐'">
+            <span>
               <img :src="rmdItem.picUrl" alt="" />
-              <div class="section-newSong-desc">
-                <p>{{ rmdItem.name }}</p>
-                <p>{{ rmdItem.desc2 }}</p>
-              </div>
-            </figure>
-          </li>
-        </ul>
-      </section>
-      <!-- 模板 -->
-      <section
-        class="section-common"
-        v-for="sectionItem in sectionScreen"
-        :key="`section-${sectionItem.id}`"
-      >
-        <div class="section-common-title">
-          <div>
-            <p>{{ sectionItem.subTitle }}</p>
-            <h2>{{ sectionItem.title }}</h2>
-          </div>
-          <div>
-            <a href="#">查看更多</a>
-          </div>
-        </div>
-        <ul class="section-common-list">
-          <li
-            v-for="(listItem, listKey) in listData[sectionItem.li.source]"
-            :key="`${sectionItem.id}-${listKey}`"
-            :class="`${sectionItem.li.class}`"
-          >
-            <figure>
-              <span><img :src="listItem.picUrl" alt="" /></span>
-              <p>{{ listItem.name }}</p>
-              <p>
-                {{ listItem.desc1 }}
-                {{ listItem.desc2 ? ` ${sectionItem.li.join} ` : "" }}
-                {{ listItem.desc2 || "" }}
-              </p>
-            </figure>
-          </li>
-        </ul>
-      </section>
-      <!-- 电台 -->
-      <section class="section-common">
-        <div class="section-common-title sub-title">
-          <div>
-            <h2>电台</h2>
-          </div>
-          <div>
-            <SubTabs
-              :sourceData="config.dj.djTabsData"
-              @change="subTabsChange"
-            />
-          </div>
-        </div>
-        <ul class="section-common-list">
-          <li v-for="rmdItem in listData.dj" :key="rmdItem.id">
-            <figure v-if="config.dj.type === '推荐'">
-              <span>
-                <img :src="rmdItem.picUrl" alt="" />
-              </span>
-              <p>{{ rmdItem.name }}</p>
-              <p>{{ rmdItem.lastProgramName }}</p>
-            </figure>
-            <figure v-else-if="config.dj.type === '热门'">
-              <span> <img :src="rmdItem.picUrl" alt="" /></span>
-              <p>{{ rmdItem.name }}</p>
-              <p>{{ rmdItem.copywriter }}</p>
-            </figure>
-            <figure v-else-if="config.dj.type === '新晋热榜'">
-              <span> <img :src="rmdItem.picUrl" alt="" /></span>
-              <p>{{ rmdItem.name }}</p>
-              <p>{{ rmdItem.rcmdtext }}</p>
-            </figure>
-            <figure v-else-if="config.dj.type === '最热主播'">
-              <span> <img :src="rmdItem.avatarUrl" alt="" /></span>
-              <p>{{ rmdItem.nickName }}</p>
-            </figure>
-          </li>
-        </ul>
-      </section>
-    </main>
-    <PlayerAudio
-      :name="$store.state.curSong.name"
-      :poster="$store.state.curSong.al.picUrl"
-      :artisis="getPickupName($store.state.curSong.ar)"
-      :pubTime="getPubTime($store.state.curSong.publishTime)"
-      :songUrl="$store.state.curSong.songUrl"
-    ></PlayerAudio>
-  </div>
+            </span>
+            <p>{{ rmdItem.name }}</p>
+            <p>{{ rmdItem.lastProgramName }}</p>
+          </figure>
+          <figure v-else-if="config.dj.type === '热门'">
+            <span> <img :src="rmdItem.picUrl" alt="" /></span>
+            <p>{{ rmdItem.name }}</p>
+            <p>{{ rmdItem.copywriter }}</p>
+          </figure>
+          <figure v-else-if="config.dj.type === '新晋热榜'">
+            <span> <img :src="rmdItem.picUrl" alt="" /></span>
+            <p>{{ rmdItem.name }}</p>
+            <p>{{ rmdItem.rcmdtext }}</p>
+          </figure>
+          <figure v-else-if="config.dj.type === '最热主播'">
+            <span> <img :src="rmdItem.avatarUrl" alt="" /></span>
+            <p>{{ rmdItem.nickName }}</p>
+          </figure>
+        </li>
+      </ul>
+    </section>
+  </main>
 </template>
 
 <script>
 import SubTabs from '@/components/SubTabs'
-import PlayerAudio from '@/components/PlayerAudio'
-import { pickUpName } from '@/util'
-import moment from 'moment'
 
 export default {
   name: 'HomeView',
   components: {
-    SubTabs,
-    PlayerAudio
+    SubTabs
   },
+
   data () {
     return {
       // section分类数据
@@ -194,29 +166,6 @@ export default {
       ],
       // 菜单配置
       config: {
-        volumeProgress: 30,
-        homeTabsData: {
-          name: 'home',
-          checked: '首页',
-          list: [
-            {
-              id: 'home-tabs-tj',
-              title: '首页'
-            },
-            {
-              id: 'home-tabs-rm',
-              title: '探索'
-            },
-            {
-              id: 'home-tabs-xj',
-              title: '媒体库'
-            },
-            {
-              id: 'home-tabs-zb',
-              title: '搜索'
-            }
-          ]
-        },
         dj: {
           type: '推荐',
           api: {
@@ -273,6 +222,7 @@ export default {
       }
     }
   },
+
   created () {
     this.$store.dispatch('getCommunity').then((res) => {
       this.listData.community = res
@@ -289,14 +239,23 @@ export default {
     this.$store.dispatch('getHotArtists').then((res) => {
       this.listData.hotArtists = res
     })
-    this.$store.dispatch(
-      'getRedirect',
-      'https://music.163.com/song/media/outer/url?id=190360.mp3'
-    )
+    // this.$store.dispatch(
+    //   'getRedirect',
+    //   'https://music.163.com/song/media/outer/url?id=190360.mp3'
+    // )
     // this.$store.dispatch('getRecords').then((res) => {
     //   this.listData.records = res
     // })
   },
+
+  mounted () {
+    console.log('mounted')
+  },
+
+  activated () {
+    console.log('activated')
+  },
+
   methods: {
     // 小菜单切换
     subTabsChange (val) {
@@ -309,31 +268,10 @@ export default {
           this.listData.dj = data
         })
       })
-    },
-    // 主页菜单切换
-    homeTabsChange (val) {
-      const routes = {
-        首页: 'home',
-        探索: 'discovery'
-      }
-      this.$router.push({
-        name: routes[val]
-      })
     }
   },
+
   computed: {
-    // 提取歌手名字(拼接数组)
-    getPickupName () {
-      return function (artists, Separator = '/') {
-        return pickUpName(artists, Separator)
-      }
-    },
-    // player获取时间
-    getPubTime () {
-      return function (timeStamp) {
-        return moment(timeStamp).format('YYYY')
-      }
-    },
     // section筛选 无数据时不显示
     sectionScreen () {
       return this.sectionData.filter(
@@ -345,340 +283,201 @@ export default {
 </script>
 
 <style lang="less">
-#home {
-  width: 100%;
-  min-height: 100vh;
-  position: relative;
-  background-color: rgba(0, 0, 0, 1);
+.section-common {
+  padding: 32px 40px 56px;
 
-  #main-bg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1),
-      rgba(0, 0, 0, 0.6)
-    );
-  }
+  // 标题
+  .section-common-title {
+    padding: 0 12px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 
-  #main-img {
-    position: absolute;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    opacity: 0.6;
-    object-fit: cover;
-  }
-
-  header {
-    height: 52px;
-    padding: 8px 16px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #000;
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 68px;
-      left: 0;
-      height: 1px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      z-index: 2;
-      transform: scaleY(0.25);
+    p {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.6);
     }
 
-    nav {
-      width: 100%;
-      height: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      div {
-        font-size: 24px;
-        font-weight: 500;
-      }
-
-      .logo {
-        width: 100px;
-        display: flex;
-        align-items: center;
-        font-weight: bold;
-
-        img {
-          max-height: 28px;
-          max-width: 28px;
-          margin: 0 4px 0 0;
-        }
-        span {
-          display: inline-block;
-        }
-        h2 {
-          font-size: 28px;
-          line-height: 1;
-        }
-      }
-
-      ul {
-        display: flex;
-        padding: 0;
-
-        li {
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 20px;
-          font-weight: 500;
-          padding: 0 22px;
-
-          &:first-child {
-            color: #fff;
-          }
-        }
-      }
-
-      .avatar {
-        display: flex;
-        align-items: center;
-        width: 100px;
-        justify-content: flex-end;
-
-        img {
-          height: 30px;
-          width: 30px;
-          border-radius: 50%;
-          margin: -2px 6px 0 0;
-        }
-
-        span {
-          font-size: 14px;
-        }
-      }
-
-      @media screen and (max-width: 768px) {
-        & {
-          ul li {
-            padding: 0 16px;
-          }
-
-          .avatar {
-            width: auto;
-          }
-        }
-      }
-
-      @media screen and (max-width: 768px) {
-        & {
-          ul li {
-            padding: 0 10px;
-          }
-
-          .avatar {
-            width: auto;
-          }
-        }
-      }
-    }
-  }
-
-  .section-common {
-    padding: 32px 40px 56px;
-
-    // 标题
-    .section-common-title {
-      padding: 0 12px;
-      margin-bottom: 16px;
+    h2 {
       line-height: 1.5;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    a {
+      font-size: 12px;
+      color: rgb(180, 180, 180);
+    }
+  }
+
+  // 子菜单
+  .sub-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  // 列表
+  ul[class="section-common-list"] {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+
+    li {
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+      width: calc(100% / 6);
+      padding: 0 12px;
+      box-sizing: border-box;
+
+      img {
+        border-radius: 12px;
+        width: 100%;
+      }
+
+      figure span::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        transition: all 0.3s;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0),
+          rgba(0, 0, 0, 0.7)
+        );
+      }
+
+      &:hover figure span::after {
+        opacity: 1;
+      }
 
       p {
         font-size: 14px;
-        font-weight: 400;
-        color: rgba(255, 255, 255, 0.6);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:last-child {
+          text-decoration: none;
+          color: rgba(255, 255, 255, 0.7);
+        }
       }
 
-      h2 {
-        line-height: 1.5;
-        font-size: 28px;
-        font-weight: 700;
-      }
+      &[class="section-mv-item"] {
+        width: 25%;
 
-      a {
-        font-size: 12px;
-        color: rgb(180, 180, 180);
-      }
-    }
-
-    // 子菜单
-    .sub-title {
-      display: flex;
-      align-items: flex-end;
-      justify-content: flex-start;
-    }
-
-    // 列表
-    ul[class="section-common-list"] {
-      display: flex;
-      overflow: hidden;
-      width: 100%;
-
-      li {
-        flex-shrink: 0;
-        cursor: pointer;
-        position: relative;
-        width: calc(100% / 6);
-        padding: 0 12px;
-        box-sizing: border-box;
-
-        img {
+        figure {
+          background: rgba(24, 24, 24, 1);
           border-radius: 12px;
-          width: 100%;
-        }
+          padding: 16px;
 
-        figure span::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          opacity: 0;
-          transition: all 0.3s;
-          background: linear-gradient(
-            to top,
-            rgba(0, 0, 0, 0),
-            rgba(0, 0, 0, 0.7)
-          );
-        }
-
-        &:hover figure span::after {
-          opacity: 1;
-        }
-
-        p {
-          font-size: 14px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-
-          &:last-child {
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.7);
-          }
-        }
-
-        &[class="section-mv-item"] {
-          width: 25%;
-
-          figure {
-            background: rgba(24, 24, 24, 1);
-            border-radius: 12px;
-            padding: 16px;
-
-            img {
-              width: 100%;
-              height: 190px;
-              object-fit: cover;
-              margin-bottom: 10px;
-              box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 24px 0px;
-            }
-          }
-
-          @media screen and (max-width: 1068px) {
-            width: 33.33%;
-          }
-
-          @media screen and (max-width: 968px) {
-            width: 50%;
+          img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 24px 0px;
           }
         }
 
         @media screen and (max-width: 1068px) {
-          width: calc(100% / 5);
-          padding: 0 10px;
+          width: 33.33%;
         }
 
         @media screen and (max-width: 968px) {
-          width: calc(100% / 4);
-          padding: 0 8px;
-        }
-
-        @media screen and (max-width: 768px) {
-          width: calc(100% / 3);
-          padding: 0 8px;
+          width: 50%;
         }
       }
 
-      .posterRound {
-        figure {
-          background: #181818;
-          border-radius: 12px;
-          padding: 12px 12px 24px;
-          img {
-            border-radius: 50%;
-          }
-          p {
-            text-align: center;
-          }
-        }
+      @media screen and (max-width: 1068px) {
+        width: calc(100% / 5);
+        padding: 0 10px;
       }
-    }
 
-    ul[class="section-newSong-list"] {
-      display: flex;
-      flex-wrap: wrap;
-      li {
-        box-sizing: border-box;
+      @media screen and (max-width: 968px) {
+        width: calc(100% / 4);
+        padding: 0 8px;
+      }
+
+      @media screen and (max-width: 768px) {
         width: calc(100% / 3);
-        margin-bottom: 12px;
-        padding: 0 12px;
-        cursor: pointer;
-        figure {
-          padding: 4px;
-          box-sizing: border-box;
+        padding: 0 8px;
+      }
+    }
+
+    .posterRound {
+      figure {
+        background: #181818;
+        border-radius: 12px;
+        padding: 12px 12px 24px;
+        img {
+          border-radius: 50%;
+        }
+        p {
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  ul[class="section-newSong-list"] {
+    display: flex;
+    flex-wrap: wrap;
+    li {
+      box-sizing: border-box;
+      width: calc(100% / 3);
+      margin-bottom: 12px;
+      padding: 0 12px;
+      cursor: pointer;
+      figure {
+        padding: 4px;
+        box-sizing: border-box;
+        border-radius: 6px;
+        width: 100%;
+        display: flex;
+        transition: all 0.2s;
+        &:hover {
+          background: #141414;
+        }
+        img {
+          height: 50px;
           border-radius: 6px;
-          width: 100%;
-          display: flex;
-          transition: all 0.2s;
-          &:hover {
-            background: #141414;
-          }
-          img {
-            height: 50px;
-            border-radius: 6px;
-            margin-right: 12px;
-          }
-          .section-newSong-desc {
-            flex: 1;
+          margin-right: 12px;
+        }
+        .section-newSong-desc {
+          flex: 1;
+          overflow: hidden;
+          p {
+            white-space: nowrap;
             overflow: hidden;
-            p {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              height: 50%;
-              &:last-child {
-                font-size: 14px;
-                color: rgba(255, 255, 255, 0.5);
-              }
+            text-overflow: ellipsis;
+            height: 50%;
+            &:last-child {
+              font-size: 14px;
+              color: rgba(255, 255, 255, 0.5);
             }
           }
         }
-        @media screen and (max-width: 1068px) {
-          padding: 0 10px;
-        }
+      }
+      @media screen and (max-width: 1068px) {
+        padding: 0 10px;
+      }
 
-        @media screen and (max-width: 968px) {
-          padding: 0 8px;
-        }
+      @media screen and (max-width: 968px) {
+        padding: 0 8px;
+      }
 
-        @media screen and (max-width: 768px) {
-          padding: 0 8px;
-          width: calc(100% / 2);
-        }
+      @media screen and (max-width: 768px) {
+        padding: 0 8px;
+        width: calc(100% / 2);
       }
     }
   }
