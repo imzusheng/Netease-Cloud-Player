@@ -1,4 +1,6 @@
 <!--
+这是播放器组件，集成
+
 localStorage:
 1.progress
 2.audioLength
