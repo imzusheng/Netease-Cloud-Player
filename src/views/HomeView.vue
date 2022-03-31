@@ -31,7 +31,7 @@
               <img :src="rmdItem.picUrl" alt="" />
               <div class="section-newSong-desc">
                 <p>{{ rmdItem.name }}</p>
-                <p>{{ pickUpName(rmdItem.song.artists) }}</p>
+                <p>{{ rmdItem.desc2 }}</p>
               </div>
             </figure>
           </li>
@@ -111,11 +111,11 @@
       </section>
     </main>
     <PlayerAudio
-      :name="curSong.name"
-      :poster="curSong.al.picUrl"
-      :artisis="pickUpName(curSong.ar)"
-      :pubTime="getPubTime(curSong.publishTime)"
-      :songUrl="curSong.songUrl"
+      :name="$store.state.curSong.name"
+      :poster="$store.state.curSong.al.picUrl"
+      :artisis="getPickupName($store.state.curSong.ar)"
+      :pubTime="getPubTime($store.state.curSong.publishTime)"
+      :songUrl="$store.state.curSong.songUrl"
     ></PlayerAudio>
   </div>
 </template>
@@ -123,7 +123,7 @@
 <script>
 import SubTabs from '@/components/SubTabs'
 import PlayerAudio from '@/components/PlayerAudio'
-import API from '@/config/api'
+import { pickUpName } from '@/util'
 import moment from 'moment'
 
 export default {
@@ -134,137 +134,7 @@ export default {
   },
   data () {
     return {
-      curSong: {
-        songUrl: '',
-        name: '等你等到我心痛',
-        id: 190360,
-        pst: 0,
-        t: 0,
-        ar: [
-          {
-            id: 6460,
-            name: '张学友',
-            tns: [],
-            alias: ['Jacky Cheung'],
-            alia: ['Jacky Cheung']
-          }
-        ],
-        alia: [],
-        pop: 100,
-        st: 0,
-        rt: '',
-        fee: 8,
-        v: 38,
-        crbt: null,
-        cf: '',
-        al: {
-          id: 19237,
-          name: '等你等到我心痛 张学友精选',
-          picUrl:
-            'http://p3.music.126.net/Frx9MSEa-t_QtBLNy2GDew==/109951166860255517.jpg',
-          tns: [],
-          pic_str: '109951166860255517',
-          pic: 109951166860255520
-        },
-        dt: 255466,
-        h: {
-          br: 320000,
-          fid: 0,
-          size: 10221236,
-          vd: 675
-        },
-        m: {
-          br: 192000,
-          fid: 0,
-          size: 6132759,
-          vd: 675
-        },
-        l: {
-          br: 128000,
-          fid: 0,
-          size: 4088520,
-          vd: 675
-        },
-        a: null,
-        cd: '1',
-        no: 1,
-        rtUrl: null,
-        ftype: 0,
-        rtUrls: [],
-        djId: 0,
-        copyright: 1,
-        s_id: 0,
-        mark: 8192,
-        originCoverType: 1,
-        originSongSimpleData: null,
-        resourceState: true,
-        version: 38,
-        single: 0,
-        noCopyrightRcmd: null,
-        rtype: 0,
-        rurl: null,
-        mst: 9,
-        cp: 7003,
-        mv: 5343605,
-        publishTime: 752083200000,
-        privilege: {
-          id: 190360,
-          fee: 8,
-          payed: 0,
-          st: 0,
-          pl: 128000,
-          dl: 0,
-          sp: 7,
-          cp: 1,
-          subp: 1,
-          cs: false,
-          maxbr: 999000,
-          fl: 128000,
-          toast: false,
-          flag: 260,
-          preSell: false,
-          playMaxbr: 999000,
-          downloadMaxbr: 999000,
-          rscl: null,
-          freeTrialPrivilege: {
-            resConsumable: false,
-            userConsumable: false
-          },
-          chargeInfoList: [
-            {
-              rate: 128000,
-              chargeUrl: null,
-              chargeMessage: null,
-              chargeType: 0
-            },
-            {
-              rate: 192000,
-              chargeUrl: null,
-              chargeMessage: null,
-              chargeType: 1
-            },
-            {
-              rate: 320000,
-              chargeUrl: null,
-              chargeMessage: null,
-              chargeType: 1
-            },
-            {
-              rate: 999000,
-              chargeUrl: null,
-              chargeMessage: null,
-              chargeType: 1
-            }
-          ]
-        },
-        lyrics: [
-          '<b>等你等你等你</b>',
-          '一世一世<b>等你</b>',
-          '<b>我</b>真的真的不愿舍弃',
-          '很想当天的一切能回味',
-          '想<b>你</b>想<b>你</b>苦<b>痛</b>'
-        ]
-      },
+      // section分类数据
       sectionData: [
         {
           id: 'section-tj',
@@ -322,6 +192,7 @@ export default {
           }
         }
       ],
+      // 菜单配置
       config: {
         volumeProgress: 30,
         homeTabsData: {
@@ -390,6 +261,7 @@ export default {
           }
         }
       },
+      // 列表数据
       listData: {
         dj: [], // 电台
         hotArtists: [], // 热门歌手
@@ -402,28 +274,30 @@ export default {
     }
   },
   created () {
-    this.getCommunity()
-    this.getRecommend()
-    this.getRecords()
-    this.getNewsong()
-    this.getMv()
-    this.getHotArtists()
-    this.getRedirect()
+    this.$store.dispatch('getCommunity').then((res) => {
+      this.listData.community = res
+    })
+    this.$store.dispatch('getRecommend').then((res) => {
+      this.listData.recommends = res
+    })
+    this.$store.dispatch('getNewsong').then((res) => {
+      this.listData.recommendPerson = res
+    })
+    this.$store.dispatch('getMv').then((res) => {
+      this.listData.recommendMv = res
+    })
+    this.$store.dispatch('getHotArtists').then((res) => {
+      this.listData.hotArtists = res
+    })
+    this.$store.dispatch(
+      'getRedirect',
+      'https://music.163.com/song/media/outer/url?id=190360.mp3'
+    )
+    // this.$store.dispatch('getRecords').then((res) => {
+    //   this.listData.records = res
+    // })
   },
-  mounted () {},
   methods: {
-    // 获取重定向url(MP3url)
-    getRedirect () {
-      fetch(
-        `https://zusheng.club/api/redirect?url=${encodeURIComponent(
-          'https://music.163.com/song/media/outer/url?id=190360.mp3'
-        )}`
-      ).then((res) => {
-        res.text().then((url) => {
-          this.curSong.songUrl = url
-        })
-      })
-    },
     // 小菜单切换
     subTabsChange (val) {
       this.config.dj.type = val
@@ -445,113 +319,19 @@ export default {
       this.$router.push({
         name: routes[val]
       })
-    },
-    // fetch数据转json
-    fetchToJson (url) {
-      return new Promise((resolve, reject) => {
-        fetch(url).then((res) => {
-          res.json().then((resJson) => {
-            if (resJson.code === 200) {
-              resolve(resJson)
-            } else {
-              reject(resJson)
-            }
-          })
-        })
-      })
-    },
-    // 社区精选
-    getCommunity () {
-      this.fetchToJson(API.GET_COMMUNITY).then((resJson) => {
-        this.listData.community = resJson.playlists.map((v) => {
-          v.picUrl = v.coverImgUrl
-          v.desc1 = v.trackCount + '首音乐'
-          return v
-        })
-      })
-    },
-    // 今日推荐
-    getRecommend () {
-      this.fetchToJson(API.GET_RECOMMENDS).then((resJson) => {
-        this.listData.recommends = resJson.result.map((v) => {
-          v.desc1 = this.convertDate(v.trackNumberUpdateTime / 1000)
-          v.desc2 = v.trackCount + '首音乐'
-          return v
-        })
-      })
-    },
-    // 播放记录/最近播放
-    getRecords () {
-      this.fetchToJson(API.AUTH.GET_RECORDS).then((resJson) => {
-        this.listData.records = resJson.weekData.map((v) => {
-          console.dir(v)
-          v.desc1 = this.pickUpName(v.song.ar)
-          v.desc2 = v.song.al.name
-          v.picUrl = v.song.al.picUrl
-          return v
-        })
-      })
-    },
-    // 播放记录/最近播放
-    getNewsong () {
-      this.fetchToJson(API.GET_PERSON_NEWSONG).then((resJson) => {
-        this.listData.recommendPerson = resJson.result.map((v) => {
-          v.desc1 = v.song.album.type
-          v.desc2 = this.pickUpName(v.song.artists)
-          return v
-        })
-      })
-    },
-    // 推荐MV
-    getMv () {
-      this.fetchToJson(API.GET_RECOMMENDS_MV).then((resJson) => {
-        this.listData.recommendMv = resJson.result.map((v) => {
-          v.desc1 = v.artistName
-          v.desc2 = v.playCount + '万次播放'
-          return v
-        })
-      })
-    },
-    // 获取热门歌手
-    getHotArtists () {
-      this.fetchToJson(API.GET_HOT_ARTISTS).then((resJson) => {
-        this.listData.hotArtists = resJson.artists.map((v) => {
-          v.picUrl = v.img1v1Url
-          v.desc1 = '艺人'
-          return v
-        })
-      })
     }
   },
   computed: {
+    // 提取歌手名字(拼接数组)
+    getPickupName () {
+      return function (artists, Separator = '/') {
+        return pickUpName(artists, Separator)
+      }
+    },
     // player获取时间
     getPubTime () {
       return function (timeStamp) {
         return moment(timeStamp).format('YYYY')
-      }
-    },
-    // 时间转换
-    convertDate () {
-      return function (date) {
-        const recordDate = new Date(date * 1000)
-        // const year = recordDate.getFullYear()
-        const month = recordDate.getMonth() + 1
-        const day = recordDate.getDate()
-        // const hours = recordDate.getHours()
-        // const minutes = recordDate.getMinutes()
-        // ${hours.toString().length === 1 ? '0' + hours : hours}:${minutes.toString().length === 1 ? '0' + minutes : minutes}
-        return `${month}月${day}日`
-      }
-    },
-    // 提取歌手名字
-    pickUpName () {
-      return function (artists, Separator = '/') {
-        return artists
-          .map((n) => {
-            if (n.name) return n.name
-            else return n
-          })
-          .join(Separator)
       }
     },
     // section筛选 无数据时不显示
@@ -637,7 +417,7 @@ export default {
         span {
           display: inline-block;
         }
-        h2{
+        h2 {
           font-size: 28px;
           line-height: 1;
         }
@@ -880,8 +660,6 @@ export default {
               overflow: hidden;
               text-overflow: ellipsis;
               height: 50%;
-              display: flex;
-              align-items: center;
               &:last-child {
                 font-size: 14px;
                 color: rgba(255, 255, 255, 0.5);
