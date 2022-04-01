@@ -13,6 +13,10 @@ export default {
   GET_HOT_ARTISTS: `${API_ROOT}/top/artists?offset=0&limit=6`,
   // 歌单详情
   GET_PLAYLIST_DETAIL: `${API_ROOT}/playlist/detail`,
+  // 单曲详情
+  GET_SONG_DETAIL: `${API_ROOT}/song/detail`,
+  // 单曲url
+  GET_SONG_URL: `${API_ROOT}/song/url`,
   // 需要登录
   AUTH: {
     GET_RECORDS: `${API_ROOT}/user/record?type=1`

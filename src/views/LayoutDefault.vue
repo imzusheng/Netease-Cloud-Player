@@ -5,11 +5,14 @@
   >
     <header>
       <nav>
+        <!-- logo -->
         <div class="logo">
           <img src="../assets/logo_m.png" alt="" />
           <h2>Music</h2>
         </div>
+        <!-- 菜单 -->
         <SubTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
+        <!-- 用户头像 -->
         <div class="avatar">
           <img :src="$store.getters.userInfo.profile.avatarUrl" alt="" />
           <!-- <span>{{ userInfo.profile.nickname }}</span> -->
@@ -18,14 +21,16 @@
       <div class="header-mask" ref="main-header-mask"></div>
       <div class="header-bg-mask"></div>
     </header>
+    <!-- 加载logo -->
     <GlobalLoading v-if="$store.state.loading" />
     <router-view v-show="!$store.state.loading"></router-view>
+    <!-- 音乐播放器 -->
     <PlayerAudio
-      :name="$store.state.curSong.name"
-      :poster="$store.state.curSong.al.picUrl"
-      :artisis="getPickupName($store.state.curSong.ar)"
-      :pubTime="getPubTime($store.state.curSong.publishTime)"
-      :songUrl="$store.state.curSong.songUrl"
+      :name="$store.getters.curSongName"
+      :songUrl="$store.getters.curSongUrl"
+      :poster="$store.getters.curSongPic"
+      :artisis="getPickupName($store.getters.curSongArtisis)"
+      :pubTime="getPubTime($store.getters.curSongPubtime)"
     />
   </div>
 </template>
@@ -93,12 +98,14 @@ export default {
     // 提取歌手名字(拼接数组)
     getPickupName () {
       return function (artists, Separator = '/') {
+        if (!artists) return ''
         return pickUpName(artists, Separator)
       }
     },
     // player获取时间
     getPubTime () {
       return function (timeStamp) {
+        if (!timeStamp) return ''
         return moment(timeStamp).format('YYYY')
       }
     }

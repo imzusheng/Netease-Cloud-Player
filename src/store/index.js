@@ -198,11 +198,17 @@ export default new Vuex.Store({
       ]
     },
     curPlaylistColor: '0, 0, 0, 1', // 当前主题颜色
-    curPlaylist: {}
+    curPlaylist: {},
+    curSongurlInfo: {}, // 当前歌曲url信息，包含码率等
+    curSongInfo: {} // 当前歌曲所有信息，包含专辑作者等
   },
   getters: {
     userInfo: state => state.userInfo,
-    songUrl: state => state.curSong.songUrl,
+    curSongName: state => state.curSongInfo.name || '',
+    curSongPic: state => state.curSongInfo.al?.picUrl || '',
+    curSongUrl: state => state.curSongurlInfo.redirect || '',
+    curSongArtisis: state => state.curSongInfo.ar || null,
+    curSongPubtime: state => state.curSongInfo.publishTime || null,
     playlistName: state => state.curPlaylist.name,
     playlistPicUrl: state => state.curPlaylist.coverImgUrl,
     playlistCreatorName: state => state.curPlaylist.creator?.nickname ?? '',
@@ -213,7 +219,7 @@ export default new Vuex.Store({
     // 获取重定向url(MP3url)
     getRedirect ({ state }, url) {
       fetch(`https://zusheng.club/api/redirect?url=${encodeURIComponent(url)}`).then(async (res) => {
-        state.curSong.songUrl = await res.text()
+        state.curSongurlInfo.redirect = await res.text()
       })
     },
     // 社区精选
@@ -247,7 +253,6 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(API.AUTH.GET_RECORDS).then((resJson) => {
           resolve(resJson.weekData.map((v) => {
-            console.dir(v)
             v.desc1 = pickUpName(v.song.ar)
             v.desc2 = v.song.al.name
             v.picUrl = v.song.al.picUrl
@@ -297,8 +302,37 @@ export default new Vuex.Store({
       state.loading = true
       fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
         Vue.set(state, 'curPlaylist', resJson.playlist)
-        console.dir(resJson.playlist.tracks)
         state.loading = false
+      })
+    },
+    // 获取单曲详情
+    getSongDetail ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // 获取单曲url
+    getSongUrl ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_SONG_URL}?id=${id}`).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // 选择歌曲，并开始播放
+    selectSong ({ state }, id) {
+      state.curSongInfo = {}
+      state.curSongurlInfo = {}
+      this.dispatch('getSongDetail', id).then(res => {
+        state.curSongInfo = res.songs[0]
+        this.dispatch('getSongUrl', id).then(res => {
+          state.curSongurlInfo = res.data[0]
+          Vue.set(state.curSongurlInfo, 'redirect', state.curSongurlInfo.url)
+          // state.curSongurlInfo.redirect = state.curSongurlInfo.url
+          // this.dispatch('getRedirect', state.curSongurlInfo.url)
+        })
       })
     }
   },

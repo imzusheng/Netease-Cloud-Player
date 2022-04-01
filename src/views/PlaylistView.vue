@@ -53,8 +53,28 @@
           <li
             v-for="(listItem, listIndex) in $store.state.curPlaylist.tracks"
             :key="`playlist${listIndex}`"
+            @click="playlistSelect(listItem)"
           >
-            <div>{{ listIndex + 1 }}</div>
+            <!-- <input type="radio" /> -->
+            <!-- 序号 -->
+            <div class="table-cell-index">
+              <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
+              <span class="playlist-table-icon">
+                <svg
+                  height="32"
+                  role="img"
+                  width="32"
+                  viewBox="0 0 24 24"
+                  class="UIBT7E6ZYMcSDl1KL62g"
+                >
+                  <polygon
+                    points="21.57 12 5.98 3 5.98 21 21.57 12"
+                    fill="currentColor"
+                  ></polygon>
+                </svg>
+              </span>
+            </div>
+            <!-- 歌曲名字和作者 -->
             <div class="table-cell-desc">
               <img :src="listItem.al.picUrl" alt="" />
               <div>
@@ -62,8 +82,11 @@
                 <div>{{ getName(listItem.ar) }}</div>
               </div>
             </div>
+            <!-- 专辑名 -->
             <div>{{ listItem.al.name }}</div>
+            <!-- 发布时间 -->
             <div>{{ getPubTime(listItem.publishTime) }}</div>
+            <!-- 时长 -->
             <div>{{ getSongDt(listItem.dt) }}</div>
           </li>
         </ul>
@@ -139,6 +162,9 @@ export default {
         i += 4
       }
       return color
+    },
+    playlistSelect (data) {
+      this.$store.dispatch('selectSong', data.id)
     }
   },
 
@@ -298,6 +324,7 @@ export default {
     }
     .playlist-content-main {
       min-height: 300px;
+      // 播放栏
       .playlist-content-action {
         box-sizing: border-box;
         padding: 32px 52px;
@@ -323,6 +350,7 @@ export default {
           }
         }
       }
+      // 表格标题
       .playlist-table-title {
         position: sticky;
         top: 67px;
@@ -348,6 +376,7 @@ export default {
           }
         }
       }
+      // 表格主体
       .playlist-table-content {
         padding: 0 52px;
         > li {
@@ -363,6 +392,9 @@ export default {
             [var2] 3fr
             [last] minmax(120px, 1fr);
           padding: 0 16px;
+          border-radius: 6px;
+          cursor: pointer;
+          // li > div
           > div {
             display: flex;
             align-items: center;
@@ -370,6 +402,31 @@ export default {
             &:last-child {
               justify-content: flex-end;
               margin-right: 32px;
+            }
+          }
+          .table-cell-index {
+            justify-content: center;
+            align-items: center;
+            .playlist-table-index {
+              display: block;
+            }
+            .playlist-table-icon {
+              display: none;
+              > svg {
+                width: 16px;
+                height: 16px;
+              }
+            }
+          }
+          &:hover {
+            background: rgb(60, 60, 60);
+            .playlist-table-index {
+              display: none;
+            }
+            .playlist-table-icon {
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
           }
           // 歌曲信息

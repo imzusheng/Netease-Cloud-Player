@@ -44,13 +44,14 @@ localStorage:
       <!-- 歌曲信息 -->
       <div class="player-song">
         <div>
-          <img :src="poster" alt="" />
+          <img :src="getPoster" alt="" />
         </div>
         <div class="player-song-desc">
-          <p>{{ name }}</p>
+          <p>{{ getName }}</p>
           <p>
-            {{ artisis }} •
-            {{ pubTime }}
+            {{ getArtisis }}
+            <span v-if="getPubTime">&nbsp;•&nbsp;</span>
+            {{ getPubTime }}
           </p>
         </div>
       </div>
@@ -174,102 +175,21 @@ localStorage:
         </div>
       </div>
       <!-- 调整音量 -->
-      <div class="player-volume">
-        <div>
-          <!-- 单击切换静音 -->
-          <button @click="switchVolume">
-            <!-- 静音icon -->
-            <svg
-              v-if="volumeProgress === 0"
-              role="presentation"
-              height="16"
-              width="16"
-              aria-label="Volume off"
-              id="volume-icon"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M13.86 5.47a.75.75 0 00-1.061 0l-1.47 1.47-1.47-1.47A.75.75 0 008.8 6.53L10.269 8l-1.47 1.47a.75.75 0 101.06 1.06l1.47-1.47 1.47 1.47a.75.75 0 001.06-1.06L12.39 8l1.47-1.47a.75.75 0 000-1.06z"
-              ></path>
-              <path
-                d="M10.116 1.5A.75.75 0 008.991.85l-6.925 4a3.642 3.642 0 00-1.33 4.967 3.639 3.639 0 001.33 1.332l6.925 4a.75.75 0 001.125-.649v-1.906a4.73 4.73 0 01-1.5-.694v1.3L2.817 9.852a2.141 2.141 0 01-.781-2.92c.187-.324.456-.594.78-.782l5.8-3.35v1.3c.45-.313.956-.55 1.5-.694V1.5z"
-              ></path>
-            </svg>
-            <!-- 低音量icon -->
-            <svg
-              v-else-if="volumeProgress <= 25"
-              role="presentation"
-              height="16"
-              width="16"
-              aria-label="Volume low"
-              id="volume-icon"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"
-              ></path>
-            </svg>
-            <!-- 中音量icon -->
-            <svg
-              v-else-if="volumeProgress <= 75"
-              role="presentation"
-              height="16"
-              width="16"
-              aria-label="Volume medium"
-              id="volume-icon"
-              viewBox="0 0 16 16"
-              class="Svg-sc-1bi12j5-0 hDgDGI"
-            >
-              <path
-                d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 6.087a4.502 4.502 0 000-8.474v1.65a2.999 2.999 0 010 5.175v1.649z"
-              ></path>
-            </svg>
-            <!-- 高音量icon -->
-            <svg
-              v-else
-              role="presentation"
-              height="16"
-              width="16"
-              aria-label="Volume high"
-              id="volume-icon"
-              viewBox="0 0 16 16"
-              class="Svg-sc-1bi12j5-0 hDgDGI"
-            >
-              <path
-                d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"
-              ></path>
-              <path
-                d="M11.5 13.614a5.752 5.752 0 000-11.228v1.55a4.252 4.252 0 010 8.127v1.55z"
-              ></path>
-            </svg>
-          </button>
-        </div>
-        <!-- 音量调整滑轨 -->
-        <div class="player-volume-progress" ref="player-volume-progress">
-          <!-- 滑轨小圆点 -->
-          <div
-            class="player-volume-point"
-            :style="{ transform: `translateX(${getVolumeProgress})` }"
-          ></div>
-          <!-- 滑轨背景 s -->
-          <div class="player-progress-bg">
-            <!-- 滑轨前景 s -->
-            <div
-              class="player-progress-fg"
-              :style="{ transform: `translateX(${getVolumeProgress})` }"
-            ></div>
-          </div>
-        </div>
-      </div>
+      <PlayerAudioVolume @volume-change="updateVolume" />
     </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
+import PlayerAudioVolume from '@/components/PlayerAudioVolume'
 
 export default {
   name: 'PlayerAudio',
+
+  components: {
+    PlayerAudioVolume
+  },
 
   props: {
     name: {
@@ -317,38 +237,23 @@ export default {
   },
 
   created () {
-    this.volumeProgress = localStorage.getItem('volumeProgress') || 50
+    this.audioRef = document.createElement('audio')
+    this.audioRef.controls = 'controls'
+    this.audioRef.preload = 'auto'
+    this.audioRef.loop = false
+    this.audioRef.currentTime = localStorage.getItem('currentTime') || 0
     this.audioLength = localStorage.getItem('audioLength')
-    this.currentTime = localStorage.getItem('currentTime')
     this.progress = localStorage.getItem('progress')
-    const songUrlProp = localStorage.getItem('songUrl')
-    if (songUrlProp && !this.audioRef) this.createAudio(songUrlProp)
+
+    this.volumeProgress = localStorage.getItem('volumeProgress') || 50
+    if (this.volumeProgress) this.updateVolume()
+
+    const songUrl = localStorage.getItem('songUrl')
+    if (songUrl) this.createAudio(songUrl, false)
   },
 
+  // 挂在后开始监听一些调整操作
   mounted () {
-    console.log('mounted')
-    /**
-     * 调整音量
-     */
-    const volumeProgressRef = this.$refs['player-volume-progress']
-    // 1.鼠标拖动时计算调整音量
-    const volumeMouseMove = (e) => {
-      let x = e.clientX - volumeProgressRef.offsetLeft
-      if (x <= 0) x = 0
-      else if (x >= 100) x = 100
-      this.volumeProgress = x // 0~100区间的音量值
-      this.updateVolume()
-    }
-    const volumeMouseMoveHandle = (e) => {
-      volumeMouseMove(e)
-      document.removeEventListener('mousemove', volumeMouseMove)
-      document.removeEventListener('mouseup', volumeMouseMoveHandle)
-    }
-    // 2.鼠标按下时，监听鼠标移动 -------------------------------------开始调整进度条
-    volumeProgressRef.addEventListener('mousedown', () => {
-      document.addEventListener('mousemove', volumeMouseMove)
-      document.addEventListener('mouseup', volumeMouseMoveHandle) // ---------------------------结束调整进度条
-    })
     /**
      * 调整音乐播放进度
      */
@@ -405,18 +310,14 @@ export default {
 
   methods: {
     // 创建audio 加载mp3
-    createAudio (url) {
-      this.audioRef = document.createElement('audio')
-      this.audioRef.controls = 'controls'
-      this.audioRef.preload = 'auto'
-      this.audioRef.loop = false
-      // this.audioRef.autoplay = 'autoplay'
+    createAudio (url, autoplay) {
+      localStorage.setItem('songUrl', url)
+      // 重置播放器信息
+      this.resetPlayer()
+      this.audioRef.autoplay = autoplay
       // this.audioRef.muted = 'muted'
       this.audioRef.src = url
-      this.audioRef.currentTime = this.currentTime || 0
       this.audioRef.load()
-      // 同步音量
-      this.updateVolume()
       // 开始播放
       this.audioRef.addEventListener('play', (e) => {
         this.playStatus = true
@@ -431,6 +332,7 @@ export default {
       })
       // 计算当前缓存进度
       this.audioRef.addEventListener('progress', (e) => {
+        // 计算缓存进度
         // 方法1
         // this.cacheProgress =
         //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
@@ -462,20 +364,9 @@ export default {
         this.audioRef.play()
       }
     },
-    // 调整音量(切换静音)
-    switchVolume () {
-      if (this.volumeProgress > 0) {
-        this.volumeProgress = 0
-        this.audioRef.volume = this.volumeProgress / 100
-      } else {
-        this.volumeProgress = localStorage.getItem('volumeProgress') || 50
-        this.updateVolume()
-      }
-    },
     // 更新音量
-    updateVolume () {
-      localStorage.setItem('volumeProgress', this.volumeProgress)
-      this.audioRef.volume = this.volumeProgress / 100
+    updateVolume (volume) {
+      if (volume) this.audioRef.volume = volume
     },
     // 切换播放模式
     audioPlayTypeSwitch () {
@@ -489,6 +380,12 @@ export default {
         this.audioPlayType = 'common'
         this.audioRef.loop = false
       }
+    },
+    // 重置播放器
+    resetPlayer () {
+      localStorage.removeItem('progress')
+      localStorage.removeItem('audioLength')
+      localStorage.removeItem('currentTime')
     }
   },
 
@@ -508,6 +405,18 @@ export default {
     // 获取缓存进度
     getCacheProgress () {
       return this.cacheProgress
+    },
+    getName () {
+      return this.$props.name || localStorage.getItem('name')
+    },
+    getArtisis () {
+      return this.$props.artisis || localStorage.getItem('artisis')
+    },
+    getPoster () {
+      return this.$props.poster || localStorage.getItem('poster')
+    },
+    getPubTime () {
+      return this.$props.pubTime || localStorage.getItem('pubTime')
     }
   },
 
@@ -515,17 +424,19 @@ export default {
     // 监听props中url是否传入且不为undefined
     '$props.songUrl': {
       handler (url) {
-        if (url && !this.audioRef) {
-          localStorage.setItem('songUrl', url)
-          this.createAudio(url)
-        }
+        // 切歌时保存数据到localStorage
+        Object.keys(this.$props).forEach((key) => {
+          localStorage.setItem(key, this.$props[key])
+        })
+        // 处理audio
+        this.createAudio(url, true)
       }
     }
   }
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 #audioPlayerWrap {
   position: fixed;
   bottom: 0;
@@ -694,6 +605,9 @@ export default {
           p:last-child {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.5);
+            span {
+              color: currentColor;
+            }
           }
         }
       }
