@@ -29,4 +29,17 @@
   background-color: rgba(0, 0, 0, 1);
   padding-bottom: 72px;
 }
+
+// * {
+//   scrollbar-width: thin;
+// }
+
+// *::-webkit-scrollbar {
+//   width: 10px;
+// }
+
+// *::-webkit-scrollbar-thumb {
+//   background: rgba(100, 100, 100, 0.7);
+//   border-radius: 1px;
+// }
 </style>

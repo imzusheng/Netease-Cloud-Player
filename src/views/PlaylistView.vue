@@ -90,9 +90,21 @@
             </div>
             <!-- 歌曲名字和作者 -->
             <div class="table-cell-desc">
-              <img :src="listItem.al.picUrl" alt="" />
+              <img
+                class="table-cell-desc-pic"
+                :src="listItem.al.picUrl"
+                alt=""
+              />
               <div>
-                <div>{{ listItem.name }}</div>
+                <div>
+                  <span> {{ listItem.name }}</span>
+                  <img
+                    v-if="![0, 8].includes(listItem.fee)"
+                    class="table-cell-desc-vip"
+                    src="../assets/vip.svg"
+                    alt=""
+                  />
+                </div>
                 <div>{{ getName(listItem.ar) }}</div>
               </div>
             </div>
@@ -475,7 +487,7 @@ export default {
           }
           // 歌曲信息
           .table-cell-desc {
-            img {
+            .table-cell-desc-pic {
               height: 54px;
               width: 54px;
               margin-right: 18px;
@@ -488,6 +500,13 @@ export default {
                   grid-area: title;
                   font-size: 16px;
                   color: #fff;
+                  display: flex;
+                  align-items: center;
+                  .table-cell-desc-vip {
+                    height: 32px;
+                    width: 32px;
+                    margin-left: 4px;
+                  }
                 }
                 &:last-child {
                   grid-column-start: badges;
