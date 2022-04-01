@@ -156,26 +156,16 @@ export default {
   methods: {
     ...mapActions(['getPlaylistDetail', 'getSongDetail', 'getSongUrl']),
     ...mapMutations([
+      'setCurSongid',
       'setCurSongInfo',
       'setCurSongurlInfo',
       'setCurPlaylist',
-      'setLoading',
-      'setCurPlaylistColor'
+      'setCurPlaylistColor',
+      'setLoading'
     ]),
     // 选择歌曲，并开始播放
     playlistSelect (data) {
-      // 重置curSongInfo, curSongurlInfo
-      this.setCurSongInfo({})
-      this.setCurSongurlInfo({})
-      // 获取歌曲详情，返回只有一个元素的songs
-      this.getSongDetail(data.id).then((res) => {
-        this.setCurSongInfo(res.songs[0])
-        // 通过歌曲的id获取MP3的url
-        this.getSongUrl(data.id).then((res) => {
-          // 将url保存在store中
-          this.setCurSongurlInfo(res.data[0])
-        })
-      })
+      this.setCurSongid(data.id)
     },
     // 播放全部歌曲
     actionPlayAll () {

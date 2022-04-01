@@ -27,7 +27,6 @@
     <PlayerAudio
       :songid="$store.getters.curSongid"
       :name="$store.getters.curSongName"
-      :songUrl="$store.getters.curSongUrl"
       :poster="$store.getters.curSongPic"
       :artisis="getPickupName($store.getters.curSongArtisis)"
       :pubTime="getPubTime($store.getters.curSongPubtime)"

@@ -71,14 +71,14 @@ export default new Vuex.Store({
     curPlaylistInfo: {}, // 当前歌单信息
     curSongurlInfo: {}, // 当前歌曲url信息，包含码率等
     curSongInfo: {}, // 当前歌曲所有信息，包含专辑作者等
+    curSongid: '', // 当前播放的歌曲id
     playQueue: [] // 播放队列
   },
   getters: {
     userInfo: state => state.userInfo,
-    curSongid: state => state.curSongInfo.id || '',
+    curSongid: state => state.curSongid || '',
     curSongName: state => state.curSongInfo.name || '',
     curSongPic: state => state.curSongInfo.al?.picUrl || '',
-    curSongUrl: state => state.curSongurlInfo.url || state.curSongurlInfo.redirect || '',
     curSongArtisis: state => state.curSongInfo.ar || null,
     curSongPubtime: state => state.curSongInfo.publishTime || null,
     playlistName: state => state.curPlaylistInfo.name,
@@ -104,6 +104,9 @@ export default new Vuex.Store({
     },
     setCurPlaylistColor (state, rgba) {
       state.curPlaylistColor = rgba
+    },
+    setCurSongid (state, id) {
+      state.curSongid = id
     }
   },
   actions: {

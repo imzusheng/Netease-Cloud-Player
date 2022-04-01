@@ -215,11 +215,6 @@ export default {
       // 发布时间
       type: [String, Number],
       required: true
-    },
-    songUrl: {
-      // MP3链接
-      type: String,
-      required: true
     }
   },
 
@@ -245,7 +240,6 @@ export default {
     ...mapMutations(['setCurSongInfo', 'setCurSongurlInfo']),
     // 创建audio 加载mp3
     createAudio (url, autoplay) {
-      localStorage.setItem('songUrl', url)
       // 重置播放器信息
       this.resetPlayer()
       this.audioRef.autoplay = autoplay
@@ -318,6 +312,18 @@ export default {
     resetPlayer () {
       localStorage.removeItem('audioLength')
       localStorage.removeItem('currentTime')
+    },
+    // 通过歌曲id获取MP3 url
+    play (songid, autoplay) {
+      // 重置curSongInfo, curSongurlInfo
+      // 获取歌曲详情，返回只有一个元素的songs
+      this.getSongDetail(songid).then((res) => {
+        this.setCurSongInfo(res.songs[0])
+        // 通过歌曲的id获取MP3的url
+        this.getSongUrl(songid).then((res) => {
+          this.createAudio(res.data[0].url, autoplay)
+        })
+      })
     }
   },
 
@@ -333,20 +339,8 @@ export default {
     this.volumeProgress = localStorage.getItem('volumeProgress') || 50
     if (this.volumeProgress) this.updateVolume()
 
-    const songid = localStorage.getItem('songid')
-    if (songid) {
-      // 重置curSongInfo, curSongurlInfo
-      this.setCurSongInfo({})
-      this.setCurSongurlInfo({})
-      // 获取歌曲详情，返回只有一个元素的songs
-      this.getSongDetail(songid).then((res) => {
-        this.setCurSongInfo(res.songs[0])
-        // 通过歌曲的id获取MP3的url
-        this.getSongUrl(songid).then((res) => {
-          this.createAudio(res.data[0].url, false)
-        })
-      })
-    }
+    // const songid = localStorage.getItem('songid')
+    // if (songid) this.play(songid, false)
   },
 
   // 挂在后开始监听一些调整操作
@@ -438,14 +432,13 @@ export default {
 
   watch: {
     // 监听props中url是否传入且不为undefined
-    '$props.songUrl': {
-      handler (url) {
+    '$props.songid': {
+      handler (songid) {
         // 切歌时保存数据到localStorage
         Object.keys(this.$props).forEach((key) => {
           localStorage.setItem(key, this.$props[key])
         })
-        // 处理audio
-        this.createAudio(url, true)
+        this.play(songid, true)
       }
     }
   }
