@@ -80,6 +80,7 @@ localStorage:
             </svg>
           </button>
           <button
+            @click="prev"
             style="--button-size: 32px"
             class="FKTganvAaWqgK6MUhbkx"
             disabled=""
@@ -124,6 +125,7 @@ localStorage:
         <div class="player-controls-right">
           <!-- 按钮 下一首 -->
           <button
+            @click="next"
             style="--button-size: 32px"
             class="ARtnAVxkbmzyEjniZXVO"
             disabled=""
@@ -237,7 +239,12 @@ export default {
 
   methods: {
     ...mapActions(['getSongDetail', 'getSongUrl']),
-    ...mapMutations(['setCurSongInfo', 'setCurSongurlInfo']),
+    ...mapMutations([
+      'setCurSongid',
+      'setCurSongInfo',
+      'setCurSongurlInfo',
+      'setPlayQueueIndex'
+    ]),
     // 创建audio 加载mp3
     createAudio (url, autoplay) {
       // 重置播放器信息
@@ -319,11 +326,28 @@ export default {
       // 获取歌曲详情，返回只有一个元素的songs
       this.getSongDetail(songid).then((res) => {
         this.setCurSongInfo(res.songs[0])
+        console.log('run')
+        console.dir(this.$props)
+        Object.keys(this.$props).forEach((key) => {
+          localStorage.setItem(key, this.$props[key])
+        })
         // 通过歌曲的id获取MP3的url
         this.getSongUrl(songid).then((res) => {
           this.createAudio(res.data[0].url, autoplay)
         })
       })
+    },
+    next () {
+      this.setPlayQueueIndex(true)
+      this.setCurSongid(
+        this.$store.state.playQueue[this.$store.state.playQueueIndex]
+      )
+    },
+    prev () {
+      this.setPlayQueueIndex(false)
+      this.setCurSongid(
+        this.$store.state.playQueue[this.$store.state.playQueueIndex]
+      )
     }
   },
 
@@ -339,8 +363,8 @@ export default {
     this.volumeProgress = localStorage.getItem('volumeProgress') || 50
     if (this.volumeProgress) this.updateVolume()
 
-    // const songid = localStorage.getItem('songid')
-    // if (songid) this.play(songid, false)
+    const songid = localStorage.getItem('songid')
+    if (songid) this.play(songid, false)
   },
 
   // 挂在后开始监听一些调整操作
@@ -435,9 +459,7 @@ export default {
     '$props.songid': {
       handler (songid) {
         // 切歌时保存数据到localStorage
-        Object.keys(this.$props).forEach((key) => {
-          localStorage.setItem(key, this.$props[key])
-        })
+        localStorage.setItem('songid', songid)
         this.play(songid, true)
       }
     }

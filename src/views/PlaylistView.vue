@@ -1,23 +1,29 @@
+<!--
+  歌单详情页面
+  // TODO 改造，将store中的信息迁移回来
+-->
+
 <template>
   <div id="playlist">
     <!-- 歌曲信息 banner -->
     <div class="playlist-banner" ref="playlist-banner">
       <div class="playlist-banner-content">
         <div class="playlist-banner-poster">
-          <img :src="$store.getters.playlistPicUrl" alt="" />
+          <img :src="playlistPicUrl" alt="" />
         </div>
         <div class="playlist-banner-desc">
-          <h2>{{ $store.getters.playlistTags }}</h2>
+          <h2>{{ playlistTags }}</h2>
           <h1 class="playlist-episodeTitle">
-            <span>{{ $store.getters.playlistName }}</span>
+            <span>{{ playlistName }}</span>
           </h1>
           <a draggable="false" href="#">
-            <span>{{ $store.getters.playlistCreatorName }}</span>
+            <span>{{ playlistCreatorName }}</span>
           </a>
         </div>
         <div></div>
       </div>
     </div>
+    <!-- 列表 -->
     <div class="playlist-content">
       <!-- 颜色过渡遮罩 -->
       <div class="playlist-content-mask" ref="playlist-content-mask"></div>
@@ -65,7 +71,7 @@
         <!-- 表格 -->
         <ul class="playlist-table-content">
           <li
-            v-for="(listItem, listIndex) in $store.state.curPlaylist"
+            v-for="(listItem, listIndex) in curPlaylist"
             :key="`playlist${listIndex}`"
             @click="playlistSelect(listItem)"
           >
@@ -122,8 +128,8 @@
 </template>
 
 <script>
-import { pickUpName, getMainColor } from '@/util'
 import moment from 'moment'
+import { pickUpName, getMainColor } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
 
 let playlistMaskRef
@@ -150,26 +156,45 @@ export default {
   name: 'PlaylistView',
 
   data () {
-    return {}
+    return {
+      songid: '', // 当前播放歌曲的id
+      curPlaylist: [], // 当前歌单列表
+      curPlaylistInfo: {} // 歌单信息
+    }
   },
 
   methods: {
-    ...mapActions(['getPlaylistDetail', 'getSongDetail', 'getSongUrl']),
+    ...mapActions([
+      'getPlaylistDetail',
+      'getSongDetail',
+      'getSongUrl',
+      'pushPlayQueue'
+    ]),
     ...mapMutations([
       'setCurSongid',
-      'setCurSongInfo',
-      'setCurSongurlInfo',
-      'setCurPlaylist',
       'setCurPlaylistColor',
-      'setLoading'
+      'setLoading',
+      'pushPlayQueue'
     ]),
     // 选择歌曲，并开始播放
     playlistSelect (data) {
-      this.setCurSongid(data.id)
+      this.songid = data.id
+      localStorage.setItem('songid', data.id)
+      // this.setCurSongid(data.id)
     },
-    // 播放全部歌曲
+    // 加载全部歌曲到列表
     actionPlayAll () {
-      console.log(this.$store.state.curPlaylist)
+      this.pushPlayQueue(false)
+      this.pushPlayQueue(true)
+      if (this.$store.state.playQueue.length > 0) {
+        this.setCurSongid(this.$store.state.playQueue[0].id)
+        // this.$store.state.playQueue.shift()
+      }
+    },
+    getPicMainColor (url) {
+      getMainColor(url).then((color) => {
+        this.setCurPlaylistColor(color)
+      })
     }
   },
 
@@ -179,10 +204,12 @@ export default {
     // 设置加载状态true
     this.setLoading(true)
     // 获取歌单详情，得到所有歌曲的id集合ids
-    this.getPlaylistDetail(id).then((ids) => {
+    this.getPlaylistDetail(id).then((playlist) => {
       // 通过ids获取每首歌的详情，返回songs
+      this.curPlaylistInfo = playlist
+      const ids = playlist.trackIds.map((track) => track.id).toString()
       this.getSongDetail(ids).then((res) => {
-        this.setCurPlaylist(res.songs)
+        this.curPlaylist = res.songs
         // 设置加载状态false
         this.setLoading(false)
       })
@@ -198,27 +225,27 @@ export default {
     // 监听滚动条事件 目的为了驱动header遮罩透明度变化
     document.addEventListener('scroll', scrollHandle)
 
-    const observer = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          const obj = {
-            time: entry.time, // 触发的时间
-            rootBounds: entry.rootBounds, //  根元素的位置矩形，这种情况下为视窗位置
-            boundingClientRect: entry.boundingClientRect, // 被观察者的位置举行
-            intersectionRect: entry.intersectionRect, // 重叠区域的位置矩形
-            intersectionRatio: entry.intersectionRatio, // 重叠区域占被观察者面积的比例（被观察者不是矩形时也按照矩形计算）
-            target: entry.target // 被观察者
-          }
-          console.log(obj)
-        })
-      },
-      {
-        threshold: 1.0,
-        root: document.querySelector('#playlist')
-      }
-    )
-    const target = document.querySelector('.playlist-table-content')
-    observer.observe(target)
+    // const observer = new IntersectionObserver(
+    //   (entries, observer) => {
+    //     entries.forEach((entry) => {
+    //       const obj = {
+    //         time: entry.time, // 触发的时间
+    //         rootBounds: entry.rootBounds, //  根元素的位置矩形，这种情况下为视窗位置
+    //         boundingClientRect: entry.boundingClientRect, // 被观察者的位置举行
+    //         intersectionRect: entry.intersectionRect, // 重叠区域的位置矩形
+    //         intersectionRatio: entry.intersectionRatio, // 重叠区域占被观察者面积的比例（被观察者不是矩形时也按照矩形计算）
+    //         target: entry.target // 被观察者
+    //       }
+    //       console.log(obj)
+    //     })
+    //   },
+    //   {
+    //     threshold: 1.0,
+    //     root: document.querySelector('#playlist')
+    //   }
+    // )
+    // const target = document.querySelector('.playlist-table-content')
+    // observer.observe(target)
   },
 
   computed: {
@@ -242,17 +269,23 @@ export default {
           _moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
         }`
       }
-    }
-  },
-
-  watch: {
-    // 获取到歌单的封面之后，开始提取主题色
-    '$store.getters.playlistPicUrl': {
-      handler (imgSrc) {
-        getMainColor(imgSrc).then((color) => {
-          this.setCurPlaylistColor(color)
-        })
-      }
+    },
+    playlistName () {
+      return this.curPlaylistInfo.name
+    },
+    playlistPicUrl () {
+      // 获取到歌单的封面之后，开始提取主题色
+      const url = this.curPlaylistInfo.coverImgUrl
+      if (url) this.getPicMainColor(url)
+      return url
+    },
+    playlistCreatorName () {
+      return this.curPlaylistInfo.creator?.nickname ?? ''
+    },
+    playlistTags () {
+      return this.curPlaylistInfo.tags
+        ? this.curPlaylistInfo.tags.join(' • ')
+        : ''
     }
   },
 

@@ -67,12 +67,13 @@ export default new Vuex.Store({
       }
     },
     curPlaylistColor: '0, 0, 0, 1', // 当前主题颜色
-    curPlaylist: {}, // 当前歌单列表
+    curPlaylist: [], // 当前歌单列表
     curPlaylistInfo: {}, // 当前歌单信息
     curSongurlInfo: {}, // 当前歌曲url信息，包含码率等
     curSongInfo: {}, // 当前歌曲所有信息，包含专辑作者等
     curSongid: '', // 当前播放的歌曲id
-    playQueue: [] // 播放队列
+    playQueue: [], // 播放队列
+    playQueueIndex: 0 // 当前播放队列数组下标
   },
   getters: {
     userInfo: state => state.userInfo,
@@ -80,18 +81,11 @@ export default new Vuex.Store({
     curSongName: state => state.curSongInfo.name || '',
     curSongPic: state => state.curSongInfo.al?.picUrl || '',
     curSongArtisis: state => state.curSongInfo.ar || null,
-    curSongPubtime: state => state.curSongInfo.publishTime || null,
-    playlistName: state => state.curPlaylistInfo.name,
-    playlistPicUrl: state => state.curPlaylistInfo.coverImgUrl,
-    playlistCreatorName: state => state.curPlaylistInfo.creator?.nickname ?? '',
-    playlistTags: state => state.curPlaylistInfo.tags ? state.curPlaylistInfo.tags.join(' • ') : ''
+    curSongPubtime: state => state.curSongInfo.publishTime || null
   },
   mutations: {
     setCurPlaylist (state, payload) {
       state.curPlaylist = payload
-    },
-    setCurPlaylistInfo (state, payload) {
-      state.curPlaylistInfo = payload
     },
     setCurSongInfo (state, payload) {
       state.curSongInfo = payload
@@ -107,6 +101,29 @@ export default new Vuex.Store({
     },
     setCurSongid (state, id) {
       state.curSongid = id
+    },
+    setPlayQueueIndex (state, type) {
+      if (type) {
+        state.playQueueIndex += 1
+      } else {
+        if (state.playQueueIndex > 1) state.playQueueIndex -= 1
+      }
+    },
+    // 修改播放列表
+    pushPlayQueue (state, playQueue) {
+      if (playQueue) {
+        // 提取id
+        const queueId = state.playQueue.map(v => v.id)
+        // 第一种 Set 去重，只保存id
+        // queueId.push(...state.curPlaylist.map(v => v.id))
+        // state.playQueue = Array.from(new Set(queueId))
+        // 第二种 foreach
+        state.curPlaylist.forEach(v => {
+          if (!queueId.includes(v.id)) state.playQueue.push(v)
+        })
+      } else {
+        state.playQueue = []
+      }
     }
   },
   actions: {
@@ -192,16 +209,15 @@ export default new Vuex.Store({
       })
     },
     // 获取歌单详情
-    getPlaylistDetail ({ state, commit }, id) {
+    getPlaylistDetail ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
-          commit('setCurPlaylistInfo', resJson.playlist)
-          resolve(resJson.playlist.trackIds.map(track => track.id).toString())
+          resolve(resJson.playlist)
         })
       })
     },
     // 获取单曲详情
-    getSongDetail ({ state, commit }, id) {
+    getSongDetail ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
           resolve(resJson)

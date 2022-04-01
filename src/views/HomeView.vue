@@ -98,6 +98,7 @@
 
 <script>
 import SubTabs from '@/components/SubTabs'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'HomeView',
@@ -224,37 +225,15 @@ export default {
     }
   },
 
-  created () {
-    this.$store.dispatch('getCommunity').then((res) => {
-      this.listData.community = res
-    })
-    this.$store.dispatch('getRecommend').then((res) => {
-      this.listData.recommends = res
-    })
-    this.$store.dispatch('getNewsong').then((res) => {
-      this.listData.recommendPerson = res
-    })
-    this.$store.dispatch('getMv').then((res) => {
-      this.listData.recommendMv = res
-    })
-    this.$store.dispatch('getHotArtists').then((res) => {
-      this.listData.hotArtists = res
-    })
-    // TODO promise.all
-    // this.$store.dispatch(
-    //   'getRedirect',
-    //   'https://music.163.com/song/media/outer/url?id=190360.mp3'
-    // )
-    // this.$store.dispatch('getRecords').then((res) => {
-    //   this.listData.records = res
-    // })
-  },
-
-  mounted () {
-    this.subTabsChange('推荐')
-  },
-
   methods: {
+    ...mapActions([
+      'getHotArtists',
+      'getCommunity',
+      'getRecommend',
+      'getRecords',
+      'getNewsong',
+      'getMv'
+    ]),
     // 小菜单切换
     subTabsChange (val) {
       this.config.dj.type = val
@@ -277,6 +256,36 @@ export default {
         }
       })
     }
+  },
+
+  created () {
+    this.getCommunity().then((res) => {
+      this.listData.community = res
+    })
+    this.getRecommend().then((res) => {
+      this.listData.recommends = res
+    })
+    this.getNewsong().then((res) => {
+      this.listData.recommendPerson = res
+    })
+    this.getMv().then((res) => {
+      this.listData.recommendMv = res
+    })
+    this.getHotArtists().then((res) => {
+      this.listData.hotArtists = res
+    })
+    // TODO promise.all
+    // this.$store.dispatch(
+    //   'getRedirect',
+    //   'https://music.163.com/song/media/outer/url?id=190360.mp3'
+    // )
+    // this.$store.dispatch('getRecords').then((res) => {
+    //   this.listData.records = res
+    // })
+  },
+
+  mounted () {
+    this.subTabsChange('推荐')
   },
 
   computed: {
