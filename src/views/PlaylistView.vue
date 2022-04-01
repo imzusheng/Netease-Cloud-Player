@@ -71,6 +71,7 @@
         <!-- 表格 -->
         <ul class="playlist-table-content">
           <li
+            class="playlist-table-row"
             v-for="(listItem, listIndex) in curPlaylist"
             :key="`playlist${listIndex}`"
             @click="playlistSelect(listItem)"
@@ -98,7 +99,7 @@
             <div class="table-cell-desc">
               <img
                 class="table-cell-desc-pic"
-                :src="listItem.al.picUrl"
+                :data-pic-src="listItem.al.picUrl"
                 alt=""
               />
               <div>
@@ -212,6 +213,24 @@ export default {
         this.curPlaylist = res.songs
         // 设置加载状态false
         this.setLoading(false)
+
+        const intersectionObserver = new IntersectionObserver((entries) => {
+          // 如果不可见，就返回
+          // if (entries[0].intersectionRatio <= 0) return
+          entries.forEach((item) => {
+            if (item.intersectionRatio > 0) {
+              item.target.src = item.target.getAttribute('data-pic-src')
+              intersectionObserver.unobserve(item.target)
+            }
+          })
+        })
+
+        setTimeout(() => {
+          // 开始观察
+          document
+            .querySelectorAll('.table-cell-desc-pic')
+            .forEach((ele) => intersectionObserver.observe(ele))
+        }, 0)
       })
     })
     // 以下都是小动画监听
@@ -224,28 +243,6 @@ export default {
       playlistBannerRef.clientHeight + playlistMaskRef.clientHeight - 68
     // 监听滚动条事件 目的为了驱动header遮罩透明度变化
     document.addEventListener('scroll', scrollHandle)
-
-    // const observer = new IntersectionObserver(
-    //   (entries, observer) => {
-    //     entries.forEach((entry) => {
-    //       const obj = {
-    //         time: entry.time, // 触发的时间
-    //         rootBounds: entry.rootBounds, //  根元素的位置矩形，这种情况下为视窗位置
-    //         boundingClientRect: entry.boundingClientRect, // 被观察者的位置举行
-    //         intersectionRect: entry.intersectionRect, // 重叠区域的位置矩形
-    //         intersectionRatio: entry.intersectionRatio, // 重叠区域占被观察者面积的比例（被观察者不是矩形时也按照矩形计算）
-    //         target: entry.target // 被观察者
-    //       }
-    //       console.log(obj)
-    //     })
-    //   },
-    //   {
-    //     threshold: 1.0,
-    //     root: document.querySelector('#playlist')
-    //   }
-    // )
-    // const target = document.querySelector('.playlist-table-content')
-    // observer.observe(target)
   },
 
   computed: {
@@ -455,10 +452,11 @@ export default {
           }
         }
       }
-      // 表格主体
+      // 表格主体 ul
       .playlist-table-content {
         padding: 0 52px;
-        > li {
+        // li
+        .playlist-table-row {
           * {
             color: #b3b3b3;
           }

@@ -21,6 +21,10 @@
   z-index: 0;
 }
 
+img:not([src]) {
+  visibility: hidden;
+}
+
 #app {
   min-width: 568px;
   width: 100%;
