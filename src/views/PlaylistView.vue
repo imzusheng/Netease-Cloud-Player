@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import { pickUpName } from '@/util'
+import { pickUpName, getMainColor } from '@/util'
 import moment from 'moment'
 
 let playlistMaskRef
@@ -141,28 +141,6 @@ export default {
   },
 
   methods: {
-    getMainColor (data) {
-      const temp = {}
-      const len = data.length
-
-      let max = 0
-      let color = ''
-      let i = 0
-      while (i < len) {
-        if (data[i + 3] !== 0) {
-          const k = `${data[i]}, ${data[i + 1]}, ${data[i + 2]}, ${
-            data[i + 3] / 255
-          }`
-          temp[k] = temp[k] ? temp[k] + 1 : 1
-          if (temp[k] > max) {
-            max = temp[k]
-            color = k
-          }
-        }
-        i += 4
-      }
-      return color
-    },
     playlistSelect (data) {
       this.$store.dispatch('selectSong', data.id)
     }
@@ -205,7 +183,7 @@ export default {
         img.onload = () => {
           ctx.drawImage(img, 0, 0, 200, 200)
           const data = ctx.getImageData(0, 0, 200, 200).data
-          const color = this.getMainColor(data)
+          const color = getMainColor(data)
           const rgb = color.split(',')
           let r = parseInt(rgb[0])
           let g = parseInt(rgb[1])
