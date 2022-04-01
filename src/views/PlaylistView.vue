@@ -142,12 +142,7 @@ export default {
   },
 
   methods: {
-    ...mapActions([
-      'getPlaylistDetail',
-      'getSongDetail',
-      'getSongDetail',
-      'getSongUrl'
-    ]),
+    ...mapActions(['getPlaylistDetail', 'getSongDetail', 'getSongUrl']),
     ...mapMutations([
       'setCurSongInfo',
       'setCurSongurlInfo',

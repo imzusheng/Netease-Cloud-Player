@@ -95,7 +95,6 @@ export default new Vuex.Store({
     },
     setCurSongInfo (state, payload) {
       state.curSongInfo = payload
-      console.log(payload)
     },
     setCurSongurlInfo (state, payload) {
       state.curSongurlInfo = payload

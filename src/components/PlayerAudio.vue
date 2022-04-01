@@ -2,11 +2,9 @@
 这是播放器组件，集成
 
 localStorage:
-1.progress
-2.audioLength
-3.currentTime
-4.volumeProgress
-5.songUrl
+1.audioLength
+2.currentTime
+3.volumeProgress
 -->
 
 <template>
@@ -183,6 +181,7 @@ localStorage:
 <script>
 import moment from 'moment'
 import PlayerAudioVolume from '@/components/PlayerAudioVolume'
+import { mapActions, mapMutations } from 'vuex'
 
 export default {
   name: 'PlayerAudio',
@@ -241,6 +240,87 @@ export default {
     }
   },
 
+  methods: {
+    ...mapActions(['getSongDetail', 'getSongUrl']),
+    ...mapMutations(['setCurSongInfo', 'setCurSongurlInfo']),
+    // 创建audio 加载mp3
+    createAudio (url, autoplay) {
+      localStorage.setItem('songUrl', url)
+      // 重置播放器信息
+      this.resetPlayer()
+      this.audioRef.autoplay = autoplay
+      // this.audioRef.muted = 'muted'
+      this.audioRef.src = url
+      this.audioRef.load()
+      // 开始播放
+      this.audioRef.addEventListener('play', (e) => {
+        this.playStatus = true
+      })
+      // 暂停播放
+      this.audioRef.addEventListener('pause', (e) => {
+        this.playStatus = false
+      })
+      // 获取音频总时长
+      this.audioRef.addEventListener('durationchange', (e) => {
+        this.audioLength = this.audioRef.duration
+        localStorage.setItem('audioLength', this.audioLength)
+      })
+      // 计算当前缓存进度
+      this.audioRef.addEventListener('progress', (e) => {
+        // 计算缓存进度
+        // 方法1
+        // this.cacheProgress =
+        //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
+        // 方法2
+        let cacheLength = 0
+        for (let i = 0; i < this.audioRef.buffered.length; i++) {
+          cacheLength +=
+            this.audioRef.buffered.end(i) - this.audioRef.buffered.start(i)
+        }
+        this.cacheProgress = (cacheLength / this.audioLength) * 100
+      })
+      // 计算当前播放进度
+      this.audioRef.addEventListener('timeupdate', (e) => {
+        this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+        // 保存进度到localStorage
+        localStorage.setItem('currentTime', this.audioRef.currentTime)
+      })
+    },
+    // 开始或暂停播放
+    audioPlay () {
+      // 如果正在播放
+      if (this.playStatus) {
+        this.playStatus = false
+        this.audioRef.pause()
+      } else {
+        this.playStatus = true
+        this.audioRef.play()
+      }
+    },
+    // 更新音量
+    updateVolume (volume) {
+      if (volume) this.audioRef.volume = volume
+    },
+    // 切换播放模式
+    audioPlayTypeSwitch () {
+      if (this.audioPlayType === 'common') {
+        this.audioPlayType = 'list'
+        this.audioRef.loop = false
+      } else if (this.audioPlayType === 'list') {
+        this.audioPlayType = 'repeat'
+        this.audioRef.loop = true
+      } else if (this.audioPlayType === 'repeat') {
+        this.audioPlayType = 'common'
+        this.audioRef.loop = false
+      }
+    },
+    // 重置播放器
+    resetPlayer () {
+      localStorage.removeItem('audioLength')
+      localStorage.removeItem('currentTime')
+    }
+  },
+
   created () {
     this.audioRef = document.createElement('audio')
     this.audioRef.controls = 'controls'
@@ -248,13 +328,25 @@ export default {
     this.audioRef.loop = false
     this.audioRef.currentTime = localStorage.getItem('currentTime') || 0
     this.audioLength = localStorage.getItem('audioLength')
-    this.progress = localStorage.getItem('progress')
+    this.progress = (this.audioRef.currentTime / this.audioLength) * 100
 
     this.volumeProgress = localStorage.getItem('volumeProgress') || 50
     if (this.volumeProgress) this.updateVolume()
 
-    const songUrl = localStorage.getItem('songUrl')
-    if (songUrl) this.createAudio(songUrl, false)
+    const songid = localStorage.getItem('songid')
+    if (songid) {
+      // 重置curSongInfo, curSongurlInfo
+      this.setCurSongInfo({})
+      this.setCurSongurlInfo({})
+      // 获取歌曲详情，返回只有一个元素的songs
+      this.getSongDetail(songid).then((res) => {
+        this.setCurSongInfo(res.songs[0])
+        // 通过歌曲的id获取MP3的url
+        this.getSongUrl(songid).then((res) => {
+          this.createAudio(res.data[0].url, false)
+        })
+      })
+    }
   },
 
   // 挂在后开始监听一些调整操作
@@ -311,87 +403,6 @@ export default {
       document.addEventListener('mousemove', mousemoveHandle) // 监听鼠标移动
       document.addEventListener('mouseup', mouseupHandle) // 监听鼠标松开 ---------------------------结束调整进度条
     })
-  },
-
-  methods: {
-    // 创建audio 加载mp3
-    createAudio (url, autoplay) {
-      localStorage.setItem('songUrl', url)
-      // 重置播放器信息
-      this.resetPlayer()
-      this.audioRef.autoplay = autoplay
-      // this.audioRef.muted = 'muted'
-      this.audioRef.src = url
-      this.audioRef.load()
-      // 开始播放
-      this.audioRef.addEventListener('play', (e) => {
-        this.playStatus = true
-      })
-      // 暂停播放
-      this.audioRef.addEventListener('pause', (e) => {
-        this.playStatus = false
-      })
-      // 获取音频总时长
-      this.audioRef.addEventListener('durationchange', (e) => {
-        this.audioLength = this.audioRef.duration
-      })
-      // 计算当前缓存进度
-      this.audioRef.addEventListener('progress', (e) => {
-        // 计算缓存进度
-        // 方法1
-        // this.cacheProgress =
-        //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
-        // 方法2
-        let cacheLength = 0
-        for (let i = 0; i < this.audioRef.buffered.length; i++) {
-          cacheLength +=
-            this.audioRef.buffered.end(i) - this.audioRef.buffered.start(i)
-        }
-        this.cacheProgress = (cacheLength / this.audioLength) * 100
-      })
-      // 计算当前播放进度
-      this.audioRef.addEventListener('timeupdate', (e) => {
-        this.progress = (this.audioRef.currentTime / this.audioLength) * 100
-        // 保存进度到localStorage
-        localStorage.setItem('progress', this.progress)
-        localStorage.setItem('audioLength', this.audioLength)
-        localStorage.setItem('currentTime', this.audioRef.currentTime)
-      })
-    },
-    // 开始或暂停播放
-    audioPlay () {
-      // 如果正在播放
-      if (this.playStatus) {
-        this.playStatus = false
-        this.audioRef.pause()
-      } else {
-        this.playStatus = true
-        this.audioRef.play()
-      }
-    },
-    // 更新音量
-    updateVolume (volume) {
-      if (volume) this.audioRef.volume = volume
-    },
-    // 切换播放模式
-    audioPlayTypeSwitch () {
-      if (this.audioPlayType === 'common') {
-        this.audioPlayType = 'list'
-        this.audioRef.loop = false
-      } else if (this.audioPlayType === 'list') {
-        this.audioPlayType = 'repeat'
-        this.audioRef.loop = true
-      } else if (this.audioPlayType === 'repeat') {
-        this.audioPlayType = 'common'
-        this.audioRef.loop = false
-      }
-    },
-    // 重置播放器
-    resetPlayer () {
-      localStorage.removeItem('progress')
-      localStorage.removeItem('audioLength')
-      localStorage.removeItem('currentTime')
-    }
   },
 
   computed: {
