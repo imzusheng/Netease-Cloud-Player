@@ -192,6 +192,11 @@ export default {
   },
 
   props: {
+    songid: {
+      // 单曲ID
+      type: [String, Number],
+      required: true
+    },
     name: {
       // 歌曲名
       type: String,

@@ -25,6 +25,7 @@
     <router-view v-show="!$store.state.loading"></router-view>
     <!-- 音乐播放器 -->
     <PlayerAudio
+      :songid="$store.getters.curSongid"
       :name="$store.getters.curSongName"
       :songUrl="$store.getters.curSongUrl"
       :poster="$store.getters.curSongPic"

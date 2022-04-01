@@ -25,7 +25,7 @@
       <div class="playlist-content-main">
         <div class="playlist-content-action">
           <div class="playlist-content-action-content">
-            <button aria-label="播放全部" data-btn-play>
+            <button aria-label="播放全部" @click="actionPlayAll" data-btn-play>
               <svg
                 role="img"
                 height="28"
@@ -169,6 +169,10 @@ export default {
           this.setCurSongurlInfo(res.data[0])
         })
       })
+    },
+    // 播放全部歌曲
+    actionPlayAll () {
+      console.log(this.$store.state.curPlaylist)
     }
   },
 
