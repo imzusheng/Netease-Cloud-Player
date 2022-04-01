@@ -66,139 +66,9 @@ export default new Vuex.Store({
         anchor: false
       }
     },
-    curSong: {
-      songUrl: '',
-      name: '等你等到我心痛',
-      id: 190360,
-      pst: 0,
-      t: 0,
-      ar: [
-        {
-          id: 6460,
-          name: '张学友',
-          tns: [],
-          alias: ['Jacky Cheung'],
-          alia: ['Jacky Cheung']
-        }
-      ],
-      alia: [],
-      pop: 100,
-      st: 0,
-      rt: '',
-      fee: 8,
-      v: 38,
-      crbt: null,
-      cf: '',
-      al: {
-        id: 19237,
-        name: '等你等到我心痛 张学友精选',
-        picUrl:
-            'http://p3.music.126.net/Frx9MSEa-t_QtBLNy2GDew==/109951166860255517.jpg',
-        tns: [],
-        pic_str: '109951166860255517',
-        pic: 109951166860255520
-      },
-      dt: 255466,
-      h: {
-        br: 320000,
-        fid: 0,
-        size: 10221236,
-        vd: 675
-      },
-      m: {
-        br: 192000,
-        fid: 0,
-        size: 6132759,
-        vd: 675
-      },
-      l: {
-        br: 128000,
-        fid: 0,
-        size: 4088520,
-        vd: 675
-      },
-      a: null,
-      cd: '1',
-      no: 1,
-      rtUrl: null,
-      ftype: 0,
-      rtUrls: [],
-      djId: 0,
-      copyright: 1,
-      s_id: 0,
-      mark: 8192,
-      originCoverType: 1,
-      originSongSimpleData: null,
-      resourceState: true,
-      version: 38,
-      single: 0,
-      noCopyrightRcmd: null,
-      rtype: 0,
-      rurl: null,
-      mst: 9,
-      cp: 7003,
-      mv: 5343605,
-      publishTime: 752083200000,
-      privilege: {
-        id: 190360,
-        fee: 8,
-        payed: 0,
-        st: 0,
-        pl: 128000,
-        dl: 0,
-        sp: 7,
-        cp: 1,
-        subp: 1,
-        cs: false,
-        maxbr: 999000,
-        fl: 128000,
-        toast: false,
-        flag: 260,
-        preSell: false,
-        playMaxbr: 999000,
-        downloadMaxbr: 999000,
-        rscl: null,
-        freeTrialPrivilege: {
-          resConsumable: false,
-          userConsumable: false
-        },
-        chargeInfoList: [
-          {
-            rate: 128000,
-            chargeUrl: null,
-            chargeMessage: null,
-            chargeType: 0
-          },
-          {
-            rate: 192000,
-            chargeUrl: null,
-            chargeMessage: null,
-            chargeType: 1
-          },
-          {
-            rate: 320000,
-            chargeUrl: null,
-            chargeMessage: null,
-            chargeType: 1
-          },
-          {
-            rate: 999000,
-            chargeUrl: null,
-            chargeMessage: null,
-            chargeType: 1
-          }
-        ]
-      },
-      lyrics: [
-        '<b>等你等你等你</b>',
-        '一世一世<b>等你</b>',
-        '<b>我</b>真的真的不愿舍弃',
-        '很想当天的一切能回味',
-        '想<b>你</b>想<b>你</b>苦<b>痛</b>'
-      ]
-    },
     curPlaylistColor: '0, 0, 0, 1', // 当前主题颜色
-    curPlaylist: {},
+    curPlaylist: {}, // 当前歌单列表
+    curPlaylistInfo: {}, // 当前歌单信息
     curSongurlInfo: {}, // 当前歌曲url信息，包含码率等
     curSongInfo: {} // 当前歌曲所有信息，包含专辑作者等
   },
@@ -206,15 +76,34 @@ export default new Vuex.Store({
     userInfo: state => state.userInfo,
     curSongName: state => state.curSongInfo.name || '',
     curSongPic: state => state.curSongInfo.al?.picUrl || '',
-    curSongUrl: state => state.curSongurlInfo.redirect || '',
+    curSongUrl: state => state.curSongurlInfo.url || state.curSongurlInfo.redirect || '',
     curSongArtisis: state => state.curSongInfo.ar || null,
     curSongPubtime: state => state.curSongInfo.publishTime || null,
-    playlistName: state => state.curPlaylist.name,
-    playlistPicUrl: state => state.curPlaylist.coverImgUrl,
-    playlistCreatorName: state => state.curPlaylist.creator?.nickname ?? '',
-    playlistTags: state => state.curPlaylist.tags ? state.curPlaylist.tags.join(' • ') : ''
+    playlistName: state => state.curPlaylistInfo.name,
+    playlistPicUrl: state => state.curPlaylistInfo.coverImgUrl,
+    playlistCreatorName: state => state.curPlaylistInfo.creator?.nickname ?? '',
+    playlistTags: state => state.curPlaylistInfo.tags ? state.curPlaylistInfo.tags.join(' • ') : ''
   },
-  mutations: {},
+  mutations: {
+    setCurPlaylist (state, payload) {
+      state.curPlaylist = payload
+    },
+    setCurPlaylistInfo (state, payload) {
+      state.curPlaylistInfo = payload
+    },
+    setCurSongInfo (state, payload) {
+      state.curSongInfo = payload
+    },
+    setCurSongurlInfo (state, payload) {
+      state.curSongurlInfo = payload
+    },
+    setLoading (state, status) {
+      state.loading = status
+    },
+    setCurPlaylistColor (state, rgba) {
+      state.curPlaylistColor = rgba
+    }
+  },
   actions: {
     // 获取重定向url(MP3url)
     getRedirect ({ state }, url) {
@@ -298,15 +187,16 @@ export default new Vuex.Store({
       })
     },
     // 获取歌单详情
-    getPlaylistDetail ({ state }, id) {
-      state.loading = true
-      fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
-        Vue.set(state, 'curPlaylist', resJson.playlist)
-        state.loading = false
+    getPlaylistDetail ({ state, commit }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
+          commit('setCurPlaylistInfo', resJson.playlist)
+          resolve(resJson.playlist.trackIds.map(track => track.id).toString())
+        })
       })
     },
     // 获取单曲详情
-    getSongDetail ({ state }, id) {
+    getSongDetail ({ state, commit }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
           resolve(resJson)
@@ -318,20 +208,6 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_URL}?id=${id}`).then((resJson) => {
           resolve(resJson)
-        })
-      })
-    },
-    // 选择歌曲，并开始播放
-    selectSong ({ state }, id) {
-      state.curSongInfo = {}
-      state.curSongurlInfo = {}
-      this.dispatch('getSongDetail', id).then(res => {
-        state.curSongInfo = res.songs[0]
-        this.dispatch('getSongUrl', id).then(res => {
-          state.curSongurlInfo = res.data[0]
-          Vue.set(state.curSongurlInfo, 'redirect', state.curSongurlInfo.url)
-          // state.curSongurlInfo.redirect = state.curSongurlInfo.url
-          // this.dispatch('getRedirect', state.curSongurlInfo.url)
         })
       })
     }

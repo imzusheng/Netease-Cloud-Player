@@ -7,8 +7,7 @@
       <nav>
         <!-- logo -->
         <div class="logo">
-          <img src="../assets/logo_m.png" alt="" />
-          <h2>Music</h2>
+          <img src="../assets/logo_a.png" alt="" />
         </div>
         <!-- 菜单 -->
         <SubTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
@@ -188,7 +187,6 @@ export default {
 
         img {
           max-height: 28px;
-          max-width: 28px;
           margin: 0 4px 0 0;
         }
         span {
