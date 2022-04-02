@@ -118,6 +118,8 @@ export default new Vuex.Store({
       } else {
         state.playQueue = []
       }
+      state.playQueueIndex = 0
+      localStorage.setItem('playQueueIndex', 0)
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
     reset (state) {
