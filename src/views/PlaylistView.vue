@@ -213,10 +213,8 @@ export default {
         this.curPlaylist = res.songs
         // 设置加载状态false
         this.setLoading(false)
-
+        // IntersectionObserver
         const intersectionObserver = new IntersectionObserver((entries) => {
-          // 如果不可见，就返回
-          // if (entries[0].intersectionRatio <= 0) return
           entries.forEach((item) => {
             if (item.intersectionRatio > 0) {
               item.target.src = item.target.getAttribute('data-pic-src')
@@ -224,13 +222,12 @@ export default {
             }
           })
         })
-
-        setTimeout(() => {
-          // 开始观察
+        // dom更新完成 开始观察
+        this.$nextTick(function () {
           document
             .querySelectorAll('.table-cell-desc-pic')
             .forEach((ele) => intersectionObserver.observe(ele))
-        }, 0)
+        })
       })
     })
     // 以下都是小动画监听
@@ -290,8 +287,6 @@ export default {
   beforeRouteLeave (to, from, next) {
     // 恢复背景色为黑色
     this.setCurPlaylistColor('0, 0, 0, 1')
-    // 清理歌单
-    this.setCurPlaylist({})
     // 删除监听
     document.removeEventListener('scroll', scrollHandle)
     next()
