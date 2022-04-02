@@ -12,7 +12,7 @@
         </div>
       </div>
       <ul class="section-newSong-list">
-        <li v-for="rmdItem in listData.recommendPerson" :key="rmdItem.id">
+        <li v-for="rmdItem in listData.newsong" :key="rmdItem.id">
           <figure>
             <img :src="rmdItem.picUrl" alt="" />
             <div class="section-newSong-desc">
@@ -46,7 +46,14 @@
           @click="toPlaylistDetail(listItem.payload)"
         >
           <figure>
-            <span><img :src="listItem.picUrl" alt="" /></span>
+            <span>
+              <img
+                src="../assets/empty_black.png"
+                alt=""
+                :data-source-src="listItem.picUrl"
+                :data-img-class="sectionItem.id"
+              />
+            </span>
             <p>{{ listItem.name }}</p>
             <p>
               {{ listItem.desc1 }}
@@ -71,7 +78,11 @@
         <li v-for="rmdItem in listData.dj" :key="rmdItem.id">
           <figure v-if="config.dj.type === '推荐'">
             <span>
-              <img :src="rmdItem.picUrl" alt="" />
+              <img
+                :data-source-src="rmdItem.picUrl"
+                src="../assets/empty_black.png"
+                alt=""
+              />
             </span>
             <p>{{ rmdItem.name }}</p>
             <p>{{ rmdItem.lastProgramName }}</p>
@@ -108,10 +119,10 @@ export default {
 
   data () {
     return {
-      // section分类数据
+      // section模板数据
       sectionData: [
         {
-          id: 'section-tj',
+          id: 'section-tuijian',
           title: '为你推荐',
           subTitle: '挑选歌曲，开始收听电台',
           moreUrl: '',
@@ -122,7 +133,7 @@ export default {
           }
         },
         {
-          id: 'section-rgs',
+          id: 'section-geshou',
           title: '热门歌手',
           subTitle: null,
           moreUrl: '',
@@ -133,7 +144,7 @@ export default {
           }
         },
         {
-          id: 'section-zj',
+          id: 'section-zuijinbofang',
           title: '最近播放',
           subTitle: null,
           moreUrl: '',
@@ -155,7 +166,7 @@ export default {
           }
         },
         {
-          id: 'section-sq',
+          id: 'section-shequ',
           title: '社区精选',
           subTitle: null,
           moreUrl: '',
@@ -219,7 +230,7 @@ export default {
         community: [], // 社区
         recommends: [], // 推荐歌单
         records: [], // 听歌记录
-        recommendPerson: [], // 推荐新曲
+        newsong: [], // 推荐新曲
         recommendMv: [] // 推荐MV
       }
     }
@@ -258,34 +269,37 @@ export default {
     }
   },
 
-  created () {
-    this.getCommunity().then((res) => {
-      this.listData.community = res
-    })
-    this.getRecommend().then((res) => {
-      this.listData.recommends = res
-    })
-    this.getNewsong().then((res) => {
-      this.listData.recommendPerson = res
-    })
-    this.getMv().then((res) => {
-      this.listData.recommendMv = res
-    })
-    this.getHotArtists().then((res) => {
-      this.listData.hotArtists = res
-    })
-    // TODO promise.all
-    // this.$store.dispatch(
-    //   'getRedirect',
-    //   'https://music.163.com/song/media/outer/url?id=190360.mp3'
-    // )
-    // this.$store.dispatch('getRecords').then((res) => {
-    //   this.listData.records = res
-    // })
-  },
-
   mounted () {
     this.subTabsChange('推荐')
+
+    Promise.all([
+      this.getCommunity(),
+      this.getRecommend(),
+      this.getNewsong(),
+      this.getMv(),
+      this.getHotArtists()
+    ]).then((resArr) => {
+      resArr.forEach((res) => {
+        this.listData[res.type] = res.data
+      })
+      // IntersectionObserver
+      const intersectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((item) => {
+          // 图片出现在视野内
+          if (item.intersectionRatio > 0) {
+            // 加载真正的src
+            item.target.src = item.target.getAttribute('data-source-src')
+            intersectionObserver.unobserve(item.target)
+          }
+        })
+      })
+      // dom更新完成 开始观察
+      this.$nextTick(() => {
+        document
+          .querySelectorAll('.section-common-list img')
+          .forEach((ele) => intersectionObserver.observe(ele))
+      })
+    })
   },
 
   computed: {

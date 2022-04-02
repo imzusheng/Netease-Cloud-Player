@@ -84,9 +84,6 @@ export default new Vuex.Store({
     curSongPubtime: state => state.curSongInfo.publishTime || null
   },
   mutations: {
-    setCurPlaylist (state, payload) {
-      state.curPlaylist = payload
-    },
     setCurSongInfo (state, payload) {
       state.curSongInfo = payload
     },
@@ -137,12 +134,16 @@ export default new Vuex.Store({
     getCommunity () {
       return new Promise(resolve => {
         fetchToJson(API.GET_COMMUNITY).then((resJson) => {
-          resolve(resJson.playlists.map((v) => {
+          const data = resJson.playlists.map((v) => {
             v.picUrl = v.coverImgUrl
             v.desc1 = v.trackCount + '首音乐'
             v.payload = v.id
             return v
-          }))
+          })
+          resolve({
+            data,
+            type: 'community'
+          })
         })
       })
     },
@@ -150,12 +151,16 @@ export default new Vuex.Store({
     getRecommend () {
       return new Promise(resolve => {
         fetchToJson(API.GET_RECOMMENDS).then((resJson) => {
-          resolve(resJson.result.map((v) => {
+          const data = resJson.result.map((v) => {
             v.desc1 = moment(v.trackNumberUpdateTime).format('M月DD日')
             v.desc2 = v.trackCount + '首音乐'
             v.payload = v.id
             return v
-          }))
+          })
+          resolve({
+            data,
+            type: 'recommends'
+          })
         })
       })
     },
@@ -176,11 +181,15 @@ export default new Vuex.Store({
     getNewsong () {
       return new Promise(resolve => {
         fetchToJson(API.GET_PERSON_NEWSONG).then((resJson) => {
-          resolve(resJson.result.map((v) => {
+          const data = resJson.result.map((v) => {
             v.desc1 = v.song.album.type
             v.desc2 = pickUpName(v.song.artists)
             return v
-          }))
+          })
+          resolve({
+            data,
+            type: 'newsong'
+          })
         })
       })
     },
@@ -188,11 +197,15 @@ export default new Vuex.Store({
     getMv () {
       return new Promise(resolve => {
         fetchToJson(API.GET_RECOMMENDS_MV).then((resJson) => {
-          resolve(resJson.result.map((v) => {
+          const data = resJson.result.map((v) => {
             v.desc1 = v.artistName
             v.desc2 = v.playCount + '万次播放'
             return v
-          }))
+          })
+          resolve({
+            data,
+            type: 'recommendMv'
+          })
         })
       })
     },
@@ -200,11 +213,15 @@ export default new Vuex.Store({
     getHotArtists () {
       return new Promise(resolve => {
         fetchToJson(API.GET_HOT_ARTISTS).then((resJson) => {
-          resolve(resJson.artists.map((v) => {
+          const data = resJson.artists.map((v) => {
             v.picUrl = v.img1v1Url
             v.desc1 = '艺人'
             return v
-          }))
+          })
+          resolve({
+            data,
+            type: 'hotArtists'
+          })
         })
       })
     },
