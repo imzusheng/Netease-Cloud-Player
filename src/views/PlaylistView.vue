@@ -104,7 +104,7 @@
               />
               <div>
                 <div>
-                  <span> {{ listItem.name }}</span>
+                  <span class="table-cell-ellipsis"> {{ listItem.name }}</span>
                   <img
                     v-if="![0, 8].includes(listItem.fee)"
                     class="table-cell-desc-vip"
@@ -112,11 +112,15 @@
                     alt=""
                   />
                 </div>
-                <div>{{ getName(listItem.ar) }}</div>
+                <div class="table-cell-ellipsis">
+                  {{ getName(listItem.ar) }}
+                </div>
               </div>
             </div>
             <!-- 专辑名 -->
-            <div>{{ listItem.al.name }}</div>
+            <div>
+              {{ listItem.al.name }}
+            </div>
             <!-- 发布时间 -->
             <div>{{ getPubTime(listItem.publishTime) }}</div>
             <!-- 时长 -->
@@ -471,6 +475,10 @@ export default {
             display: flex;
             align-items: center;
             padding: 16px 0;
+            // -webkit-line-clamp: 3;
+            // -webkit-box-orient: vertical;
+            // display: -webkit-box;
+            // overflow: hidden;
             &:last-child {
               justify-content: flex-end;
               margin-right: 32px;
@@ -532,6 +540,12 @@ export default {
                 }
               }
             }
+          }
+          // 需要省略的格子
+          .table-cell-ellipsis {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }
