@@ -104,7 +104,10 @@
               />
               <div>
                 <div>
-                  <span class="table-cell-ellipsis"> {{ listItem.name }}</span>
+                  <span :title="listItem.name" class="table-cell-ellipsis">
+                    {{ listItem.name }}</span
+                  >
+                  <!-- vip -->
                   <img
                     v-if="![0, 8].includes(listItem.fee)"
                     class="table-cell-desc-vip"
@@ -112,14 +115,20 @@
                     alt=""
                   />
                 </div>
-                <div class="table-cell-ellipsis">
+                <div :title="getName(listItem.ar)" class="table-cell-ellipsis">
                   {{ getName(listItem.ar) }}
                 </div>
               </div>
             </div>
             <!-- 专辑名 -->
-            <div>
-              {{ listItem.al.name }}
+            <div class="table-cell-ellipsis">
+              <div
+                :title="listItem.al.name"
+                style="display: block"
+                class="table-cell-ellipsis"
+              >
+                {{ listItem.al.name }}
+              </div>
             </div>
             <!-- 发布时间 -->
             <div>{{ getPubTime(listItem.publishTime) }}</div>
