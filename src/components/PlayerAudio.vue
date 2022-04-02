@@ -42,14 +42,14 @@ localStorage:
       <!-- 歌曲信息 -->
       <div class="player-song">
         <div>
-          <img :src="getPoster" alt="" />
+          <img :src="curSongPic" alt="" />
         </div>
         <div class="player-song-desc">
-          <p>{{ getName }}</p>
+          <p>{{ curSongName }}</p>
           <p>
-            {{ getArtisis }}
-            <span v-if="getPubTime">&nbsp;•&nbsp;</span>
-            {{ getPubTime }}
+            {{ curSongArtisis }}
+            <span v-if="curSongPubtime">&nbsp;•&nbsp;</span>
+            {{ curSongPubtime }}
           </p>
         </div>
       </div>
@@ -184,6 +184,7 @@ localStorage:
 import moment from 'moment'
 import PlayerAudioVolume from '@/components/PlayerAudioVolume'
 import { mapActions, mapMutations } from 'vuex'
+import { pickUpName } from '@/util'
 
 export default {
   name: 'PlayerAudio',
@@ -192,63 +193,62 @@ export default {
     PlayerAudioVolume
   },
 
-  props: {
-    songid: {
-      // 单曲ID
-      type: [String, Number],
-      required: true
-    },
-    name: {
-      // 歌曲名
-      type: String,
-      required: true
-    },
-    poster: {
-      // 封面url
-      type: String,
-      required: true
-    },
-    artisis: {
-      // 作者
-      type: String,
-      required: true
-    },
-    pubTime: {
-      // 发布时间
-      type: [String, Number],
-      required: true
-    }
-  },
-
   data () {
     return {
-      audioPlayType: 'common', // 播放模式 如: repeat(单曲循环), common(不), list(列表播放)
-      currentTimeFormat: '', // 鼠标到进度条位置对应的时间 如 3:01
-      mouseMoveProgress: '', // 鼠标在进度条的位置 0~100
-      mouseMoveX: '', // 鼠标在进度条的位置 X轴
-      progress: '', // 播放进度 0~100
-      audioLength: '', // 音频总长度
-      cacheProgress: '', // 已经缓存的进度
-      audioRef: '', // 元素节点引用
-      audioSeeking: false, // 是否正在调整视频(拖动进度条)
-      volumeProgress: 0, // 音量 0~100
-      playStatus: false, // 音乐是否正在播放
-      currentTime: '' // 刷新时恢复播放进度
+      // 播放模式 如: repeat(单曲循环), common(不), list(列表播放)
+      audioPlayType: 'common',
+
+      // 鼠标到进度条位置对应的时间 如 3:01
+      currentTimeFormat: '',
+
+      // 鼠标在进度条的位置 0~100
+      mouseMoveProgress: '',
+
+      // 鼠标在进度条的位置 X轴
+      mouseMoveX: '',
+
+      // 播放进度 0~100
+      progress: '',
+
+      // 音频总长度
+      audioLength: '',
+
+      // 已经缓存的进度
+      cacheProgress: '',
+
+      // 元素节点引用
+      audioRef: '',
+      // 是否正在调整视频(拖动进度条)
+      audioSeeking: false,
+
+      // 音量 0~100
+      volumeProgress: 0,
+
+      // 音乐是否正在播放
+      playStatus: false,
+
+      // 刷新时恢复播放进度
+      currentTime: '',
+
+      // 当前播放的歌曲信息
+      curSongInfo: {
+        name: '',
+        picUrl: '',
+        artisis: '',
+        publishTime: ''
+      }
     }
   },
 
   methods: {
     ...mapActions(['getSongDetail', 'getSongUrl']),
-    ...mapMutations([
-      'setCurSongid',
-      'setCurSongInfo',
-      'setCurSongurlInfo',
-      'setPlayQueueIndex'
-    ]),
+    ...mapMutations(['setCurSongid', 'setCurSongurlInfo', 'setPlayQueueIndex']),
     // 创建audio 加载mp3
     createAudio (url, autoplay) {
-      // 重置播放器信息
-      this.resetPlayer()
+      // 重置播放器信息,删除上一首歌播放进度
+      localStorage.removeItem('audioLength')
+      localStorage.removeItem('currentTime')
+      // 设置是否自动播放
       this.audioRef.autoplay = autoplay
       // this.audioRef.muted = 'muted'
       this.audioRef.src = url
@@ -315,22 +315,22 @@ export default {
         this.audioRef.loop = false
       }
     },
-    // 重置播放器
-    resetPlayer () {
-      localStorage.removeItem('audioLength')
-      localStorage.removeItem('currentTime')
-    },
     // 通过歌曲id获取MP3 url
-    play (songid, autoplay) {
-      // 重置curSongInfo, curSongurlInfo
+    idToUrl (songid, autoplay) {
       // 获取歌曲详情，返回只有一个元素的songs
       this.getSongDetail(songid).then((res) => {
-        this.setCurSongInfo(res.songs[0])
-        console.log('run')
-        console.dir(this.$props)
-        Object.keys(this.$props).forEach((key) => {
-          localStorage.setItem(key, this.$props[key])
+        const data = res.songs[0]
+        const curSongInfo = {
+          name: data.name,
+          picUrl: data.al.picUrl,
+          artisis: data.ar,
+          publishTime: data.publishTime
+        }
+        // 赋值到this.curSongInfo
+        Object.keys(curSongInfo).forEach((key) => {
+          this.curSongInfo[key] = curSongInfo[key]
         })
+        localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
         // 通过歌曲的id获取MP3的url
         this.getSongUrl(songid).then((res) => {
           this.createAudio(res.data[0].url, autoplay)
@@ -338,20 +338,21 @@ export default {
       })
     },
     next () {
-      this.setPlayQueueIndex(true)
-      this.setCurSongid(
-        this.$store.state.playQueue[this.$store.state.playQueueIndex]
-      )
+      // this.setPlayQueueIndex(true)
+      // this.setCurSongid(
+      //   this.$store.state.playQueue[this.$store.state.playQueueIndex]
+      // )
     },
     prev () {
-      this.setPlayQueueIndex(false)
-      this.setCurSongid(
-        this.$store.state.playQueue[this.$store.state.playQueueIndex]
-      )
+      // this.setPlayQueueIndex(false)
+      // this.setCurSongid(
+      //   this.$store.state.playQueue[this.$store.state.playQueueIndex]
+      // )
     }
   },
 
   created () {
+    // 配置audio
     this.audioRef = document.createElement('audio')
     this.audioRef.controls = 'controls'
     this.audioRef.preload = 'auto'
@@ -360,11 +361,21 @@ export default {
     this.audioLength = localStorage.getItem('audioLength')
     this.progress = (this.audioRef.currentTime / this.audioLength) * 100
 
+    // 读取音量
     this.volumeProgress = localStorage.getItem('volumeProgress') || 50
     if (this.volumeProgress) this.updateVolume()
 
+    // 读取上次播放的歌曲id
     const songid = localStorage.getItem('songid')
-    if (songid) this.play(songid, false)
+    if (songid) this.idToUrl(songid, false)
+
+    // 读取上次播放的歌曲
+    const curSongInfo = localStorage.getItem('curSongInfo')
+    if (curSongInfo) {
+      Object.keys(JSON.parse(curSongInfo)).forEach((key) => {
+        this.curSongInfo[key] = curSongInfo[key]
+      })
+    }
   },
 
   // 挂在后开始监听一些调整操作
@@ -440,27 +451,28 @@ export default {
     getCacheProgress () {
       return this.cacheProgress
     },
-    getName () {
-      return this.$props.name || localStorage.getItem('name')
+
+    // 以下歌曲信息
+    curSongName () {
+      return this.curSongInfo.name || ''
     },
-    getArtisis () {
-      return this.$props.artisis || localStorage.getItem('artisis')
+    curSongPic () {
+      return this.curSongInfo.picUrl || ''
     },
-    getPoster () {
-      return this.$props.poster || localStorage.getItem('poster')
+    curSongArtisis () {
+      return pickUpName(this.curSongInfo.artisis) ?? null
     },
-    getPubTime () {
-      return this.$props.pubTime || localStorage.getItem('pubTime')
+    curSongPubtime () {
+      const timeStamp = this.curSongInfo.publishTime
+      if (!timeStamp) return ''
+      return moment(timeStamp).format('YYYY') || ''
     }
   },
 
   watch: {
-    // 监听props中url是否传入且不为undefined
-    '$props.songid': {
+    '$store.getters.curSongid': {
       handler (songid) {
-        // 切歌时保存数据到localStorage
-        localStorage.setItem('songid', songid)
-        this.play(songid, true)
+        this.idToUrl(songid, true)
       }
     }
   }
