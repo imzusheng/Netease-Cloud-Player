@@ -1,3 +1,12 @@
+<!--
+  默认布局页面
+  包含:
+  1.头部
+  2.全局加载logo
+  3.router-view
+  4.地板播放器
+-->
+
 <template>
   <div
     id="layout-default"

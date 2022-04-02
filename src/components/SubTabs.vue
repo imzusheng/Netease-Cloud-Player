@@ -1,4 +1,6 @@
-<!-- 大标题下的tabs组件 -->
+<!--
+  大标题下的tabs组件
+-->
 <template>
   <ul class="sub-tabs">
     <li

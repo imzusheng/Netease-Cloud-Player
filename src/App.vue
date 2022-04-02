@@ -31,7 +31,7 @@ img:not([src]) {
   min-height: 100vh;
   position: relative;
   background-color: rgba(0, 0, 0, 1);
-  padding-bottom: 72px;
+  // padding-bottom: 72px;
 }
 
 // * {

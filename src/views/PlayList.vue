@@ -1,6 +1,5 @@
 <!--
   歌单详情页面
-  // TODO 改造，将store中的信息迁移回来
 -->
 
 <template>
@@ -167,7 +166,7 @@ const scrollHandle = () => {
 }
 
 export default {
-  name: 'PlaylistView',
+  name: 'PlayList',
 
   data () {
     return {

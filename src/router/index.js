@@ -19,7 +19,11 @@ const routes = [
     }, {
       path: 'playlist',
       name: 'playlist',
-      component: () => import('@/views/PlaylistView.vue')
+      component: () => import('@/views/PlayList.vue')
+    }, {
+      path: 'playqueue',
+      name: 'playqueue',
+      component: () => import('@/views/PlayQueue.vue')
     }]
   }]
 
