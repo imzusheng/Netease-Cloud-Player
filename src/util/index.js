@@ -18,12 +18,17 @@ export const fetchToJson = (url) => {
 }
 // 提取歌手名字
 export const pickUpName = (artists, Separator = '/') => {
-  return artists
-    .map((n) => {
-      if (n.name) return n.name
-      else return n
-    })
-    .join(Separator)
+  // 判断是否是数组
+  if (Object.prototype.toString.call(artists) === '[object Array]') {
+    return artists
+      .map((n) => {
+        if (n.name) return n.name
+        else return n
+      })
+      .join(Separator)
+  } else {
+    return null
+  }
 }
 
 /**

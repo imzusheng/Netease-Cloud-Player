@@ -56,21 +56,8 @@ localStorage:
       <!-- 中控 -->
       <div class="player-controls">
         <div class="player-controls-left">
-          <button
-            style="--button-size: 32px"
-            role="switch"
-            aria-checked="false"
-            aria-label="开启随机播放"
-            data-testid="control-button-shuffle"
-            aria-expanded="false"
-          >
-            <svg
-              role="img"
-              height="16"
-              width="16"
-              viewBox="0 0 16 16"
-              class="Svg-sc-1bi12j5-0 hDgDGI"
-            >
+          <button>
+            <svg role="img" height="16" width="16" viewBox="0 0 16 16">
               <path
                 d="M13.151.922a.75.75 0 10-1.06 1.06L13.109 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5H0V14h.391a3.75 3.75 0 002.873-1.34l6.173-7.356a2.25 2.25 0 011.724-.804h1.947l-1.017 1.018a.75.75 0 001.06 1.06L15.98 3.75 13.15.922zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 00.39 3.5z"
               ></path>
@@ -79,14 +66,7 @@ localStorage:
               ></path>
             </svg>
           </button>
-          <button
-            @click="prev"
-            style="--button-size: 32px"
-            class="FKTganvAaWqgK6MUhbkx"
-            disabled=""
-            aria-label="上一首"
-            aria-expanded="false"
-          >
+          <button @click="prev">
             <svg
               role="img"
               height="16"
@@ -124,15 +104,7 @@ localStorage:
         </div>
         <div class="player-controls-right">
           <!-- 按钮 下一首 -->
-          <button
-            @click="next"
-            style="--button-size: 32px"
-            class="ARtnAVxkbmzyEjniZXVO"
-            disabled=""
-            aria-label="下一首"
-            data-testid="control-button-skip-forward"
-            aria-expanded="false"
-          >
+          <button @click="next" style="--button-size: 32px">
             <svg
               role="img"
               height="16"
@@ -330,6 +302,7 @@ export default {
         Object.keys(curSongInfo).forEach((key) => {
           this.curSongInfo[key] = curSongInfo[key]
         })
+        console.log(JSON.stringify(curSongInfo))
         localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
         // 通过歌曲的id获取MP3的url
         this.getSongUrl(songid).then((res) => {
@@ -338,16 +311,10 @@ export default {
       })
     },
     next () {
-      // this.setPlayQueueIndex(true)
-      // this.setCurSongid(
-      //   this.$store.state.playQueue[this.$store.state.playQueueIndex]
-      // )
+      this.setPlayQueueIndex(true)
     },
     prev () {
-      // this.setPlayQueueIndex(false)
-      // this.setCurSongid(
-      //   this.$store.state.playQueue[this.$store.state.playQueueIndex]
-      // )
+      this.setPlayQueueIndex(false)
     }
   },
 
@@ -472,7 +439,10 @@ export default {
   watch: {
     '$store.getters.curSongid': {
       handler (songid) {
-        this.idToUrl(songid, true)
+        if (songid) {
+          localStorage.setItem('songid', songid)
+          this.idToUrl(songid, true)
+        }
       }
     }
   }

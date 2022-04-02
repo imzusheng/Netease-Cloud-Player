@@ -66,30 +66,24 @@ export default new Vuex.Store({
         anchor: false
       }
     },
-    curPlaylistColor: '0, 0, 0, 1', // 当前主题颜色
-    curPlaylist: [], // 当前歌单列表
-    curPlaylistInfo: {}, // 当前歌单信息
-    curSongurlInfo: {}, // 当前歌曲url信息，包含码率等
-    curSongInfo: {}, // 当前歌曲所有信息，包含专辑作者等
-    curSongid: '', // 当前播放的歌曲id
-    playQueue: [], // 播放队列
-    playQueueIndex: 0 // 当前播放队列数组下标
+    // 当前主题颜色
+    curPlaylistColor: '0, 0, 0, 1',
+    // 当前播放的歌曲
+    curSong: {
+      id: '' // 当前播放的歌曲id
+      // url: '',
+      // info: {}
+    },
+    // 播放队列
+    playQueue: [],
+    // 当前播放队列数组下标
+    playQueueIndex: 0
   },
   getters: {
     userInfo: state => state.userInfo,
-    curSongid: state => state.curSongid || '',
-    curSongName: state => state.curSongInfo.name || '',
-    curSongPic: state => state.curSongInfo.al?.picUrl || '',
-    curSongArtisis: state => state.curSongInfo.ar || null,
-    curSongPubtime: state => state.curSongInfo.publishTime || null
+    curSongid: state => state.curSong.id || ''
   },
   mutations: {
-    setCurSongInfo (state, payload) {
-      state.curSongInfo = payload
-    },
-    setCurSongurlInfo (state, payload) {
-      state.curSongurlInfo = payload
-    },
     setLoading (state, status) {
       state.loading = status
     },
@@ -97,7 +91,7 @@ export default new Vuex.Store({
       state.curPlaylistColor = rgba
     },
     setCurSongid (state, id) {
-      state.curSongid = id
+      state.curSong.id = id
     },
     setPlayQueueIndex (state, type) {
       if (type) {
@@ -105,6 +99,9 @@ export default new Vuex.Store({
       } else {
         if (state.playQueueIndex > 1) state.playQueueIndex -= 1
       }
+      state.curSong.id = state.playQueue[state.playQueueIndex].id
+      // 保存playQueueIndex
+      localStorage.setItem('playQueueIndex', state.playQueueIndex)
     },
     // 修改播放列表
     pushPlayQueue (state, playQueue) {
@@ -112,15 +109,21 @@ export default new Vuex.Store({
         // 提取id
         const queueId = state.playQueue.map(v => v.id)
         // 第一种 Set 去重，只保存id
-        // queueId.push(...state.curPlaylist.map(v => v.id))
+        // queueId.push(playQueue.map(v => v.id))
         // state.playQueue = Array.from(new Set(queueId))
         // 第二种 foreach
-        state.curPlaylist.forEach(v => {
+        playQueue.forEach(v => {
           if (!queueId.includes(v.id)) state.playQueue.push(v)
         })
       } else {
         state.playQueue = []
       }
+      localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
+    },
+    reset (state) {
+      state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []
+      state.playQueueIndex = localStorage.getItem('playQueueIndex') ? Number(localStorage.getItem('playQueueIndex')) : 0
+      state.curSong.id = state.playQueue[state.playQueueIndex]?.id || null
     }
   },
   actions: {

@@ -158,43 +158,55 @@ export default {
 
   data () {
     return {
-      songid: '', // 当前播放歌曲的id
       curPlaylist: [], // 当前歌单列表
       curPlaylistInfo: {} // 歌单信息
     }
   },
 
   methods: {
-    ...mapActions([
-      'getPlaylistDetail',
-      'getSongDetail',
-      'getSongUrl',
-      'pushPlayQueue'
-    ]),
+    ...mapActions(['getPlaylistDetail', 'getSongDetail']),
     ...mapMutations([
-      'setCurSongid',
       'setCurPlaylistColor',
+      'setCurSongid',
       'setLoading',
       'pushPlayQueue'
     ]),
     // 选择歌曲，并开始播放
     playlistSelect (data) {
-      this.songid = data.id
       localStorage.setItem('songid', data.id)
-      // this.setCurSongid(data.id)
+      this.setCurSongid(data.id)
     },
     // 加载全部歌曲到列表
     actionPlayAll () {
-      this.pushPlayQueue(false)
-      this.pushPlayQueue(true)
+      // 清空先前的播放列表
+      this.pushPlayQueue(null)
+      this.pushPlayQueue(this.curPlaylist)
       if (this.$store.state.playQueue.length > 0) {
         this.setCurSongid(this.$store.state.playQueue[0].id)
-        // this.$store.state.playQueue.shift()
       }
     },
+    // 提取颜色
     getPicMainColor (url) {
       getMainColor(url).then((color) => {
         this.setCurPlaylistColor(color)
+      })
+    },
+    // 实现图片懒加载
+    lazyLoadimg () {
+      // IntersectionObserver
+      const intersectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((item) => {
+          if (item.intersectionRatio > 0) {
+            item.target.src = item.target.getAttribute('data-pic-src')
+            intersectionObserver.unobserve(item.target)
+          }
+        })
+      })
+      // dom更新完成 开始观察
+      this.$nextTick(function () {
+        document
+          .querySelectorAll('.table-cell-desc-pic')
+          .forEach((ele) => intersectionObserver.observe(ele))
       })
     }
   },
@@ -206,30 +218,18 @@ export default {
     this.setLoading(true)
     // 获取歌单详情，得到所有歌曲的id集合ids
     this.getPlaylistDetail(id).then((playlist) => {
-      // 通过ids获取每首歌的详情，返回songs
       this.curPlaylistInfo = playlist
       const ids = playlist.trackIds.map((track) => track.id).toString()
+      // 通过ids获取每首歌的详情，返回songs
       this.getSongDetail(ids).then((res) => {
         this.curPlaylist = res.songs
         // 设置加载状态false
         this.setLoading(false)
-        // IntersectionObserver
-        const intersectionObserver = new IntersectionObserver((entries) => {
-          entries.forEach((item) => {
-            if (item.intersectionRatio > 0) {
-              item.target.src = item.target.getAttribute('data-pic-src')
-              intersectionObserver.unobserve(item.target)
-            }
-          })
-        })
-        // dom更新完成 开始观察
-        this.$nextTick(function () {
-          document
-            .querySelectorAll('.table-cell-desc-pic')
-            .forEach((ele) => intersectionObserver.observe(ele))
-        })
+        // 实现图片懒加载
+        this.lazyLoadimg()
       })
     })
+    //
     // 以下都是小动画监听
     playlistMaskRef = this.$refs['playlist-content-mask']
     playlistBannerRef = this.$refs['playlist-banner']

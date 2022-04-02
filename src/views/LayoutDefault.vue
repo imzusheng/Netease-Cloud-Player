@@ -3,34 +3,36 @@
     id="layout-default"
     :style="{ '--color-playlist': $store.state.curPlaylistColor }"
   >
+    <!-- 头部 -->
     <header>
       <nav>
         <!-- logo -->
         <div class="logo">
           <img src="../assets/logo_a.png" alt="" />
         </div>
+
         <!-- 菜单 -->
         <SubTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
+
         <!-- 用户头像 -->
         <div class="avatar">
           <img :src="$store.getters.userInfo.profile.avatarUrl" alt="" />
           <!-- <span>{{ userInfo.profile.nickname }}</span> -->
         </div>
       </nav>
+
+      <!-- 无关的遮罩 -->
       <div class="header-mask" ref="main-header-mask"></div>
       <div class="header-bg-mask"></div>
     </header>
+
     <!-- 加载logo -->
     <GlobalLoading v-if="$store.state.loading" />
+
     <router-view v-show="!$store.state.loading"></router-view>
+
     <!-- 音乐播放器 -->
-    <PlayerAudio
-      :songid="$store.getters.curSongid"
-      :name="$store.getters.curSongName"
-      :poster="$store.getters.curSongPic"
-      :artisis="getPickupName($store.getters.curSongArtisis)"
-      :pubTime="getPubTime($store.getters.curSongPubtime)"
-    />
+    <PlayerAudio />
   </div>
 </template>
 
@@ -48,6 +50,10 @@ export default {
     SubTabs,
     PlayerAudio,
     GlobalLoading
+  },
+
+  created () {
+    this.$store.commit('reset')
   },
 
   data () {

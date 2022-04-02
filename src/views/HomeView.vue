@@ -1,3 +1,7 @@
+<!--
+  首页
+-->
+
 <template>
   <main id="home">
     <!-- 热门歌曲 -->
@@ -109,7 +113,7 @@
 
 <script>
 import SubTabs from '@/components/SubTabs'
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 
 export default {
   name: 'HomeView',
@@ -245,6 +249,7 @@ export default {
       'getNewsong',
       'getMv'
     ]),
+    ...mapMutations(['setLoading']),
     // 小菜单切换
     subTabsChange (val) {
       this.config.dj.type = val
@@ -272,6 +277,8 @@ export default {
   mounted () {
     this.subTabsChange('推荐')
 
+    this.setLoading(true)
+
     Promise.all([
       this.getCommunity(),
       this.getRecommend(),
@@ -282,6 +289,7 @@ export default {
       resArr.forEach((res) => {
         this.listData[res.type] = res.data
       })
+      this.setLoading(false)
       // IntersectionObserver
       const intersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((item) => {
