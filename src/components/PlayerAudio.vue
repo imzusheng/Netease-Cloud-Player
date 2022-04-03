@@ -35,6 +35,7 @@
           <!-- 播放进度 红色 -->
           <div
             class="player-progress-bg"
+            :class="{ 'player-progress-bg-animate': !audioSeeking }"
             :style="{ transform: `translateX(-${100 - getPlayProgress}%)` }"
           >
             <!-- 小圆点 -->
@@ -203,6 +204,7 @@ export default {
 
       // 元素节点引用
       audioRef: '',
+
       // 是否正在调整视频(拖动进度条)
       audioSeeking: false,
 
@@ -221,7 +223,10 @@ export default {
         picUrl: '',
         artisis: '',
         publishTime: ''
-      }
+      },
+
+      // 出现错误的次数， 每一首歌有一次重连机会
+      errorNum: 0
     }
   },
 
@@ -238,6 +243,7 @@ export default {
       this.audioRef.autoplay = autoplay
       // this.audioRef.muted = 'muted'
       this.audioRef.src = url
+      // this.audioRef.src = 'www.baidu.com' // 测试错误
       this.audioRef.load()
     },
     // 开始或暂停播放
@@ -317,8 +323,25 @@ export default {
     this.audioRef.currentTime = localStorage.getItem('currentTime') || 0
     this.audioLength = localStorage.getItem('audioLength')
     this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+
+    // 监听错误
+    this.audioRef.addEventListener('error', (e) => {
+      this.audioRef.pause()
+      this.loading = true
+      if (this.errorNum === 0) {
+        this.errorNum = 1
+        setTimeout(() => {
+          this.idToUrl(songid, true)
+        }, 3000)
+      } else {
+        // TODO 重新加载一次都不行，这时候页面就是显示错误了，可能是url过期等网络问题
+        console.error(e, '玩了，芭比Q了.直接刷新页面吧')
+      }
+    })
     // 可以开始播放，加载完毕
     this.audioRef.addEventListener('canplay', () => {
+      // 加载成功之后就再给他一次重连的机会
+      this.errorNum = 0
       this.loading = false
     })
     // 开始播放
@@ -360,10 +383,6 @@ export default {
     // 用户代理试图获取媒体数据，但数据意外地没有进入。
     this.audioRef.addEventListener('stalled', (e) => {
       console.log('stalled', e)
-    })
-    // 媒体加载挂起。
-    this.audioRef.addEventListener('suspend', (e) => {
-      console.log('suspend', e)
     })
     // 因为暂时性缺少数据，播放暂停。
     this.audioRef.addEventListener('waiting', (e) => {
@@ -487,7 +506,6 @@ export default {
           this.idToUrl(songid, true)
           this.audioRef.pause()
           this.loading = true
-          console.log('run', songid)
         }
       }
     }
@@ -588,8 +606,6 @@ export default {
         z-index: 2;
         background: rgba(240, 0, 0, 0.8);
         transform: translateX(-90%);
-        transition: transform 0.25s linear 0s;
-        // transition: transform 0.4s;
         // 小圆点
         .player-progress-point {
           display: none;
@@ -604,6 +620,10 @@ export default {
           border-radius: 50%;
           z-index: 3;
         }
+      }
+
+      player-progress-bg-animate {
+        transition: transform 0.25s linear 0s;
       }
 
       &:hover {
