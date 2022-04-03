@@ -33,7 +33,10 @@ export default new Vuex.Store({
     playQueue: [],
 
     // 播放队列图标状态
-    playQueueStatus: false
+    playQueueStatus: false,
+
+    // 小提示内容
+    tips: ''
   },
   getters: {
     userInfo: state => state.userInfo,
@@ -48,6 +51,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setTips (state, content) {
+      state.tips = content
+    },
     setPlayQueueStatus (state, status) {
       state.playQueueStatus = status
     },

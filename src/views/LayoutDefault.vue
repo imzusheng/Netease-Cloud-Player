@@ -38,6 +38,8 @@
     <!-- 加载logo -->
     <TheLoading v-if="$store.state.loading" />
 
+    <TheTips />
+
     <router-view v-show="!$store.state.loading"></router-view>
 
     <!-- 音乐播放器 -->
@@ -49,6 +51,7 @@
 import SubTabs from '@/components/SubTabs'
 import PlayerAudio from '@/components/PlayerAudio'
 import TheLoading from '@/components/TheLoading'
+import TheTips from '@/components/TheTips'
 import { pickUpName } from '@/util'
 import moment from 'moment'
 
@@ -58,7 +61,8 @@ export default {
   components: {
     SubTabs,
     TheLoading,
-    PlayerAudio
+    PlayerAudio,
+    TheTips
   },
 
   created () {

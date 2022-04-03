@@ -6,7 +6,6 @@
   2.currentTime
   3.volumeProgress
 
-  切歌有延迟
   离开页面久了，有时候会触发暂停，但是歌还在放
 -->
 
@@ -71,7 +70,7 @@
       <!-- 中控 -->
       <div class="player-controls">
         <div class="player-controls-left">
-          <button>
+          <button @click="randomPlay" :class="{ 'random-play': random }">
             <svg role="img" height="16" width="16" viewBox="0 0 16 16">
               <path
                 d="M13.151.922a.75.75 0 10-1.06 1.06L13.109 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5H0V14h.391a3.75 3.75 0 002.873-1.34l6.173-7.356a2.25 2.25 0 011.724-.804h1.947l-1.017 1.018a.75.75 0 001.06 1.06L15.98 3.75 13.15.922zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 00.39 3.5z"
@@ -226,14 +225,17 @@ export default {
       },
 
       // 出现错误的次数， 每一首歌有一次重连机会
-      errorNum: 0
+      errorNum: 0,
+
+      // 是否开启随机播放
+      random: false
     }
   },
 
   methods: {
     ...mapGetters(['playQueue', 'playQueueIndex']),
     ...mapActions(['getSongDetail', 'getSongUrl']),
-    ...mapMutations(['setCurSongid', 'setCurSongurlInfo']),
+    ...mapMutations(['setCurSongid', 'setCurSongurlInfo', 'setTips']),
     // 创建audio 加载mp3
     createAudio (url, autoplay) {
       // 重置播放器信息,删除上一首歌播放进度
@@ -266,12 +268,15 @@ export default {
       if (this.audioPlayType === 'common') {
         this.audioPlayType = 'list'
         this.audioRef.loop = false
+        this.setTips('列表循环播放')
       } else if (this.audioPlayType === 'list') {
         this.audioPlayType = 'repeat'
         this.audioRef.loop = true
+        this.setTips('单曲播放')
       } else if (this.audioPlayType === 'repeat') {
         this.audioPlayType = 'common'
         this.audioRef.loop = false
+        this.setTips('列表播放')
       }
     },
     // 通过歌曲id获取MP3 url
@@ -296,14 +301,30 @@ export default {
         })
       })
     },
+
+    // 下一首
     next () {
       const playQueue = this.playQueue()
       const playQueueIndex = this.playQueueIndex()
-      // 如果播放到尾，则从头开始
-      const nextIndex =
-        playQueueIndex === playQueue.length - 1 ? 0 : playQueueIndex + 1
-      this.setCurSongid(playQueue[nextIndex].id)
+      // 判断是否开启了随机播放
+      if (this.random) {
+        // 为了排除随机到正在播放的歌曲
+        function getNextIndex () {
+          const nextIndex = this.getRandomIndex(playQueue.length - 1)
+          if (nextIndex === playQueueIndex) getNextIndex()
+          else return nextIndex
+        }
+        const nextIndex = getNextIndex.call(this)
+        this.setCurSongid(playQueue[nextIndex].id)
+      } else {
+        // 如果播放到尾，则从头开始
+        const nextIndex =
+          playQueueIndex === playQueue.length - 1 ? 0 : playQueueIndex + 1
+        this.setCurSongid(playQueue[nextIndex].id)
+      }
     },
+
+    // 上一首
     prev () {
       const playQueue = this.playQueue()
       const playQueueIndex = this.playQueueIndex()
@@ -311,6 +332,17 @@ export default {
       const prevIndex =
         playQueueIndex === 0 ? playQueue.length - 1 : playQueueIndex - 1
       this.setCurSongid(playQueue[prevIndex].id)
+    },
+
+    // 切换随机播放
+    randomPlay () {
+      this.random = !this.random
+      this.setTips(this.random ? '开启随机播放' : '关闭随机播放')
+    },
+
+    // 获取 [0,max]的随机数
+    getRandomIndex (max) {
+      return Math.floor(Math.random() * (max + 1))
     }
   },
 
@@ -378,6 +410,24 @@ export default {
       this.progress = (this.audioRef.currentTime / this.audioLength) * 100
       // 保存进度到localStorage
       localStorage.setItem('currentTime', this.audioRef.currentTime)
+    })
+    // 播放完毕
+    this.audioRef.addEventListener('ended', (e) => {
+      if (this.audioPlayType === 'list') {
+        // 列表循环模式
+        this.next()
+      } else if (this.audioPlayType === 'repeat') {
+        // 单曲循环模式
+        this.audioRef.currentTime = 0
+      } else {
+        // 列表播放，播完即止
+        const playQueue = this.playQueue()
+        const playQueueIndex = this.playQueueIndex()
+        // 如果播放到尾，则结束播放。反之下一首
+        if (playQueueIndex !== playQueue.length - 1) {
+          this.next()
+        }
+      }
     })
 
     // 用户代理试图获取媒体数据，但数据意外地没有进入。
@@ -708,6 +758,11 @@ export default {
         justify-content: center;
         align-items: center;
       }
+      .random-play {
+        * {
+          color: rgba(240, 0, 0, 0.8);
+        }
+      }
       .player-controls-center {
         border-radius: 50%;
         background: rgba(255, 255, 255, 1);
@@ -747,6 +802,16 @@ export default {
           &,
           * {
             color: rgba(240, 0, 0, 0.8);
+          }
+          &::after {
+            content: "";
+            background-color: currentColor;
+            border-radius: 50%;
+            bottom: 0;
+            display: block;
+            height: 4px;
+            position: absolute;
+            width: 4px;
           }
         }
       }
