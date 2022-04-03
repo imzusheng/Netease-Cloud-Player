@@ -36,7 +36,7 @@
     </header>
 
     <!-- 加载logo -->
-    <GlobalLoading v-if="$store.state.loading" />
+    <TheLoading v-if="$store.state.loading" />
 
     <router-view v-show="!$store.state.loading"></router-view>
 
@@ -48,7 +48,7 @@
 <script>
 import SubTabs from '@/components/SubTabs'
 import PlayerAudio from '@/components/PlayerAudio'
-import GlobalLoading from '@/components/GlobalLoading'
+import TheLoading from '@/components/TheLoading'
 import { pickUpName } from '@/util'
 import moment from 'moment'
 
@@ -57,8 +57,8 @@ export default {
 
   components: {
     SubTabs,
-    PlayerAudio,
-    GlobalLoading
+    TheLoading,
+    PlayerAudio
   },
 
   created () {

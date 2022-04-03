@@ -46,12 +46,16 @@
       <div class="player-song">
         <!-- 封面 -->
         <div class="player-song-pic">
-          <img :src="curSongPic" alt="" />
+          <img v-if="!loading" :src="curSongPic" alt="" />
+          <TheLoadingCircle v-else class="pic-loading" />
         </div>
         <!-- 歌曲信息 -->
         <div class="player-song-desc">
-          <p :title="curSongName">{{ curSongName }}</p>
+          <p :title="curSongName">
+            {{ loading ? "正在加载..." : curSongName }}
+          </p>
           <p
+            v-if="!loading"
             :title="`${curSongArtisis}${
               curSongPubtime ? ' • ' : ''
             }${curSongPubtime}`"
@@ -60,6 +64,7 @@
             <span v-if="curSongPubtime">&nbsp;•&nbsp;</span>
             {{ curSongPubtime }}
           </p>
+          <p v-else>&nbsp;</p>
         </div>
       </div>
       <!-- 中控 -->
@@ -90,7 +95,7 @@
           </button>
         </div>
         <div class="player-controls-center">
-          <button title="播放/暂停" @click="audioPlay">
+          <button title="播放/暂停" @click="audioPlay" :disabled="loading">
             <!-- 开始 -->
             <svg
               v-if="getPlayStatus"
@@ -158,6 +163,7 @@
 <script>
 import moment from 'moment'
 import PlayerAudioVolume from '@/components/PlayerAudioVolume'
+import TheLoadingCircle from '@/components/TheLoadingCircle'
 import { mapActions, mapMutations, mapGetters } from 'vuex'
 import { pickUpName } from '@/util'
 
@@ -165,11 +171,15 @@ export default {
   name: 'PlayerAudio',
 
   components: {
-    PlayerAudioVolume
+    PlayerAudioVolume,
+    TheLoadingCircle
   },
 
   data () {
     return {
+      // 歌曲加载状态
+      loading: false,
+
       // 播放模式 如: repeat(单曲循环), common(不), list(列表播放)
       audioPlayType: 'common',
 
@@ -307,6 +317,10 @@ export default {
     this.audioRef.currentTime = localStorage.getItem('currentTime') || 0
     this.audioLength = localStorage.getItem('audioLength')
     this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+    // 可以开始播放，加载完毕
+    this.audioRef.addEventListener('canplay', () => {
+      this.loading = false
+    })
     // 开始播放
     this.audioRef.addEventListener('play', (e) => {
       this.playStatus = true
@@ -472,6 +486,8 @@ export default {
           localStorage.setItem('songid', songid)
           this.idToUrl(songid, true)
           this.audioRef.pause()
+          this.loading = true
+          console.log('run', songid)
         }
       }
     }
@@ -621,16 +637,19 @@ export default {
       width: 30%;
       height: 100%;
       display: flex;
+      align-items: center;
       .player-song-pic {
-        display: flex;
-        height: 100%;
-        justify-content: center;
-        flex-direction: column;
+        height: 48px;
+        width: 48px;
+        margin-right: 12px;
         img {
           height: 48px;
           border-radius: 3px;
-          margin-right: 12px;
           cursor: pointer;
+        }
+        .pic-loading {
+          padding: 6px;
+          box-sizing: border-box;
         }
       }
       .player-song-desc {
