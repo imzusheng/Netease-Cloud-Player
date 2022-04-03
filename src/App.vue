@@ -33,6 +33,7 @@ img:not([src]) {
   background-color: rgba(0, 0, 0, 1);
   padding-bottom: 72px;
   box-sizing: border-box;
+  display: flex;
 }
 
 // * {

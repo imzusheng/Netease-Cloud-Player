@@ -5,7 +5,7 @@
       <button
         title="播放队列"
         class="play-queue"
-        :class="{ 'play-queue-open': playQueueStatus }"
+        :class="{ 'play-queue-open': $store.state.playQueueStatus }"
         @click="toPlayQueue"
       >
         <svg role="img" height="16" width="16" viewBox="0 0 16 16">
@@ -106,15 +106,8 @@ export default {
   data () {
     return {
       // 0~100区间的音量值
-      volumeProgress: localStorage.getItem('volumeProgress') || 50,
-
-      // 是否打开播放列表页面
-      playQueueStatus: false
+      volumeProgress: localStorage.getItem('volumeProgress') || 50
     }
-  },
-
-  created () {
-    this.playQueueStatus = this.$route.name === 'playqueue'
   },
 
   mounted () {
@@ -159,11 +152,9 @@ export default {
     },
     // 前往播放列表
     toPlayQueue () {
-      if (!this.playQueueStatus) {
-        this.playQueueStatus = true
+      if (!this.$store.state.playQueueStatus) {
         this.$router.push({ name: 'playqueue' })
       } else {
-        this.playQueueStatus = false
         this.$router.go(-1)
       }
     }

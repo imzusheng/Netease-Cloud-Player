@@ -385,7 +385,7 @@ export default {
       right: 0;
       background-color: rgba(var(--color-playlist));
       height: 232px;
-      transition: background 0.65s;
+      // transition: background 0.65s;
       background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgb(18, 18, 18));
       z-index: -1;
     }

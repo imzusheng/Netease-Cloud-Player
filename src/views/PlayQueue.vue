@@ -5,15 +5,21 @@
 <template>
   <div id="play-queue">
     <div class="play-queue-spacing">
-      <h1>播放队列</h1>
-      <h2>
-        共{{ $store.state.playQueue.length }}首，待播放{{
-          $store.state.playQueue.length - $store.state.playQueueIndex - 2
-        }}首
-      </h2>
+      <div class="play-queue-title">
+        <h1>播放队列</h1>
+        <div class="play-queue-subtitle">
+          <h2 v-if="$store.state.playQueue.length > 0">
+            共{{ $store.state.playQueue.length }}首，待播放{{
+              $store.state.playQueue.length - $store.state.playQueueIndex - 2
+            }}首
+          </h2>
+          <h2 v-else>在歌单中点击“加入队列”便可在此查看内容</h2>
+          <div class="clear-queue" @click="clearQueue">清空队列</div>
+        </div>
+      </div>
       <main class="play-queue-main">
         <!-- 表格 -->
-        <ul class="play-queue-table">
+        <ul v-if="$store.state.playQueue.length > 0" class="play-queue-table">
           <li
             class="table-row"
             v-for="(listItem, listIndex) in $store.state.playQueue"
@@ -112,6 +118,11 @@
             <div>{{ getSongDt(listItem.dt) }}</div>
           </li>
         </ul>
+        <div v-else>
+          <button class="find-more" @click="toHome">
+            发现更多你感兴趣的内容
+          </button>
+        </div>
       </main>
     </div>
   </div>
@@ -120,6 +131,7 @@
 <script>
 import moment from 'moment'
 import { pickUpName } from '@/util'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'PlayQueue',
@@ -129,6 +141,7 @@ export default {
   },
 
   methods: {
+    ...mapMutations(['pushPlayQueue']),
     // 实现图片懒加载
     lazyLoadimg () {
       // IntersectionObserver
@@ -146,6 +159,13 @@ export default {
           .querySelectorAll('.table-cell-desc-pic')
           .forEach((ele) => intersectionObserver.observe(ele))
       })
+    },
+    clearQueue () {
+      // 清空先前的播放列表
+      this.pushPlayQueue(null)
+    },
+    toHome () {
+      this.$router.push({ name: 'home' })
     }
   },
 
@@ -171,149 +191,197 @@ export default {
 
 <style lang="less" scoped>
 #play-queue {
+  background: #000;
+  position: relative;
+  height: 100%;
   .play-queue-spacing {
-    padding: 32px 40px 56px;
+    padding: 0 40px 10px;
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     // 大标题
-    h1 {
-      padding: 0 10px;
-      line-height: 1.5;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    h2 {
-      padding: 0 10px 10px;
-      font-size: 16px;
-      font-weight: 400;
-      color: #b3b3b3;
-      margin-bottom: 24px;
-    }
-    // ul
-    .play-queue-table {
-      * {
-        color: #b3b3b3;
-        font-size: 14px;
+    .play-queue-title {
+      padding-top: 32px;
+      position: sticky;
+      top: 68px;
+      background: #000;
+      z-index: 1;
+      border-bottom: 1px solid rgba(255, 255green, 255, 0.1);
+      h1 {
+        padding: 0 10px;
+        line-height: 1.5;
+        font-size: 28px;
+        font-weight: 700;
       }
-      // li
-      .table-row {
-        display: grid;
-        grid-gap: 16px;
-        grid-template-columns:
-          [index] 16px
-          [first] 6fr
-          [var1] 4fr
-          [last] minmax(120px, 1fr);
-        padding: 0 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        // li > div
-        > div {
-          display: flex;
-          align-items: center;
-          padding: 5px 0;
-          &:last-child {
-            justify-content: flex-end;
-            margin-right: 32px;
-          }
+      .play-queue-subtitle {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        h2 {
+          padding: 4px 10px 10px;
+          font-size: 16px;
+          font-weight: 400;
+          color: #b3b3b3;
         }
-        // index单元格
-        .table-cell-index {
-          justify-content: center;
-          align-items: center;
-          .playlist-table-index {
-            display: block;
-          }
-          .playlist-table-icon {
-            display: none;
-            > svg {
-              width: 16px;
-              height: 16px;
-            }
-          }
-        }
-        // 歌曲信息
-        .table-cell-desc {
-          // 歌曲封面
-          .table-cell-desc-pic {
-            height: 54px;
-            width: 54px;
-            flex-shrink: 0;
-            margin-right: 5px;
-            padding: 5px;
-            box-sizing: border-box;
-          }
-          // 歌曲名 和 歌手
-          .table-cell-desc-info {
-            display: grid;
-            grid-template: "title title" "badges subtitle" / auto 1fr;
-            .table-desc-name {
-              grid-area: title;
-              color: #fff;
-              display: flex;
-              align-items: center;
-              > span {
-                font-size: 15px;
-                color: #fff;
-                font-weight: 600;
-              }
-              .table-cell-desc-vip {
-                height: 32px;
-                width: 32px;
-                margin-left: 4px;
-              }
-            }
-            .table-desc-ar {
-              grid-column-start: badges;
-              grid-area: subtitle;
-              color: #b3b3b3;
-            }
-          }
-        }
-        // hover样式
-        &:hover {
-          .playlist-table-index {
-            display: none;
-          }
-          .playlist-table-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .table-desc-name {
+        .clear-queue {
+          padding: 4px;
+          font-size: 16px;
+          font-weight: 400;
+          color: #fff;
+          cursor: pointer;
+          &:hover {
             text-decoration: underline;
           }
         }
-        // 需要省略的格子
-        .table-cell-ellipsis {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
       }
+    }
 
-      // 正在播放的歌曲样式
-      .playing {
-        background: rgb(60, 60, 60);
-        .playlist-table-index {
-          display: none !important;
+    .play-queue-main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // 发现更多按钮
+      .find-more {
+        border: none;
+        // background: rgba(240, 0, 0, 0.9);
+        background: rgba(255, 255, 255, 0.9);
+        color: #000;
+        font-size: 16px;
+        height: 48px;
+        padding: 0 32px;
+        border-radius: 50px;
+        cursor: pointer;
+      }
+      // ul
+      .play-queue-table {
+        * {
+          color: #b3b3b3;
+          font-size: 14px;
         }
-        .playlist-table-icon {
-          display: flex !important;
-          align-items: center;
-          justify-content: center;
-          .icon-pause {
-            display: none;
+        // li
+        .table-row {
+          display: grid;
+          grid-gap: 16px;
+          grid-template-columns:
+            [index] 16px
+            [first] 6fr
+            [var1] 4fr
+            [last] minmax(120px, 1fr);
+          padding: 0 16px;
+          border-radius: 6px;
+          cursor: pointer;
+          // li > div
+          > div {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            &:last-child {
+              justify-content: flex-end;
+              margin-right: 32px;
+            }
           }
-          .icon-equaliser {
-            display: block;
-          }
-        }
-        &:hover {
-          .playlist-table-icon {
-            .icon-pause {
+          // index单元格
+          .table-cell-index {
+            justify-content: center;
+            align-items: center;
+            .playlist-table-index {
               display: block;
             }
-            .icon-equaliser {
+            .playlist-table-icon {
               display: none;
+              > svg {
+                width: 16px;
+                height: 16px;
+              }
+            }
+          }
+          // 歌曲信息
+          .table-cell-desc {
+            // 歌曲封面
+            .table-cell-desc-pic {
+              height: 54px;
+              width: 54px;
+              flex-shrink: 0;
+              margin-right: 5px;
+              padding: 5px;
+              box-sizing: border-box;
+            }
+            // 歌曲名 和 歌手
+            .table-cell-desc-info {
+              display: grid;
+              grid-template: "title title" "badges subtitle" / auto 1fr;
+              .table-desc-name {
+                grid-area: title;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                > span {
+                  font-size: 15px;
+                  color: #fff;
+                  font-weight: 600;
+                }
+                .table-cell-desc-vip {
+                  height: 32px;
+                  width: 32px;
+                  margin-left: 4px;
+                }
+              }
+              .table-desc-ar {
+                grid-column-start: badges;
+                grid-area: subtitle;
+                color: #b3b3b3;
+              }
+            }
+          }
+          // hover样式
+          &:hover {
+            .playlist-table-index {
+              display: none;
+            }
+            .playlist-table-icon {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .table-desc-name {
+              text-decoration: underline;
+            }
+          }
+          // 需要省略的格子
+          .table-cell-ellipsis {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        // 正在播放的歌曲样式
+        .playing {
+          background: rgb(60, 60, 60);
+          .playlist-table-index {
+            display: none !important;
+          }
+          .playlist-table-icon {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            .icon-pause {
+              display: none;
+            }
+            .icon-equaliser {
+              display: block;
+            }
+          }
+          &:hover {
+            .playlist-table-icon {
+              .icon-pause {
+                display: block;
+              }
+              .icon-equaliser {
+                display: none;
+              }
             }
           }
         }

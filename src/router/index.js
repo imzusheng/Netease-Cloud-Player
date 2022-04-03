@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,10 @@ const router = new VueRouter({
       y: 0
     }
   }
+})
+
+router.afterEach((to, from) => {
+  store.commit('setPlayQueueStatus', to.name === 'playqueue')
 })
 
 export default router

@@ -131,20 +131,23 @@ export default {
 #layout-default {
   --color-playlist: "0, 0, 0, 1";
   width: 100%;
-  min-height: 100vh;
   position: relative;
+  padding: 68px 0 0;
   background-color: rgba(var(--color-playlist));
-  transition: background 0.65s;
+  // transition: background 0.65s;
   // background: rgb(8, 64, 64);
   // background: rgb(152, 64, 64);
 
   header {
-    height: 52px;
-    padding: 8px 16px;
-    position: sticky;
+    // position: sticky;
+    position: fixed;
     top: 0;
+    width: 100%;
+    height: 68px;
+    padding: 8px 16px;
+    box-sizing: border-box;
     z-index: 1;
-    transition: background 0.65s;
+    // transition: background 0.65s;
     // background-color: rgba(var(--color-playlist));
 
     .header-mask {
@@ -165,7 +168,7 @@ export default {
       right: 0;
       bottom: 0;
       z-index: -2;
-      transition: background 0.65s;
+      // transition: background 0.65s;
       background-color: rgba(var(--color-playlist));
     }
 
@@ -184,7 +187,7 @@ export default {
 
     nav {
       width: 100%;
-      height: inherit;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;

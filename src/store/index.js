@@ -8,7 +8,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+
     loading: false, // 全局加载动画
+
     userInfo: {
       code: 200,
       account: {
@@ -66,24 +68,34 @@ export default new Vuex.Store({
         anchor: false
       }
     },
+
     // 当前主题颜色
     curPlaylistColor: '0, 0, 0, 1',
+
     // 当前播放的歌曲
     curSong: {
       id: '' // 当前播放的歌曲id
       // url: '',
       // info: {}
     },
+
     // 播放队列
     playQueue: [],
+
     // 当前播放队列数组下标
-    playQueueIndex: 0
+    playQueueIndex: 0,
+
+    // 播放队列图标状态
+    playQueueStatus: false
   },
   getters: {
     userInfo: state => state.userInfo,
     curSongid: state => state.curSong.id || ''
   },
   mutations: {
+    setPlayQueueStatus (state, status) {
+      state.playQueueStatus = status
+    },
     setLoading (state, status) {
       state.loading = status
     },
@@ -122,6 +134,7 @@ export default new Vuex.Store({
       localStorage.setItem('playQueueIndex', 0)
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
+    // 从localStorage恢复数据
     reset (state) {
       state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []
       state.playQueueIndex = localStorage.getItem('playQueueIndex') ? Number(localStorage.getItem('playQueueIndex')) : 0
