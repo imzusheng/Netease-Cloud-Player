@@ -41,12 +41,18 @@ localStorage:
       </div>
       <!-- 歌曲信息 -->
       <div class="player-song">
-        <div>
+        <!-- 封面 -->
+        <div class="player-song-pic">
           <img :src="curSongPic" alt="" />
         </div>
+        <!-- 歌曲信息 -->
         <div class="player-song-desc">
-          <p>{{ curSongName }}</p>
-          <p>
+          <p :title="curSongName">{{ curSongName }}</p>
+          <p
+            :title="`${curSongArtisis}${
+              curSongPubtime ? ' • ' : ''
+            }${curSongPubtime}`"
+          >
             {{ curSongArtisis }}
             <span v-if="curSongPubtime">&nbsp;•&nbsp;</span>
             {{ curSongPubtime }}
@@ -81,7 +87,7 @@ localStorage:
           </button>
         </div>
         <div class="player-controls-center">
-          <button @click="audioPlay">
+          <button title="播放/暂停" @click="audioPlay">
             <!-- 开始 -->
             <svg
               v-if="getPlayStatus"
@@ -593,12 +599,12 @@ export default {
     }
     // 歌曲信息
     .player-song {
-      flex: 1;
+      width: 30%;
       height: 100%;
       display: flex;
-      > div {
-        height: 100%;
+      .player-song-pic {
         display: flex;
+        height: 100%;
         justify-content: center;
         flex-direction: column;
         img {
@@ -607,29 +613,38 @@ export default {
           margin-right: 12px;
           cursor: pointer;
         }
-        &[class="player-song-desc"] {
-          p:hover {
-            cursor: pointer;
-            text-decoration: underline;
-          }
-          p:first-child {
-            font-size: 14px;
-          }
-          p:last-child {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
-            span {
-              color: currentColor;
-            }
+      }
+      .player-song-desc {
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        flex-direction: column;
+        overflow: hidden;
+        white-space: nowrap;
+        p:hover {
+          cursor: pointer;
+          text-decoration: underline;
+        }
+        p:first-child {
+          font-size: 14px;
+        }
+        p:last-child {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.5);
+          span {
+            color: currentColor;
           }
         }
       }
     }
+
     // 控制按钮
     .player-controls {
       display: flex;
+      width: 40%;
       justify-content: center;
-      flex: 1;
       > div {
         display: flex;
         justify-content: center;
@@ -679,9 +694,10 @@ export default {
         }
       }
     }
+
     // 音量控制
     .player-volume {
-      flex: 1;
+      width: 30%;
       display: flex;
       align-items: center;
       justify-content: flex-end;

@@ -6,6 +6,11 @@
   <div id="play-queue">
     <div class="play-queue-spacing">
       <h1>播放队列</h1>
+      <h2>
+        共{{ $store.state.playQueue.length }}首，待播放{{
+          $store.state.playQueue.length - $store.state.playQueueIndex - 2
+        }}首
+      </h2>
       <main class="play-queue-main">
         <!-- 表格 -->
         <ul class="play-queue-table">
@@ -22,7 +27,7 @@
                 <img
                   class="icon-equaliser"
                   v-if="$store.state.playQueueIndex === listIndex"
-                  src="../assets/equaliser.gif"
+                  src="../assets/equaliser.svg"
                   alt=""
                 />
                 <svg
@@ -170,10 +175,16 @@ export default {
     padding: 32px 40px 56px;
     // 大标题
     h1 {
-      padding: 10px;
+      padding: 0 10px;
       line-height: 1.5;
       font-size: 28px;
       font-weight: 700;
+    }
+    h2 {
+      padding: 0 10px 10px;
+      font-size: 16px;
+      font-weight: 400;
+      color: #b3b3b3;
       margin-bottom: 24px;
     }
     // ul
