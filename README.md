@@ -41,10 +41,10 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 * [x] 显示播放进度
 * [x] vip提示
 * [ ] 登录
-* [ ] 自动连播
+* [x] 自动连播
 * [ ] 选择码率
-* [ ] 随机播放
-* [ ] 播放模式
+* [x] 随机播放
+* [x] 播放模式
 * [ ] 歌词
 
 [我的博客](https://zusheng.club)
