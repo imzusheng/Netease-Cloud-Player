@@ -29,29 +29,29 @@ export default {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    margin-left: -50%;
+    // margin-left: -50%;
     animation: typing 1s linear infinite;
     // alternate
-    background-color: rgba(255, 255, 255, 1);
-    box-shadow: 24px 0px 0px 0px rgba(255, 255, 255, 0.2),
-      48px 0px 0px 0px rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: -26px 0px 0px 0px rgba(255, 255, 255, 1),
+      24px 0px 0px 0px rgba(255, 255, 255, 0.1);
   }
 
   @keyframes typing {
     0% {
-      background-color: rgba(255, 255, 255, 1);
-      box-shadow: 24px 0px 0px 0px rgba(255, 255, 255, 0.2),
-        48px 0px 0px 0px rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 0.1);
+      box-shadow: -26px 0px 0px 0px rgba(255, 255, 255, 1),
+        24px 0px 0px 0px rgba(255, 255, 255, 0.1);
     }
     25% {
-      background-color: rgba(255, 255, 255, 0.2);
-      box-shadow: 24px 0px 0px 0px rgba(255, 255, 255, 1),
-        48px 0px 0px 0px rgba(255, 255, 255, 0.2);
+      background-color: rgba(255, 255, 255, 1);
+      box-shadow: -24px 0px 0px 0px rgba(255, 255, 255, 0.1),
+        24px 0px 0px 0px rgba(255, 255, 255, 0.1);
     }
     75% {
-      background-color: rgba(255, 255, 255, 0.2);
-      box-shadow: 24px 0px 0px 0px rgba(255, 255, 255, 0.2),
-        48px 0px 0px 0px rgba(255, 255, 255, 1);
+      background-color: rgba(255, 255, 255, 0.1);
+      box-shadow: -24px 0px 0px 0px rgba(255, 255, 255, 0.1),
+        26px 0px 0px 0px rgba(255, 255, 255, 1);
     }
   }
 }
