@@ -193,9 +193,7 @@ export default {
       // 清空先前的播放列表
       this.pushPlayQueue(null)
       this.pushPlayQueue(this.curPlaylist)
-      if (this.$store.state.playQueue.length > 0) {
-        this.setCurSongid(this.$store.state.playQueue[0].id)
-      }
+      this.setCurSongid(this.curPlaylist[0].id)
     },
     // 提取颜色
     getPicMainColor (url) {

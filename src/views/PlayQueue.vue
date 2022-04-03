@@ -8,23 +8,20 @@
       <div class="play-queue-title">
         <h1>播放队列</h1>
         <div class="play-queue-subtitle">
-          <h2 v-if="$store.state.playQueue.length > 0">
-            共{{ $store.state.playQueue.length }}首，待播放{{
-              $store.state.playQueue.length - $store.state.playQueueIndex - 2
-            }}首
-          </h2>
+          <h2 v-if="playQueue().length > 0">共{{ playQueue().length }}首</h2>
           <h2 v-else>在歌单中点击“加入队列”便可在此查看内容</h2>
           <div class="clear-queue" @click="clearQueue">清空队列</div>
         </div>
       </div>
       <main class="play-queue-main">
         <!-- 表格 -->
-        <ul v-if="$store.state.playQueue.length > 0" class="play-queue-table">
+        <ul v-if="playQueue().length > 0" class="play-queue-table">
           <li
+            @click="cut(listItem.id)"
             class="table-row"
-            v-for="(listItem, listIndex) in $store.state.playQueue"
+            v-for="(listItem, listIndex) in playQueue()"
             :key="`playQueue${listIndex}`"
-            :class="{ playing: $store.state.playQueueIndex === listIndex }"
+            :class="{ playing: playQueueIndex() === listIndex }"
           >
             <!-- 序号 -->
             <div class="table-cell-index">
@@ -32,13 +29,13 @@
               <span class="playlist-table-icon">
                 <img
                   class="icon-equaliser"
-                  v-if="$store.state.playQueueIndex === listIndex"
+                  v-if="playQueueIndex() === listIndex"
                   src="../assets/equaliser.svg"
                   alt=""
                 />
                 <svg
                   class="icon-pause"
-                  v-if="$store.state.playQueueIndex === listIndex"
+                  v-if="playQueueIndex() === listIndex"
                   height="32"
                   role="img"
                   width="32"
@@ -131,7 +128,7 @@
 <script>
 import moment from 'moment'
 import { pickUpName } from '@/util'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   name: 'PlayQueue',
@@ -141,7 +138,8 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['pushPlayQueue']),
+    ...mapGetters(['playQueue', 'playQueueIndex']),
+    ...mapMutations(['pushPlayQueue', 'setCurSongid']),
     // 实现图片懒加载
     lazyLoadimg () {
       // IntersectionObserver
@@ -166,6 +164,9 @@ export default {
     },
     toHome () {
       this.$router.push({ name: 'home' })
+    },
+    cut (id) {
+      this.setCurSongid(id)
     }
   },
 

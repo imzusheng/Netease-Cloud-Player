@@ -158,7 +158,7 @@
 <script>
 import moment from 'moment'
 import PlayerAudioVolume from '@/components/PlayerAudioVolume'
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions, mapMutations, mapGetters } from 'vuex'
 import { pickUpName } from '@/util'
 
 export default {
@@ -216,6 +216,7 @@ export default {
   },
 
   methods: {
+    ...mapGetters(['playQueue', 'playQueueIndex']),
     ...mapActions(['getSongDetail', 'getSongUrl']),
     ...mapMutations(['setCurSongid', 'setCurSongurlInfo']),
     // 创建audio 加载mp3
@@ -279,8 +280,22 @@ export default {
         })
       })
     },
-    next () {},
-    prev () {}
+    next () {
+      const playQueue = this.playQueue()
+      const playQueueIndex = this.playQueueIndex()
+      // 如果播放到尾，则从头开始
+      const nextIndex =
+        playQueueIndex === playQueue.length - 1 ? 0 : playQueueIndex + 1
+      this.setCurSongid(playQueue[nextIndex].id)
+    },
+    prev () {
+      const playQueue = this.playQueue()
+      const playQueueIndex = this.playQueueIndex()
+      // 如果播放到尾，则从头开始
+      const prevIndex =
+        playQueueIndex === 0 ? playQueue.length - 1 : playQueueIndex - 1
+      this.setCurSongid(playQueue[prevIndex].id)
+    }
   },
 
   created () {
@@ -557,6 +572,7 @@ export default {
         z-index: 2;
         background: rgba(240, 0, 0, 0.8);
         transform: translateX(-90%);
+        transition: transform 0.25s linear 0s;
         // transition: transform 0.4s;
         // 小圆点
         .player-progress-point {

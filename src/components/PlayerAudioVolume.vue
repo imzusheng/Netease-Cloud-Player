@@ -146,7 +146,9 @@ export default {
       }
     },
     updateVolume (x) {
-      if (this.volumeProgress !== x) this.$emit('volume-change', x / 100)
+      if (this.volumeProgress !== x) {
+        this.$emit('volume-change', x / 100)
+      }
       localStorage.setItem('volumeProgress', x)
       this.volumeProgress = x
     },

@@ -36,16 +36,14 @@ img:not([src]) {
   display: flex;
 }
 
-// * {
-//   scrollbar-width: thin;
-// }
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  border: 2px auto;
+  border: 2px solid transparent;
+  background: transparent;
+}
 
-// *::-webkit-scrollbar {
-//   width: 10px;
-// }
-
-// *::-webkit-scrollbar-thumb {
-//   background: rgba(100, 100, 100, 0.7);
-//   border-radius: 1px;
-// }
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
 </style>

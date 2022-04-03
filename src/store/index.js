@@ -74,7 +74,7 @@ export default new Vuex.Store({
 
     // 当前播放的歌曲
     curSong: {
-      id: '' // 当前播放的歌曲id
+      id: 0 // 当前播放的歌曲id
       // url: '',
       // info: {}
     },
@@ -82,15 +82,20 @@ export default new Vuex.Store({
     // 播放队列
     playQueue: [],
 
-    // 当前播放队列数组下标
-    playQueueIndex: 0,
-
     // 播放队列图标状态
     playQueueStatus: false
   },
   getters: {
     userInfo: state => state.userInfo,
-    curSongid: state => state.curSong.id || ''
+    curSongid: state => state.curSong.id || '',
+    playQueue: state => state.playQueue,
+    playQueueIndex: state => {
+      const ids = state.playQueue.map(v => v.id)
+      if (typeof state.curSong.id === 'string') {
+        state.curSong.id = Number(state.curSong.id)
+      }
+      return ids.indexOf(state.curSong.id)
+    }
   },
   mutations: {
     setPlayQueueStatus (state, status) {
@@ -105,40 +110,23 @@ export default new Vuex.Store({
     setCurSongid (state, id) {
       state.curSong.id = id
     },
-    setPlayQueueIndex (state, type) {
-      if (type) {
-        state.playQueueIndex += 1
-      } else {
-        if (state.playQueueIndex > 1) state.playQueueIndex -= 1
-      }
-      state.curSong.id = state.playQueue[state.playQueueIndex].id
-      // 保存playQueueIndex
-      localStorage.setItem('playQueueIndex', state.playQueueIndex)
-    },
     // 修改播放列表
     pushPlayQueue (state, playQueue) {
       if (playQueue) {
-        // 提取id
-        const queueId = state.playQueue.map(v => v.id)
-        // 第一种 Set 去重，只保存id
-        // queueId.push(playQueue.map(v => v.id))
-        // state.playQueue = Array.from(new Set(queueId))
-        // 第二种 foreach
-        playQueue.forEach(v => {
-          if (!queueId.includes(v.id)) state.playQueue.push(v)
+        const ids = state.playQueue.map(v => v.id)
+        playQueue.forEach(song => {
+          if (!ids.includes(song.id)) state.playQueue.push(song)
         })
       } else {
         state.playQueue = []
       }
-      state.playQueueIndex = 0
-      localStorage.setItem('playQueueIndex', 0)
+      console.log(state.playQueue)
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
     // 从localStorage恢复数据
     reset (state) {
       state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []
-      state.playQueueIndex = localStorage.getItem('playQueueIndex') ? Number(localStorage.getItem('playQueueIndex')) : 0
-      state.curSong.id = state.playQueue[state.playQueueIndex]?.id || null
+      state.curSong.id = localStorage.getItem('songid') || null
     }
   },
   actions: {
