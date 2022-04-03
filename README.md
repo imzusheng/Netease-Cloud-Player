@@ -1,8 +1,24 @@
-# vue2-netease-cloud-music
+<div align="center">
+  <h1>Bilibili Download</h1>
+  <blockquote>bilibili视频下载Web平台，免登录，支持下载720p、480p、360p</blockquote>
+</div>
+<br/>
+<p align="center">
+    <a href="https://demo.zusheng.club/bili_download/">
+        <img src="https://img.shields.io/badge/项目地址-demo.zusheng.club/bili_download-green.svg?style=flat-square" alt="项目地址">
+    </a>
+</p>
 
-VUE | 从 0 搭建「网易云音乐」WEB 端
+## 安装
 
-## 技术
+## 演示
+
+## 功能
+* [x] 播放列表
+* [x] 音乐播放器
+* [x] 刷新恢复播放
+
+## 一些技术细节
 
 1.图片懒加载
 

@@ -1,8 +1,21 @@
 <template>
   <div class="player-volume">
-    <div>
+    <div class="btn-row">
+      <!-- 播放队列 -->
+      <button
+        title="播放队列"
+        class="play-queue"
+        :class="{ 'play-queue-open': playQueueStatus }"
+        @click="toPlayQueue"
+      >
+        <svg role="img" height="16" width="16" viewBox="0 0 16 16">
+          <path
+            d="M15 15H1v-1.5h14V15zm0-4.5H1V9h14v1.5zm-14-7A2.5 2.5 0 013.5 1h9a2.5 2.5 0 010 5h-9A2.5 2.5 0 011 3.5zm2.5-1a1 1 0 000 2h9a1 1 0 100-2h-9z"
+          ></path>
+        </svg>
+      </button>
       <!-- 单击切换静音 -->
-      <button @click="switchVolume">
+      <button title="静音" class="switch-volume" @click="switchVolume">
         <!-- 静音icon -->
         <svg
           v-if="volumeProgress === 0"
@@ -92,8 +105,16 @@ export default {
 
   data () {
     return {
-      volumeProgress: localStorage.getItem('volumeProgress') || 50 // 0~100区间的音量值
+      // 0~100区间的音量值
+      volumeProgress: localStorage.getItem('volumeProgress') || 50,
+
+      // 是否打开播放列表页面
+      playQueueStatus: false
     }
+  },
+
+  created () {
+    this.playQueueStatus = this.$route.name === 'playqueue'
   },
 
   mounted () {
@@ -135,6 +156,16 @@ export default {
       if (this.volumeProgress !== x) this.$emit('volume-change', x / 100)
       localStorage.setItem('volumeProgress', x)
       this.volumeProgress = x
+    },
+    // 前往播放列表
+    toPlayQueue () {
+      if (!this.playQueueStatus) {
+        this.playQueueStatus = true
+        this.$router.push({ name: 'playqueue' })
+      } else {
+        this.playQueueStatus = false
+        this.$router.go(-1)
+      }
     }
   },
 
@@ -159,6 +190,30 @@ export default {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  .btn-row {
+    display: flex;
+    .play-queue,
+    .switch-volume {
+      position: relative;
+      margin: 0 4px 0 0 !important;
+    }
+    .play-queue-open {
+      * {
+        color: rgba(240, 0, 0, 0.8) !important;
+      }
+      &::after {
+        content: "";
+        background-color: rgba(240, 0, 0, 0.8);
+        border-radius: 50%;
+        bottom: 0;
+        display: block;
+        height: 4px;
+        position: absolute;
+        width: 4px;
+      }
+    }
+  }
+
   .player-volume-progress {
     height: 12px;
     width: 100px;

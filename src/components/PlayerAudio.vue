@@ -1,10 +1,13 @@
 <!--
-这是播放器组件，集成
+  这是播放器组件，集成
 
-localStorage:
-1.audioLength
-2.currentTime
-3.volumeProgress
+  localStorage:
+  1.audioLength
+  2.currentTime
+  3.volumeProgress
+
+  切歌有延迟
+  离开页面久了，有时候会触发暂停，但是歌还在放
 -->
 
 <template>
@@ -111,13 +114,7 @@ localStorage:
         <div class="player-controls-right">
           <!-- 按钮 下一首 -->
           <button @click="next" style="--button-size: 32px">
-            <svg
-              role="img"
-              height="16"
-              width="16"
-              viewBox="0 0 16 16"
-              class="Svg-sc-1bi12j5-0 hDgDGI"
-            >
+            <svg role="img" height="16" width="16" viewBox="0 0 16 16">
               <path
                 d="M12.7 1a.7.7 0 00-.7.7v5.15L2.05 1.107A.7.7 0 001 1.712v12.575a.7.7 0 001.05.607L12 9.149V14.3a.7.7 0 00.7.7h1.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-1.6z"
               ></path>
@@ -231,39 +228,6 @@ export default {
       // this.audioRef.muted = 'muted'
       this.audioRef.src = url
       this.audioRef.load()
-      // 开始播放
-      this.audioRef.addEventListener('play', (e) => {
-        this.playStatus = true
-      })
-      // 暂停播放
-      this.audioRef.addEventListener('pause', (e) => {
-        this.playStatus = false
-      })
-      // 获取音频总时长
-      this.audioRef.addEventListener('durationchange', (e) => {
-        this.audioLength = this.audioRef.duration
-        localStorage.setItem('audioLength', this.audioLength)
-      })
-      // 计算当前缓存进度
-      this.audioRef.addEventListener('progress', (e) => {
-        // 计算缓存进度
-        // 方法1
-        // this.cacheProgress =
-        //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
-        // 方法2
-        let cacheLength = 0
-        for (let i = 0; i < this.audioRef.buffered.length; i++) {
-          cacheLength +=
-            this.audioRef.buffered.end(i) - this.audioRef.buffered.start(i)
-        }
-        this.cacheProgress = (cacheLength / this.audioLength) * 100
-      })
-      // 计算当前播放进度
-      this.audioRef.addEventListener('timeupdate', (e) => {
-        this.progress = (this.audioRef.currentTime / this.audioLength) * 100
-        // 保存进度到localStorage
-        localStorage.setItem('currentTime', this.audioRef.currentTime)
-      })
     },
     // 开始或暂停播放
     audioPlay () {
@@ -308,7 +272,6 @@ export default {
         Object.keys(curSongInfo).forEach((key) => {
           this.curSongInfo[key] = curSongInfo[key]
         })
-        console.log(JSON.stringify(curSongInfo))
         localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
         // 通过歌曲的id获取MP3的url
         this.getSongUrl(songid).then((res) => {
@@ -333,6 +296,41 @@ export default {
     this.audioRef.currentTime = localStorage.getItem('currentTime') || 0
     this.audioLength = localStorage.getItem('audioLength')
     this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+    // 开始播放
+    this.audioRef.addEventListener('play', (e) => {
+      this.playStatus = true
+      console.log('触发开始')
+    })
+    // 暂停播放
+    this.audioRef.addEventListener('pause', (e) => {
+      this.playStatus = false
+      console.log('触发暂停')
+    })
+    // 获取音频总时长
+    this.audioRef.addEventListener('durationchange', (e) => {
+      this.audioLength = this.audioRef.duration
+      localStorage.setItem('audioLength', this.audioLength)
+    })
+    // 计算当前缓存进度
+    this.audioRef.addEventListener('progress', (e) => {
+      // 计算缓存进度
+      // 方法1
+      // this.cacheProgress =
+      //   (this.audioRef.buffered.end(0) / this.audioLength) * 100
+      // 方法2
+      let cacheLength = 0
+      for (let i = 0; i < this.audioRef.buffered.length; i++) {
+        cacheLength +=
+          this.audioRef.buffered.end(i) - this.audioRef.buffered.start(i)
+      }
+      this.cacheProgress = (cacheLength / this.audioLength) * 100
+    })
+    // 计算当前播放进度
+    this.audioRef.addEventListener('timeupdate', (e) => {
+      this.progress = (this.audioRef.currentTime / this.audioLength) * 100
+      // 保存进度到localStorage
+      localStorage.setItem('currentTime', this.audioRef.currentTime)
+    })
 
     // 读取音量
     this.volumeProgress = localStorage.getItem('volumeProgress') || 50
@@ -443,11 +441,13 @@ export default {
   },
 
   watch: {
+    // ID改变，相当于切歌
     '$store.getters.curSongid': {
       handler (songid) {
         if (songid) {
           localStorage.setItem('songid', songid)
           this.idToUrl(songid, true)
+          this.audioRef.pause()
         }
       }
     }
@@ -479,21 +479,15 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 8px;
+    margin: 0 6px;
     cursor: pointer;
     * {
-      color: #535353;
-      transition: color 0.2s;
+      color: rgba(255, 255, 255, 1);
     }
     svg {
       fill: currentcolor;
       height: 16px;
       width: 16px;
-    }
-    &:hover {
-      * {
-        color: #ccc;
-      }
     }
   }
   .player-main {
@@ -649,21 +643,20 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        &[class="player-controls-center"] {
-          border-radius: 50%;
-          background: #535353;
-          margin: 0 12px;
-          transition: all 0.2s;
-          * {
-            color: #141414;
-          }
-          button {
-            margin: 0;
-          }
-          &:hover {
-            background: #ccc;
-            transform: scale(1.08);
-          }
+      }
+      .player-controls-center {
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 1);
+        margin: 0 12px;
+        transition: all 0.2s;
+        * {
+          color: #141414;
+        }
+        button {
+          margin: 0;
+        }
+        &:hover {
+          transform: translate3d(0, 0, 0) scale(1.08);
         }
       }
       .player-controls-right {
