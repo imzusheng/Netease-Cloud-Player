@@ -217,7 +217,7 @@ export default {
 
   methods: {
     ...mapActions(['getSongDetail', 'getSongUrl']),
-    ...mapMutations(['setCurSongid', 'setCurSongurlInfo', 'setPlayQueueIndex']),
+    ...mapMutations(['setCurSongid', 'setCurSongurlInfo']),
     // 创建audio 加载mp3
     createAudio (url, autoplay) {
       // 重置播放器信息,删除上一首歌播放进度
@@ -242,7 +242,7 @@ export default {
     },
     // 更新音量
     updateVolume (volume) {
-      if (volume) this.audioRef.volume = volume
+      if (typeof volume !== 'undefined') this.audioRef.volume = volume
     },
     // 切换播放模式
     audioPlayTypeSwitch () {
@@ -279,12 +279,8 @@ export default {
         })
       })
     },
-    next () {
-      this.setPlayQueueIndex(true)
-    },
-    prev () {
-      this.setPlayQueueIndex(false)
-    }
+    next () {},
+    prev () {}
   },
 
   created () {
@@ -330,6 +326,19 @@ export default {
       this.progress = (this.audioRef.currentTime / this.audioLength) * 100
       // 保存进度到localStorage
       localStorage.setItem('currentTime', this.audioRef.currentTime)
+    })
+
+    // 用户代理试图获取媒体数据，但数据意外地没有进入。
+    this.audioRef.addEventListener('stalled', (e) => {
+      console.log('stalled', e)
+    })
+    // 媒体加载挂起。
+    this.audioRef.addEventListener('suspend', (e) => {
+      console.log('suspend', e)
+    })
+    // 因为暂时性缺少数据，播放暂停。
+    this.audioRef.addEventListener('waiting', (e) => {
+      console.log('waiting', e)
     })
 
     // 读取音量
