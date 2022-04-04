@@ -47,7 +47,7 @@
           v-for="(listItem, listKey) in listData[sectionItem.li.source]"
           :key="`${sectionIndex}-${listKey}`"
           :class="`${sectionItem.li.class}`"
-          @click="toPlaylistDetail(listItem.payload)"
+          @click="toPlaylistDetail(sectionItem.query, listItem.payload)"
         >
           <figure>
             <span>
@@ -126,13 +126,28 @@ export default {
       // section模板数据
       sectionData: [
         {
+          // id调试时输出用
           id: 'section-tuijian',
+
+          // 标题
           title: '为你推荐',
           subTitle: '挑选歌曲，开始收听电台',
+
+          // 查看更多的url
           moreUrl: '',
+
+          // query用于跳转到playlist时url的type参数
+          query: 'playlist',
+
+          // li数据
           li: {
+            // 类名
             class: 'section-common-item',
+
+            // 元数据的key名
             source: 'recommends',
+
+            // 文本连接符号
             join: '•'
           }
         },
@@ -140,6 +155,7 @@ export default {
           id: 'section-geshou',
           title: '热门歌手',
           subTitle: null,
+          query: 'artist',
           moreUrl: '',
           li: {
             class: 'section-common-item posterRound',
@@ -152,6 +168,7 @@ export default {
           title: '最近播放',
           subTitle: null,
           moreUrl: '',
+          query: '',
           li: {
             class: 'section-common-item',
             source: 'records',
@@ -163,6 +180,7 @@ export default {
           title: '推荐的MV',
           subTitle: null,
           moreUrl: '',
+          query: '',
           li: {
             class: 'section-mv-item',
             source: 'recommendMv',
@@ -174,6 +192,7 @@ export default {
           title: '社区精选',
           subTitle: null,
           moreUrl: '',
+          query: 'playlist',
           li: {
             class: 'section-common-item',
             source: 'community',
@@ -262,15 +281,18 @@ export default {
         })
       })
     },
-    // 点击歌单
-    toPlaylistDetail (payload) {
-      this.$router.push({
-        name: 'playlist',
-        query: {
-          type: 'playlist',
-          id: payload
-        }
-      })
+    // 点击进入详情
+    toPlaylistDetail (name, id) {
+      if (name && id) {
+        this.$router.push({
+          name: name,
+          query: {
+            id
+          }
+        })
+      } else {
+        console.log('toPlaylistDetail', name, id)
+      }
     }
   },
 

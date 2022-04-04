@@ -131,7 +131,7 @@ import { pickUpName } from '@/util'
 import { mapMutations, mapGetters } from 'vuex'
 
 export default {
-  name: 'PlayQueue',
+  name: 'DetailPlayQueue',
 
   mounted () {
     this.lazyLoadimg()

@@ -32,7 +32,6 @@
 
       <!-- 无关的遮罩 -->
       <div class="header-mask" ref="main-header-mask"></div>
-      <div class="header-bg-mask"></div>
     </header>
 
     <!-- 加载logo -->
@@ -136,11 +135,8 @@ export default {
   --color-playlist: "0, 0, 0, 1";
   width: 100%;
   position: relative;
-  padding: 68px 0 0;
   background-color: rgba(var(--color-playlist));
   // transition: background 0.65s;
-  // background: rgb(8, 64, 64);
-  // background: rgb(152, 64, 64);
 
   header {
     // position: sticky;
@@ -150,7 +146,7 @@ export default {
     height: 68px;
     padding: 8px 16px;
     box-sizing: border-box;
-    z-index: 1;
+    z-index: 2;
     // transition: background 0.65s;
     // background-color: rgba(var(--color-playlist));
 
@@ -161,33 +157,10 @@ export default {
       right: 0;
       bottom: 0;
       z-index: -1;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+      background-color: rgba(var(--color-playlist));
       opacity: 0;
     }
-
-    .header-bg-mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: -2;
-      // transition: background 0.65s;
-      background-color: rgba(var(--color-playlist));
-    }
-
-    // 头部导航栏下的白边
-    // &::after {
-    //   content: "";
-    //   position: absolute;
-    //   top: 68px;
-    //   left: 0;
-    //   height: 1px;
-    //   width: 100%;
-    //   background: rgba(255, 255, 255, 0.4);
-    //   z-index: 2;
-    //   transform: scaleY(0.25);
-    // }
 
     nav {
       width: 100%;

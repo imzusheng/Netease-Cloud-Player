@@ -56,11 +56,11 @@
           </p>
           <p
             v-if="!loading"
-            :title="`${curSongArtisis}${
+            :title="`${curSongArtists}${
               curSongPubtime ? ' • ' : ''
             }${curSongPubtime}`"
           >
-            {{ curSongArtisis }}
+            {{ curSongArtists }}
             <span v-if="curSongPubtime">&nbsp;•&nbsp;</span>
             {{ curSongPubtime }}
           </p>
@@ -220,7 +220,7 @@ export default {
       curSongInfo: {
         name: '',
         picUrl: '',
-        artisis: '',
+        artists: '',
         publishTime: ''
       },
 
@@ -287,7 +287,7 @@ export default {
         const curSongInfo = {
           name: data.name,
           picUrl: data.al.picUrl,
-          artisis: data.ar,
+          artists: data.ar,
           publishTime: data.publishTime
         }
         // 赋值到this.curSongInfo
@@ -537,8 +537,8 @@ export default {
     curSongPic () {
       return this.curSongInfo.picUrl || ''
     },
-    curSongArtisis () {
-      return pickUpName(this.curSongInfo.artisis) ?? null
+    curSongArtists () {
+      return pickUpName(this.curSongInfo.artists) ?? null
     },
     curSongPubtime () {
       const timeStamp = this.curSongInfo.publishTime
@@ -565,6 +565,7 @@ export default {
 
 <style lang="less">
 #audioPlayerWrap {
+  display: none;
   position: fixed;
   bottom: 0;
   left: 0;

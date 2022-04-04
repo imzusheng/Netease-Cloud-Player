@@ -46,15 +46,22 @@ export const getMainColor = (imgSrc) => {
     let i = 0
     while (i < len) {
       if (data[i + 3] !== 0) {
-      // k格式为 255, 255, 255, 1
-        const k = `${data[i]}, ${data[i + 1]}, ${data[i + 2]}, ${data[i + 3] / 255}`
-        // 利用temp对象统计该颜色出现的次数
-        race[k] = race[k] ? race[k] + 1 : 1
-        if (race[k] > max) {
-        // 替换出现的最大次数
-          max = race[k]
-          // 当前出现次数最多的颜色
-          color = k
+        const r = data[i]
+        const g = data[i + 1]
+        const b = data[i + 2]
+        const c = 20
+        const c2 = 230
+        if (!(r < c && g < c && b < c) && !(r > c2 && g > c2 && b > c2)) {
+          // k格式为 255, 255, 255, 1
+          const k = `${data[i]}, ${data[i + 1]}, ${data[i + 2]}, ${data[i + 3] / 255}`
+          // 利用temp对象统计该颜色出现的次数
+          race[k] = race[k] ? race[k] + 1 : 1
+          if (race[k] > max) {
+            // 替换出现的最大次数
+            max = race[k]
+            // 当前出现次数最多的颜色
+            color = k
+          }
         }
       }
       i += 4
@@ -64,8 +71,8 @@ export const getMainColor = (imgSrc) => {
   return new Promise(resolve => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    canvas.width = 200
-    canvas.height = 200
+    // canvas.width = 200
+    // canvas.height = 200
     const img = new Image()
     // 跨域
     img.setAttribute('crossOrigin', '')
@@ -80,17 +87,17 @@ export const getMainColor = (imgSrc) => {
       let b = parseInt(rgb[2])
       // 为了让颜色更匹配网站主题
       if (r > 200 || g > 200 || b > 200) {
-        r -= 80
-        g -= 80
-        b -= 80
-      } else if (r > 150 || g > 150 || b > 150) {
         r -= 40
         g -= 40
         b -= 40
-      } else if (r < 50 || g < 50 || b < 50) {
-        r += 80
-        g += 80
-        b += 80
+      } else if (r > 150 || g > 150 || b > 150) {
+        r -= 20
+        g -= 20
+        b -= 20
+      } else if (r < 30 || g < 30 || b < 30) {
+        r += 20
+        g += 20
+        b += 20
       }
       resolve(`${r}, ${g}, ${b}, 1`)
     }

@@ -20,7 +20,7 @@ export default new Vuex.Store({
     },
 
     // 当前主题颜色
-    curPlaylistColor: '0, 0, 0, 1',
+    curPlaylistColor: '0, 0, 0, 0',
 
     // 当前播放的歌曲
     curSong: {
@@ -178,6 +178,7 @@ export default new Vuex.Store({
           const data = resJson.artists.map((v) => {
             v.picUrl = v.img1v1Url
             v.desc1 = '艺人'
+            v.payload = v.id
             return v
           })
           resolve({
@@ -208,6 +209,58 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_URL}?id=${id}`).then((resJson) => {
           resolve(resJson)
+        })
+      })
+    },
+    // 获取歌手信息
+    getArtistDetail ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_DETAIL}?id=${id}`).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // 获取歌手粉丝
+    getArtistFans ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_FANS}?id=${id}`).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // 获取歌手单曲
+    getArtistSong ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
+          const data = resJson.hotSongs.splice(0, 5)
+          resolve({
+            data,
+            type: 'hotSongs'
+          })
+        })
+      })
+    },
+    // 获取歌手专辑
+    getArtistALBUM ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_ALBUM}?id=${id}`).then((resJson) => {
+          const data = resJson.hotAlbums
+          resolve({
+            data,
+            type: 'hotAlbums'
+          })
+        })
+      })
+    },
+    // 获取歌手MV
+    getArtistMV ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_MV}?id=${id}`).then((resJson) => {
+          const data = resJson.mvs.splice(0, 6)
+          resolve({
+            data,
+            type: 'mv'
+          })
         })
       })
     }

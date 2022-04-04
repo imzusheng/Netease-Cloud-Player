@@ -17,6 +17,16 @@ export default {
   GET_SONG_DETAIL: `${API_ROOT}/song/detail`,
   // 单曲url
   GET_SONG_URL: `${API_ROOT}/song/url`,
+  // 歌手信息
+  GET_ARTIST_DETAIL: `${API_ROOT}/artist/detail`,
+  // 歌手粉丝
+  GET_ARTIST_FANS: `${API_ROOT}/artist/follow/count`,
+  // 歌手热门单曲
+  GET_ARTIST_SONG: `${API_ROOT}/artists`,
+  // 歌手专辑
+  GET_ARTIST_ALBUM: `${API_ROOT}/artist/album`,
+  // 歌手MV
+  GET_ARTIST_MV: `${API_ROOT}/artist/mv`,
   // 需要登录
   AUTH: {
     GET_RECORDS: `${API_ROOT}/user/record?type=1`

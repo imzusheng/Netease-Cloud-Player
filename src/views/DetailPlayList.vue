@@ -166,7 +166,7 @@ const scrollHandle = () => {
 }
 
 export default {
-  name: 'PlayList',
+  name: 'DetailPlayList',
 
   data () {
     return {
@@ -314,6 +314,7 @@ export default {
     max-height: 500px;
     min-height: 340px;
     position: relative;
+    margin-top: 68px;
     &::after {
       content: "";
       position: absolute;

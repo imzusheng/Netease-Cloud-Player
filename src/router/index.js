@@ -20,11 +20,15 @@ const routes = [
     }, {
       path: 'playlist',
       name: 'playlist',
-      component: () => import('@/views/PlayList.vue')
+      component: () => import('@/views/DetailPlayList.vue')
     }, {
       path: 'playqueue',
       name: 'playqueue',
-      component: () => import('@/views/PlayQueue.vue')
+      component: () => import('@/views/DetailPlayQueue.vue')
+    }, {
+      path: 'artist',
+      name: 'artist',
+      component: () => import('@/views/DetailArtist.vue')
     }]
   }]
 
