@@ -26,7 +26,7 @@ img:not([src]) {
 }
 
 #app {
-  min-width: 568px;
+  min-width: 528px;
   width: 100%;
   min-height: 100vh;
   position: relative;

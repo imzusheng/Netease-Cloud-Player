@@ -59,6 +59,7 @@
               <div class="table-cell-desc">
                 <img
                   class="table-cell-desc-pic"
+                  ref="lazyload-img"
                   :data-pic-src="listItem.al.picUrl"
                   alt=""
                 />
@@ -94,7 +95,9 @@
           </ul>
           <a href="#" class="more-hotSongs">查看更多</a>
         </section>
-        <section></section>
+        <SectionList :title="'专辑'" :listData="tableData.hotAlbums" />
+        <SectionList :title="'MV'" :listData="tableData.mvs" />
+        <SectionList :title="'粉丝也喜欢'" :listData="tableData.mvs" />
       </div>
     </div>
   </main>
@@ -104,13 +107,19 @@
 import moment from 'moment'
 import { getMainColor } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
+import SectionList from '@/components/SectionList.vue'
 
-let artistPlaylistRef
-let headerMaskRef
-let MaskTransRef
-let underPosterRef
-
+// 滚动条参数
+const refs = {
+  artistPlaylistRef: undefined,
+  headerMaskRef: undefined,
+  MaskTransRef: undefined,
+  underPosterRef: undefined
+}
+// 监听滚动条
 const scrollHandle = () => {
+  const { artistPlaylistRef, underPosterRef, MaskTransRef, headerMaskRef } =
+    refs
   const curScrollTop = document.documentElement.scrollTop
   const targetHeight = artistPlaylistRef.offsetTop - 68
   if (targetHeight < 0) return
@@ -120,6 +129,7 @@ const scrollHandle = () => {
   } else {
     curValue = 1
   }
+  curValue = curValue.toFixed(3)
   underPosterRef.style.transform = `scale(${1.05 - 0.05 * curValue})`
   MaskTransRef.style.opacity = curValue * 1.5 > 1 ? 1 : curValue * 1.5
   headerMaskRef.style.opacity = curValue
@@ -128,8 +138,13 @@ const scrollHandle = () => {
 export default {
   name: 'DetailArtist',
 
+  components: {
+    SectionList
+  },
+
   data () {
     return {
+      tit: '哈哈',
       ...mapMutations(['setLoading', 'setCurPlaylistColor']),
       ...mapActions([
         'getArtistDetail',
@@ -163,9 +178,9 @@ export default {
       })
       // dom更新完成 开始观察
       this.$nextTick(function () {
-        document
-          .querySelectorAll('.table-cell-desc-pic')
-          .forEach((ele) => intersectionObserver.observe(ele))
+        this.$refs['lazyload-img'].forEach((ele) =>
+          intersectionObserver.observe(ele)
+        )
       })
     }
   },
@@ -174,31 +189,32 @@ export default {
     this.setLoading(true)
     // 获取id
     const { id } = this.$route.query
+    // 获取歌手信息
     this.getArtistDetail(id).then(async (res) => {
       this.artistInfo = res.data
       const color = await getMainColor(res.data.artist.cover)
       this.setCurPlaylistColor(color)
-      this.setLoading(false)
-    })
-
-    Promise.all([
-      this.getArtistSong(id),
-      this.getArtistALBUM(id),
-      this.getArtistMV(id)
-    ]).then((resArr) => {
-      resArr.forEach((res) => {
-        this.tableData[res.type] = res.data
+      // 获取专辑、MV等其余所有数据
+      Promise.all([
+        this.getArtistSong(id),
+        this.getArtistALBUM(id),
+        this.getArtistMV(id)
+      ]).then((resArr) => {
+        resArr.forEach((res) => {
+          this.tableData[res.type] = res.data
+        })
+        // 懒加载
+        this.lazyLoadimg()
+        this.setLoading(false)
       })
-      // 懒加载
-      this.lazyLoadimg()
     })
   },
 
   mounted () {
-    artistPlaylistRef = document.querySelector('.artist-playlist')
-    headerMaskRef = this.$parent.$refs['main-header-mask']
-    MaskTransRef = this.$refs['under-poster-mask-trans']
-    underPosterRef = this.$refs['under-poster']
+    refs.artistPlaylistRef = document.querySelector('.artist-playlist')
+    refs.headerMaskRef = this.$parent.$refs['main-header-mask']
+    refs.MaskTransRef = this.$refs['under-poster-mask-trans']
+    refs.underPosterRef = this.$refs['under-poster']
     // 滑动动画
     document.addEventListener('scroll', scrollHandle)
   },
@@ -254,6 +270,7 @@ export default {
     // min-height: 340px;
     // max-height: 500px;
   }
+  // 歌手封面
   .under-poster {
     // background: url("https://i.scdn.co/image/ab676186000010165883f9c0c5865d49b13d75c3")
     //   center 0 no-repeat;
@@ -271,6 +288,7 @@ export default {
     opacity: 0;
   }
 
+  // 歌手信息
   .artist-info {
     height: 100vh;
     // min-height: 340px;
@@ -308,6 +326,7 @@ export default {
     }
   }
 
+  // 歌单等信息
   .artist-playlist {
     width: 100%;
     position: relative;
@@ -321,9 +340,9 @@ export default {
       background-color: rgba(var(--color-playlist));
     }
     .artist-playlist-bg {
-      height: 100%;
       position: absolute;
       top: 0;
+      height: 100%;
       width: 100%;
       background: #121212;
     }

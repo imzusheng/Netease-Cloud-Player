@@ -244,7 +244,10 @@ export default new Vuex.Store({
     getArtistALBUM ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_ALBUM}?id=${id}`).then((resJson) => {
-          const data = resJson.hotAlbums
+          const data = resJson.hotAlbums.splice(0, 7).map(v => {
+            v.desc = `${moment(v.publishTime).year()} • ${v.type === 'Single' ? v.type = '单曲' : v.type}`
+            return v
+          })
           resolve({
             data,
             type: 'hotAlbums'
@@ -256,10 +259,16 @@ export default new Vuex.Store({
     getArtistMV ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_MV}?id=${id}`).then((resJson) => {
-          const data = resJson.mvs.splice(0, 6)
+          const data = resJson.mvs.splice(0, 7).map(v => {
+            v.picUrl = v.imgurl
+            // v.desc = ` ${v.playCount}次观看`
+            v.desc = v.name
+            return v
+          })
+          console.log(data)
           resolve({
             data,
-            type: 'mv'
+            type: 'mvs'
           })
         })
       })
