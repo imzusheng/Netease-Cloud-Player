@@ -11,16 +11,16 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 ## 演示
 
 自动提取主题色
-![](./screenshots/03.png)
+![](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/03.png)
 
 主页
-![](./screenshots/01.png)
+![](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/01.png)
 
 主页
-![](./screenshots/02.png)
+![](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/02.png)
 
 播放列表
-![](./screenshots/04.png)
+![](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/04.png)
 
 ## 技术栈
 * vue2
