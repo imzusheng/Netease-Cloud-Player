@@ -20,7 +20,6 @@ export default new Vuex.Store({
     },
 
     // 当前主题颜色
-    // curPlaylistColor: '0, 0, 0, 0',
     curPlaylistColor: '12, 12, 12, 1',
 
     // 当前播放的歌曲
@@ -37,7 +36,13 @@ export default new Vuex.Store({
     playQueueStatus: false,
 
     // 小提示内容
-    tips: ''
+    tips: '',
+
+    // 错误提示页面
+    error: {
+      status: false,
+      msg: ''
+    }
   },
   getters: {
     userInfo: state => state.userInfo,
@@ -52,6 +57,10 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setError (state, { status = false, msg = '' }) {
+      state.error.status = status
+      state.error.msg = msg
+    },
     setTips (state, content) {
       state.tips = content
     },
@@ -222,9 +231,11 @@ export default new Vuex.Store({
     },
     // 获取歌单详情
     getPlaylistDetail ({ state }, id) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
           resolve(resJson.playlist)
+        }).catch(err => {
+          reject(err)
         })
       })
     },
@@ -281,6 +292,8 @@ export default new Vuex.Store({
         fetchToJson(`${API.GET_ARTIST_ALBUM}?id=${id}`).then((resJson) => {
           const data = resJson.hotAlbums.splice(0, 7).map(v => {
             v.desc = `${moment(v.publishTime).year()} • ${v.type === 'Single' ? v.type = '单曲' : v.type}`
+            v.query = 'playlist'
+            v.payload = v.id
             return v
           })
           resolve({

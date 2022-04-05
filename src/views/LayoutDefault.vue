@@ -34,12 +34,18 @@
       <div class="header-mask" ref="main-header-mask"></div>
     </header>
 
+    <TheError v-if="$store.state.error.status" />
+
     <!-- 加载logo -->
     <TheLoading v-if="$store.state.loading" />
 
+    <!-- 切换播放模式的提示 -->
     <TheTips />
 
-    <router-view v-show="!$store.state.loading"></router-view>
+    <!-- 当页面加载完毕且没有错误时，才显示 -->
+    <router-view
+      v-show="!$store.state.loading && !$store.state.error.status"
+    ></router-view>
 
     <!-- 音乐播放器 -->
     <PlayerAudio />
@@ -51,6 +57,7 @@ import SubTabs from '@/components/SubTabs'
 import PlayerAudio from '@/components/PlayerAudio'
 import TheLoading from '@/components/TheLoading'
 import TheTips from '@/components/TheTips'
+import TheError from '@/components/TheError'
 import { pickUpName } from '@/util'
 import moment from 'moment'
 
@@ -61,6 +68,7 @@ export default {
     SubTabs,
     TheLoading,
     PlayerAudio,
+    TheError,
     TheTips
   },
 

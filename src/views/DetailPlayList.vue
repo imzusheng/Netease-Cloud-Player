@@ -179,9 +179,10 @@ export default {
     ...mapActions(['getPlaylistDetail', 'getSongDetail']),
     ...mapMutations([
       'setCurPlaylistColor',
+      'pushPlayQueue',
       'setCurSongid',
       'setLoading',
-      'pushPlayQueue'
+      'setError'
     ]),
     // 选择歌曲，并开始播放
     playlistSelect (data) {
@@ -460,7 +461,7 @@ export default {
       }
       // 表格主体 ul
       .playlist-table-content {
-        padding: 0 52px;
+        padding: 0 52px 72px;
         // li
         .playlist-table-row {
           * {

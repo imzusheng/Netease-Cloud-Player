@@ -1,3 +1,5 @@
+import store from '@/store'
+
 /**
  * fetch数据转json
  * @param {String} url 传入url
@@ -10,6 +12,11 @@ export const fetchToJson = (url) => {
         if (resJson.code === 200) {
           resolve(resJson)
         } else {
+          store.commit('setLoading', false)
+          store.commit('setError', {
+            status: true,
+            msg: resJson.msg
+          })
           reject(resJson)
         }
       })

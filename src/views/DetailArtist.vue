@@ -276,15 +276,12 @@ export default {
 
   // 离开时清理一下
   beforeRouteLeave (to, from, next) {
-    console.log('clear')
     // 删除监听
     document.removeEventListener('scroll', throttleScrollHandle)
     // 恢复背景色为黑色
     this.setCurPlaylistColor('12, 12, 12, 1')
     this.setLoading(true)
-    this.$nextTick(() => {
-      next()
-    })
+    next()
   }
 }
 </script>

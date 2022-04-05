@@ -221,7 +221,7 @@ export default {
 
 <style lang="less">
 #home {
-  padding-top: 68px;
+  padding: 68px 0 72px;
 
   .section-common-hotSong {
     padding: 32px 40px 56px;
