@@ -95,6 +95,7 @@ export default {
             // 压缩比例
             const compressionRatio = 0.1
             const tempImg = new Image()
+            // 跨域
             tempImg.setAttribute('crossOrigin', 'Anonymous')
             tempImg.src = item.target.getAttribute('data-pic-src')
             console.dir(tempImg)
