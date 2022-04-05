@@ -224,7 +224,10 @@ export default new Vuex.Store({
     getArtistFans ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_FANS}?id=${id}`).then((resJson) => {
-          resolve(resJson)
+          resolve({
+            data: resJson.data,
+            type: 'fans'
+          })
         })
       })
     },
@@ -281,7 +284,6 @@ export default new Vuex.Store({
             v.desc = '艺人'
             return v
           })
-          console.log(data)
           resolve({
             data,
             type: 'simi'

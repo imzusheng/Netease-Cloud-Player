@@ -104,6 +104,7 @@ export const getMainColor = (imgSrc) => {
   })
 }
 
+// 防抖
 export const throttle = (func, delay) => {
   let last, timer
   return function () {
@@ -119,4 +120,121 @@ export const throttle = (func, delay) => {
       func()
     }
   }
+}
+
+/**
+ * 压缩图片
+ * @param {String} imgSrc
+ * @returns {Promise} canvas.toDataURL('image/jpg')
+ */
+export const compressionImage = (imgSrc) => {
+  const tempImg = new Image()
+  // 跨域
+  tempImg.setAttribute('crossOrigin', 'Anonymous')
+  tempImg.src = imgSrc
+  return new Promise(resolve => {
+    tempImg.onload = function () {
+      // 图片原始宽高
+      const rawImgWidth = tempImg.width
+      const rawImageHeight = tempImg.height
+
+      // 处理后的宽高 比例1:1，默认等于原始宽高
+      let setImgWidth = rawImgWidth
+      let setImgHeight = rawImageHeight
+
+      // 宽屏图时，设置为等比例
+      if (rawImgWidth / rawImageHeight > 1) {
+        // 重新设置宽高
+        setImgWidth = setImgHeight = rawImageHeight
+      } else if (rawImgWidth / rawImageHeight < 1) {
+        // 重新设置宽高
+        setImgWidth = setImgHeight = rawImgWidth
+      }
+
+      // 创建画布
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+
+      // 压缩比例，默认等于50%
+      let compressionRatio = 0.5
+
+      switch (true) {
+        case setImgWidth > 4000:
+          compressionRatio = 0.025
+          break
+
+        case setImgWidth > 3000:
+          compressionRatio = 0.05
+          break
+
+        case setImgWidth > 2000:
+          compressionRatio = 0.075
+          break
+
+        case setImgWidth > 1000:
+          compressionRatio = 0.1
+          break
+
+        case setImgWidth > 500:
+          compressionRatio = 0.2
+          break
+
+        default:
+          break
+      }
+
+      // 画布宽高等于处理后的宽高
+      canvas.width = setImgWidth * compressionRatio
+      canvas.height = setImgHeight * compressionRatio
+
+      // console.log(rawImgWidth, rawImageHeight, setImgWidth, setImgHeight)
+
+      // 裁剪图片
+      context.drawImage(
+        tempImg,
+        // 裁剪起始点
+        0, 0,
+        // 裁剪大小
+        setImgWidth,
+        setImgHeight,
+        // 画布起始点
+        0, 0,
+        // 画布大小
+        setImgWidth * compressionRatio,
+        setImgHeight * compressionRatio
+      )
+      resolve(canvas.toDataURL('image/jpg'))
+    }
+  })
+}
+
+/**
+ * 图片懒加载
+ * 传入需要观察的图片引用
+ */
+export const lazyLoadImg = (refs) => {
+  // IntersectionObserver
+  const intersectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((item) => {
+      // 图片出现，挂上src
+      if (item.intersectionRatio > 0) {
+        // 停止观察
+        intersectionObserver.unobserve(item.target)
+        const rawSrc = item.target.getAttribute('data-pic-src')
+        // item.target.src = rawSrc
+        // 压缩图片
+        compressionImage(rawSrc).then((src) => {
+          item.target.src = src
+        }).catch(e => {
+          item.target.src = rawSrc
+        })
+      }
+    })
+  })
+  // 开始观察
+  refs.forEach((ele) => {
+    if (ele) {
+      intersectionObserver.observe(ele)
+    }
+  })
 }

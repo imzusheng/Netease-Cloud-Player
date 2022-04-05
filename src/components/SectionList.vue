@@ -13,7 +13,6 @@
     <ul class="section-row">
       <li
         class="section-column"
-        ref="lazyload-img"
         v-for="(item, index) in getListData"
         :key="`${getTitle}-${index}`"
       >
@@ -41,6 +40,8 @@
 </template>
 
 <script>
+import { lazyLoadImg } from '@/util'
+
 export default {
   name: 'SectionList',
 
@@ -85,74 +86,9 @@ export default {
   methods: {
     // 实现图片懒加载
     lazyLoadimg () {
-      // IntersectionObserver
-      const intersectionObserver = new IntersectionObserver((entries) => {
-        entries.forEach((item) => {
-          if (item.intersectionRatio > 0) {
-            /**
-             * 以下为压缩图片
-             */
-            // 压缩比例
-            const compressionRatio = 0.2
-            const tempImg = new Image()
-            // 跨域
-            tempImg.setAttribute('crossOrigin', 'Anonymous')
-            tempImg.src = item.target.getAttribute('data-pic-src')
-            tempImg.onload = function () {
-              // 图片原始宽高
-              const rawImgWidth = tempImg.width
-              const rawImageHeight = tempImg.height
-              // 处理后的宽高 比例1:1
-              let setImgWidth, setImgHeight
-
-              // 宽屏图时，设置为等比例
-              if (rawImgWidth / rawImageHeight > 1) {
-                // 重新设置宽高
-                setImgWidth = setImgHeight = rawImageHeight
-              } else if (rawImgWidth / rawImageHeight < 1) {
-                // 重新设置宽高
-                setImgWidth = setImgHeight = rawImgWidth
-              } else {
-                setImgWidth = rawImgWidth
-                setImgHeight = rawImageHeight
-              }
-
-              // 创建画布
-              const canvas = document.createElement('canvas')
-              const context = canvas.getContext('2d')
-              // 画布宽高等于处理后的宽高
-              canvas.width = setImgWidth * compressionRatio
-              canvas.height = setImgHeight * compressionRatio
-
-              // 裁剪图片
-              context.drawImage(
-                tempImg,
-                // 裁剪起始点
-                0,
-                0,
-                // 裁剪大小
-                rawImgWidth,
-                rawImageHeight,
-                // 画布起始点
-                0,
-                0,
-                // 画布大小
-                setImgWidth * compressionRatio,
-                setImgHeight * compressionRatio
-              )
-              item.target.src = canvas.toDataURL('image/jpg')
-            }
-            intersectionObserver.unobserve(item.target)
-          }
-        })
-      })
-      // dom更新完成 开始观察
-      this.$nextTick(function () {
-        this.$refs['lazyload-img'].forEach((ele) => {
-          if (ele) {
-            intersectionObserver.observe(ele)
-          }
-        })
+      // dom更新完成
+      this.$nextTick(() => {
+        lazyLoadImg(this.$refs['lazyload-img'])
       })
     }
   },

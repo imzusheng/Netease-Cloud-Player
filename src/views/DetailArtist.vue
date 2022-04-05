@@ -19,9 +19,10 @@
       <div class="artist-info-spacing">
         <!-- 信息容器 -->
         <div class="artist-info-main">
-          <span class="artist-info-type">入住艺人</span>
-          <span class="artist-info-name">{{ artistnName }}</span>
-          <span class="artist-info-follower">每月有 1,148,445 名听众</span>
+          <span class="artist-info-name">{{ artistName }}</span>
+          <span class="artist-info-type" :title="artistTags">{{
+            artistTags
+          }}</span>
         </div>
       </div>
     </div>
@@ -29,6 +30,21 @@
     <!-- 歌单列表 -->
     <div class="artist-playlist">
       <div class="artist-playlist-main">
+        <div class="artist-playlist-action">
+          <div class="artist-playlist-action-content">
+            <button aria-label="播放全部" class="action-btn-play">
+              <svg role="img" height="28" width="28" viewBox="0 0 24 24">
+                <path
+                  d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"
+                ></path>
+              </svg>
+            </button>
+            <button aria-label="关注" class="action-btn-subscribe">
+              {{ artistFansCnt }}
+            </button>
+          </div>
+        </div>
+        <!-- 热门歌曲 -->
         <section class="section-hot-song">
           <h2>热门</h2>
           <ul class="hot-song-table">
@@ -58,8 +74,9 @@
               <!-- 歌曲名字和作者 -->
               <div class="table-cell-desc">
                 <img
+                  ref="lazyload-img"
                   class="table-cell-desc-pic"
-                  :src="listItem.al.picUrl"
+                  :data-pic-src="listItem.al.picUrl"
                   alt=""
                 />
                 <div class="table-cell-desc-info">
@@ -72,6 +89,7 @@
                     <img
                       v-if="![0, 8].includes(listItem.fee)"
                       class="table-cell-desc-vip"
+                      ref=""
                       src="../assets/vip.svg"
                       alt=""
                     />
@@ -98,8 +116,8 @@
         <SectionList :title="'MV'" :listData="tableData.mvs" />
         <SectionList
           :title="'粉丝也喜欢'"
-          :round="true"
           :listData="tableData.simi"
+          :round="true"
         />
       </div>
     </div>
@@ -108,7 +126,7 @@
 
 <script>
 import moment from 'moment'
-import { getMainColor, throttle } from '@/util'
+import { getMainColor, throttle, lazyLoadImg } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
 import SectionList from '@/components/SectionList.vue'
 
@@ -133,7 +151,7 @@ const scrollHandle = () => {
   curValue = curValue.toFixed(3)
 
   refs.underPosterRef.style.transform = `scale(${1.05 - 0.05 * curValue})`
-  refs.MaskTransRef.style.opacity = curValue * 1.5 > 1 ? 1 : curValue * 1.5
+  refs.MaskTransRef.style.opacity = curValue * 1.7 > 1 ? 1 : curValue * 1.7
   refs.headerMaskRef.style.opacity = curValue
 }
 // 防抖
@@ -162,10 +180,21 @@ export default {
         hotSongs: [],
         hotAlbums: [],
         mvs: [],
-        simi: []
+        simi: [],
+        fans: {}
       },
 
       artistInfo: {}
+    }
+  },
+
+  methods: {
+    // 实现图片懒加载
+    lazyLoadimg () {
+      // dom更新完成
+      this.$nextTick(() => {
+        lazyLoadImg(this.$refs['lazyload-img'])
+      })
     }
   },
 
@@ -190,12 +219,15 @@ export default {
           this.getArtistSimi(id),
           this.getArtistSong(id),
           this.getArtistALBUM(id),
-          this.getArtistMV(id)
+          this.getArtistMV(id),
+          this.getArtistFans(id)
         ]).then((resArr) => {
           this.artistInfo = res.data
           resArr.forEach((res) => {
             this.tableData[res.type] = res.data
           })
+          console.log(this.artistInfo)
+          this.lazyLoadimg()
           this.setLoading(false)
         })
       })
@@ -209,8 +241,27 @@ export default {
       if (this.artistInfo?.artist) return this.artistInfo.artist.identifyTag[0]
       else return ''
     },
-    artistnName () {
+    artistName () {
       return this.artistInfo.artist?.name || ''
+    },
+    artistTags () {
+      // const tags = this.artistInfo.identify?.imageDesc
+      const tags = this.artistInfo.artist?.briefDesc
+      return tags ?? ''
+    },
+    // 粉丝数量
+    artistFansCnt () {
+      const num = this.tableData.fans?.fansCnt
+
+      function fun (num) {
+        if (Number(num) > 10000) {
+          return (num / 10000).toFixed(1) + '万'
+        } else {
+          return num
+        }
+      }
+
+      return num ? '订阅 ' + fun(num) : ''
     },
     artistnPoster () {
       return `url(${this.artistInfo.artist?.cover || ''})`
@@ -294,20 +345,20 @@ export default {
         border-left: 6px solid #fff;
         padding-left: 24px;
         box-sizing: border-box;
-        .artist-info-type {
-          font-size: 16px;
-        }
         .artist-info-name {
           width: 100%;
           font-size: 96px;
           line-height: 96px;
           font-weight: 900;
-          margin: 10px 0;
+          margin-bottom: 24px;
         }
-        .artist-info-follower {
+        .artist-info-type {
           font-size: 16px;
           line-height: 2;
-          margin-top: 4px;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          display: -webkit-box;
+          overflow: hidden;
         }
       }
     }
@@ -322,7 +373,7 @@ export default {
       height: 100%;
       position: relative;
       z-index: 2;
-      padding: 52px;
+      padding: 0 52px 52px;
       box-sizing: border-box;
       &::after {
         content: "";
@@ -345,6 +396,39 @@ export default {
         background-image: linear-gradient(rgba(0, 0, 0, 0.6), #121212 100%),
           var(--background-noise);
         z-index: -1;
+      }
+      // 播放栏
+      .artist-playlist-action {
+        box-sizing: border-box;
+        padding: 32px 0 32px;
+        * {
+          color: rgba(240, 240, 240, 1);
+        }
+        .artist-playlist-action-content {
+          display: flex;
+          align-items: center;
+          .action-btn-play {
+            border: none;
+            outline: none;
+            box-shadow: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 32px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: rgba(240, 0, 0, 1);
+          }
+          .action-btn-subscribe {
+            padding: 6px 16px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+          }
+        }
       }
       section {
         margin-bottom: 40px;
