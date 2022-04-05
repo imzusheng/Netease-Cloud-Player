@@ -98,7 +98,6 @@ export default {
             // 跨域
             tempImg.setAttribute('crossOrigin', 'Anonymous')
             tempImg.src = item.target.getAttribute('data-pic-src')
-            console.dir(tempImg)
             tempImg.onload = function () {
               // 图片原始宽高
               const rawImgWidth = tempImg.width
