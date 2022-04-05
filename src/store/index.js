@@ -35,6 +35,9 @@ export default new Vuex.Store({
     // 播放队列图标状态
     playQueueStatus: false,
 
+    // 音乐播放器是否显示
+    audioDisplay: false,
+
     // 小提示内容
     tips: '',
 
@@ -327,6 +330,8 @@ export default new Vuex.Store({
           const data = resJson.artists.splice(0, 7).map(v => {
             v.picUrl = v.img1v1Url
             v.desc = '艺人'
+            v.query = 'artist'
+            v.payload = v.id
             return v
           })
           resolve({

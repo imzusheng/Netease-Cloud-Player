@@ -1,5 +1,8 @@
 <template>
-  <main id="artist">
+  <main
+    id="artist"
+    :style="{ '--audio-height': $store.state.audioDisplay ? '72px' : '0px' }"
+  >
     <!-- 海报 -->
     <div
       class="under-poster"
@@ -288,6 +291,7 @@ export default {
 
 <style lang="less">
 #artist {
+  --audio-height: 72px;
   --background-noise: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=");
   height: 100%;
   position: relative;
@@ -298,7 +302,7 @@ export default {
     top: 0;
     left: 0;
     right: 0;
-    height: 100vh;
+    height: calc(100vh - var(--audio-height));
     // min-height: 340px;
     // max-height: 500px;
   }
@@ -311,7 +315,9 @@ export default {
     transform: scale(1.05);
   }
   .under-poster-mask {
-    background: linear-gradient(transparent 0, rgba(0, 0, 0, 0.5) 100%),
+    // background: linear-gradient(transparent 0, rgba(0, 0, 0, 0.5) 100%),
+    //   var(--background-noise);
+    background: linear-gradient(rgba(0, 0, 0, 0.4) 0, rgba(0, 0, 0, 0.3) 100%),
       var(--background-noise);
   }
   .under-poster-mask-trans {
@@ -322,9 +328,7 @@ export default {
 
   // 歌手信息
   .artist-info {
-    height: 100vh;
-    // min-height: 340px;
-    // max-height: 500px;
+    height: calc(100vh - var(--audio-height));
     .artist-info-spacing {
       display: flex;
       align-items: flex-end;

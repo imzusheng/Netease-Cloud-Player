@@ -10,7 +10,10 @@
 -->
 
 <template>
-  <div id="audioPlayerWrap">
+  <div
+    id="audioPlayerWrap"
+    :class="{ 'audio-player-hidden': !$store.state.audioDisplay }"
+  >
     <div class="player-main">
       <!-- 进度条 -->
       <div
@@ -564,8 +567,10 @@ export default {
 </script>
 
 <style lang="less">
+.audio-player-hidden {
+  display: none;
+}
 #audioPlayerWrap {
-  // display: none;
   position: fixed;
   bottom: 0;
   left: 0;

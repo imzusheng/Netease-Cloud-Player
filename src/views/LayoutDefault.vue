@@ -45,7 +45,8 @@
     <!-- 当页面加载完毕且没有错误时，才显示 -->
     <router-view
       v-show="!$store.state.loading && !$store.state.error.status"
-    ></router-view>
+      :key="refreshKey"
+    />
 
     <!-- 音乐播放器 -->
     <PlayerAudio />
@@ -132,6 +133,14 @@ export default {
       return function (timeStamp) {
         if (!timeStamp) return ''
         return moment(timeStamp).format('YYYY')
+      }
+    },
+    refreshKey () {
+      console.log('run')
+      if (this.$route.query.id) {
+        return Date.now() + this.$route.query.id
+      } else {
+        return ''
       }
     }
   }
