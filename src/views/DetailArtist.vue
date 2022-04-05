@@ -226,7 +226,6 @@ export default {
           resArr.forEach((res) => {
             this.tableData[res.type] = res.data
           })
-          console.log(this.artistInfo)
           this.lazyLoadimg()
           this.setLoading(false)
         })
