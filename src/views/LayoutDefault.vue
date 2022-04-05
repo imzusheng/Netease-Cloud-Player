@@ -136,10 +136,9 @@ export default {
   width: 100%;
   position: relative;
   background-color: rgba(var(--color-playlist));
-  // transition: background 0.65s;
+  transition: background-color 0.65s;
 
   header {
-    // position: sticky;
     position: fixed;
     top: 0;
     width: 100%;
@@ -147,8 +146,6 @@ export default {
     padding: 8px 16px;
     box-sizing: border-box;
     z-index: 2;
-    // transition: background 0.65s;
-    // background-color: rgba(var(--color-playlist));
 
     .header-mask {
       position: absolute;
@@ -161,6 +158,8 @@ export default {
       background-color: rgba(var(--color-playlist));
       opacity: 0;
     }
+
+    // 后期全部改成class
 
     nav {
       width: 100%;

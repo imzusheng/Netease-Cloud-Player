@@ -19,6 +19,7 @@
   list-style: none;
   line-height: 1.6;
   z-index: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 img:not([src]) {

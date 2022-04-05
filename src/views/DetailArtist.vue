@@ -25,9 +25,9 @@
         </div>
       </div>
     </div>
+
+    <!-- 歌单列表 -->
     <div class="artist-playlist">
-      <div class="artist-playlist-mask"></div>
-      <div class="artist-playlist-bg"></div>
       <div class="artist-playlist-main">
         <section class="section-hot-song">
           <h2>热门</h2>
@@ -59,8 +59,7 @@
               <div class="table-cell-desc">
                 <img
                   class="table-cell-desc-pic"
-                  ref="lazyload-img"
-                  :data-pic-src="listItem.al.picUrl"
+                  :src="listItem.al.picUrl"
                   alt=""
                 />
                 <div class="table-cell-desc-info">
@@ -97,7 +96,11 @@
         </section>
         <SectionList :title="'专辑'" :listData="tableData.hotAlbums" />
         <SectionList :title="'MV'" :listData="tableData.mvs" />
-        <SectionList :title="'粉丝也喜欢'" :listData="tableData.mvs" />
+        <SectionList
+          :title="'粉丝也喜欢'"
+          :round="true"
+          :listData="tableData.simi"
+        />
       </div>
     </div>
   </main>
@@ -105,7 +108,7 @@
 
 <script>
 import moment from 'moment'
-import { getMainColor } from '@/util'
+import { getMainColor, throttle } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
 import SectionList from '@/components/SectionList.vue'
 
@@ -118,10 +121,8 @@ const refs = {
 }
 // 监听滚动条
 const scrollHandle = () => {
-  const { artistPlaylistRef, underPosterRef, MaskTransRef, headerMaskRef } =
-    refs
+  const targetHeight = refs.artistPlaylistRef.offsetTop - 68
   const curScrollTop = document.documentElement.scrollTop
-  const targetHeight = artistPlaylistRef.offsetTop - 68
   if (targetHeight < 0) return
   let curValue
   if (targetHeight > curScrollTop) {
@@ -130,10 +131,13 @@ const scrollHandle = () => {
     curValue = 1
   }
   curValue = curValue.toFixed(3)
-  underPosterRef.style.transform = `scale(${1.05 - 0.05 * curValue})`
-  MaskTransRef.style.opacity = curValue * 1.5 > 1 ? 1 : curValue * 1.5
-  headerMaskRef.style.opacity = curValue
+
+  refs.underPosterRef.style.transform = `scale(${1.05 - 0.05 * curValue})`
+  refs.MaskTransRef.style.opacity = curValue * 1.5 > 1 ? 1 : curValue * 1.5
+  refs.headerMaskRef.style.opacity = curValue
 }
+// 防抖
+const throttleScrollHandle = throttle(scrollHandle, 1000 / 60)
 
 export default {
   name: 'DetailArtist',
@@ -144,70 +148,25 @@ export default {
 
   data () {
     return {
-      tit: '哈哈',
       ...mapMutations(['setLoading', 'setCurPlaylistColor']),
       ...mapActions([
         'getArtistDetail',
         'getArtistFans',
         'getArtistSong',
         'getArtistALBUM',
-        'getArtistMV'
+        'getArtistMV',
+        'getArtistSimi'
       ]),
 
       tableData: {
         hotSongs: [],
         hotAlbums: [],
-        mvs: []
+        mvs: [],
+        simi: []
       },
 
       artistInfo: {}
     }
-  },
-
-  methods: {
-    // 实现图片懒加载
-    lazyLoadimg () {
-      // IntersectionObserver
-      const intersectionObserver = new IntersectionObserver((entries) => {
-        entries.forEach((item) => {
-          if (item.intersectionRatio > 0) {
-            item.target.src = item.target.getAttribute('data-pic-src')
-            intersectionObserver.unobserve(item.target)
-          }
-        })
-      })
-      // dom更新完成 开始观察
-      this.$nextTick(function () {
-        this.$refs['lazyload-img'].forEach((ele) =>
-          intersectionObserver.observe(ele)
-        )
-      })
-    }
-  },
-
-  created () {
-    this.setLoading(true)
-    // 获取id
-    const { id } = this.$route.query
-    // 获取歌手信息
-    this.getArtistDetail(id).then(async (res) => {
-      this.artistInfo = res.data
-      const color = await getMainColor(res.data.artist.cover)
-      this.setCurPlaylistColor(color)
-      // 获取专辑、MV等其余所有数据
-      Promise.all([
-        this.getArtistSong(id),
-        this.getArtistALBUM(id),
-        this.getArtistMV(id)
-      ]).then((resArr) => {
-        resArr.forEach((res) => {
-          this.tableData[res.type] = res.data
-        })
-        // 懒加载
-        this.lazyLoadimg()
-        this.setLoading(false)
-      })
-    })
   },
 
   mounted () {
@@ -215,8 +174,34 @@ export default {
     refs.headerMaskRef = this.$parent.$refs['main-header-mask']
     refs.MaskTransRef = this.$refs['under-poster-mask-trans']
     refs.underPosterRef = this.$refs['under-poster']
+
+    this.setLoading(true)
+    // 获取id
+    const { id } = this.$route.query
+    // 获取歌手信息
+    this.getArtistDetail(id).then(async (res) => {
+      // 获取主题颜色
+      const color = await getMainColor(res.data.artist.cover)
+      // 设置主题颜色
+      this.setCurPlaylistColor(color)
+      this.$nextTick(() => {
+        // 获取专辑、MV等其余所有数据
+        Promise.all([
+          this.getArtistSimi(id),
+          this.getArtistSong(id),
+          this.getArtistALBUM(id),
+          this.getArtistMV(id)
+        ]).then((resArr) => {
+          this.artistInfo = res.data
+          resArr.forEach((res) => {
+            this.tableData[res.type] = res.data
+          })
+          this.setLoading(false)
+        })
+      })
+    })
     // 滑动动画
-    document.addEventListener('scroll', scrollHandle)
+    document.addEventListener('scroll', throttleScrollHandle)
   },
 
   computed: {
@@ -244,11 +229,14 @@ export default {
 
   // 离开时清理一下
   beforeRouteLeave (to, from, next) {
+    // 删除监听
+    document.removeEventListener('scroll', throttleScrollHandle)
     // 恢复背景色为黑色
     this.setCurPlaylistColor('0, 0, 0, 1')
-    // 删除监听
-    document.removeEventListener('scroll', scrollHandle)
-    next()
+    this.setLoading(true)
+    this.$nextTick(() => {
+      next()
+    })
   }
 }
 </script>
@@ -258,7 +246,6 @@ export default {
   --background-noise: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=");
   height: 100%;
   position: relative;
-  --poster-url: url("");
   .under-poster,
   .under-poster-mask,
   .under-poster-mask-trans {
@@ -283,8 +270,8 @@ export default {
       var(--background-noise);
   }
   .under-poster-mask-trans {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
     background-color: rgba(var(--color-playlist));
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
     opacity: 0;
   }
 
@@ -330,22 +317,6 @@ export default {
   .artist-playlist {
     width: 100%;
     position: relative;
-    .artist-playlist-mask {
-      background-image: linear-gradient(rgba(0, 0, 0, 0.6), #121212 100%),
-        var(--background-noise);
-      height: 232px;
-      position: absolute;
-      width: 100%;
-      z-index: 1;
-      background-color: rgba(var(--color-playlist));
-    }
-    .artist-playlist-bg {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 100%;
-      background: #121212;
-    }
 
     .artist-playlist-main {
       height: 100%;
@@ -353,6 +324,28 @@ export default {
       z-index: 2;
       padding: 52px;
       box-sizing: border-box;
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #121212;
+        z-index: -2;
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        height: 232px;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(var(--color-playlist));
+        background-image: linear-gradient(rgba(0, 0, 0, 0.6), #121212 100%),
+          var(--background-noise);
+        z-index: -1;
+      }
       section {
         margin-bottom: 40px;
         > h2 {

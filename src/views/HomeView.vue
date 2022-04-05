@@ -296,10 +296,12 @@ export default {
     }
   },
 
+  created () {
+    this.setLoading(true)
+  },
+
   mounted () {
     this.subTabsChange('推荐')
-
-    this.setLoading(true)
 
     Promise.all([
       this.getCommunity(),
@@ -311,7 +313,6 @@ export default {
       resArr.forEach((res) => {
         this.listData[res.type] = res.data
       })
-      this.setLoading(false)
       // IntersectionObserver
       const intersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((item) => {
@@ -325,6 +326,7 @@ export default {
       })
       // dom更新完成 开始观察
       this.$nextTick(() => {
+        this.setLoading(false)
         document
           .querySelectorAll('.section-common-list img')
           .forEach((ele) => intersectionObserver.observe(ele))

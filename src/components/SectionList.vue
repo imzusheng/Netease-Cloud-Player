@@ -2,7 +2,10 @@
     歌单列表组件
 -->
 <template>
-  <section class="section-common">
+  <section
+    class="section-common"
+    :style="{ '--shape-round': $props.round ? '50%' : '4px' }"
+  >
     <div class="section-common-title">
       <h2>{{ getTitle }}</h2>
       <span v-if="$props.listData.length > 6">查看更多</span>
@@ -48,7 +51,7 @@ export default {
     }
   },
 
-  props: ['title', 'listData'],
+  props: ['title', 'listData', 'round'],
 
   mounted () {
     const route = {
@@ -86,16 +89,70 @@ export default {
       const intersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((item) => {
           if (item.intersectionRatio > 0) {
-            item.target.src = item.target.getAttribute('data-pic-src')
+            /**
+             * 以下为压缩图片
+             */
+            // 压缩比例
+            const compressionRatio = 0.1
+            const tempImg = new Image()
+            tempImg.setAttribute('crossOrigin', 'Anonymous')
+            tempImg.src = item.target.getAttribute('data-pic-src')
+            console.dir(tempImg)
+            tempImg.onload = function () {
+              // 图片原始宽高
+              const rawImgWidth = tempImg.width
+              const rawImageHeight = tempImg.height
+              // 处理后的宽高 比例1:1
+              let setImgWidth, setImgHeight
+
+              // 宽屏图时，设置为等比例
+              if (rawImgWidth / rawImageHeight > 1) {
+                // 重新设置宽高
+                setImgWidth = setImgHeight = rawImageHeight
+              } else if (rawImgWidth / rawImageHeight < 1) {
+                // 重新设置宽高
+                setImgWidth = setImgHeight = rawImgWidth
+              } else {
+                setImgWidth = rawImgWidth
+                setImgHeight = rawImageHeight
+              }
+
+              // 创建画布
+              const canvas = document.createElement('canvas')
+              const context = canvas.getContext('2d')
+              // 画布宽高等于处理后的宽高
+              canvas.width = setImgWidth * compressionRatio
+              canvas.height = setImgHeight * compressionRatio
+
+              // 裁剪图片
+              context.drawImage(
+                tempImg,
+                // 裁剪起始点
+                0,
+                0,
+                // 裁剪大小
+                rawImgWidth,
+                rawImageHeight,
+                // 画布起始点
+                0,
+                0,
+                // 画布大小
+                setImgWidth * compressionRatio,
+                setImgHeight * compressionRatio
+              )
+              item.target.src = canvas.toDataURL('image/jpg')
+            }
             intersectionObserver.unobserve(item.target)
           }
         })
       })
       // dom更新完成 开始观察
       this.$nextTick(function () {
-        this.$refs['lazyload-img'].forEach((ele) =>
-          intersectionObserver.observe(ele)
-        )
+        this.$refs['lazyload-img'].forEach((ele) => {
+          if (ele) {
+            intersectionObserver.observe(ele)
+          }
+        })
       })
     }
   },
@@ -122,6 +179,8 @@ export default {
   --grid-gap: 24px;
   // 每行的列数
   --column-count: 4;
+  // 图片圆角
+  --shape-round: 4px;
   margin-bottom: 48px;
 
   > .section-common-title {
@@ -164,9 +223,9 @@ export default {
         .column-poster {
           width: 100%;
           object-fit: cover;
-          border-radius: 4px;
           margin-bottom: 16px;
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+          border-radius: var(--shape-round);
         }
         .column-info {
           // 歌手名

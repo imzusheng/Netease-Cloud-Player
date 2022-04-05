@@ -265,10 +265,26 @@ export default new Vuex.Store({
             v.desc = v.name
             return v
           })
-          console.log(data)
           resolve({
             data,
             type: 'mvs'
+          })
+        })
+      })
+    },
+    // 相似歌手
+    getArtistSimi ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_SIMI}?id=${id}`).then((resJson) => {
+          const data = resJson.artists.splice(0, 7).map(v => {
+            v.picUrl = v.img1v1Url
+            v.desc = '艺人'
+            return v
+          })
+          console.log(data)
+          resolve({
+            data,
+            type: 'simi'
           })
         })
       })

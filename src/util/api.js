@@ -27,6 +27,8 @@ export default {
   GET_ARTIST_ALBUM: `${API_ROOT}/artist/album`,
   // 歌手MV
   GET_ARTIST_MV: `${API_ROOT}/artist/mv`,
+  // 相似歌手
+  GET_ARTIST_SIMI: `${API_ROOT}/simi/artist`,
   // 需要登录
   AUTH: {
     GET_RECORDS: `${API_ROOT}/user/record?type=1`
