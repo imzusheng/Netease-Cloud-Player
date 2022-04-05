@@ -93,7 +93,7 @@ export default {
              * 以下为压缩图片
              */
             // 压缩比例
-            const compressionRatio = 0.1
+            const compressionRatio = 0.2
             const tempImg = new Image()
             // 跨域
             tempImg.setAttribute('crossOrigin', 'Anonymous')
