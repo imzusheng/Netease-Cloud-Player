@@ -565,7 +565,7 @@ export default {
 
 <style lang="less">
 #audioPlayerWrap {
-  display: none;
+  // display: none;
   position: fixed;
   bottom: 0;
   left: 0;

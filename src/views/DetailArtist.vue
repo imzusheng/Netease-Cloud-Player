@@ -196,11 +196,10 @@ export default {
   },
 
   mounted () {
-    refs.artistPlaylistRef = document.querySelector('.artist-playlist')
     refs.headerMaskRef = this.$parent.$refs['main-header-mask']
     refs.MaskTransRef = this.$refs['under-poster-mask-trans']
     refs.underPosterRef = this.$refs['under-poster']
-    refs.targetHeight = refs.artistPlaylistRef.offsetTop - 68
+    refs.targetHeight = document.documentElement.clientHeight - 68
 
     this.setLoading(true)
     // 获取id
@@ -277,6 +276,7 @@ export default {
 
   // 离开时清理一下
   beforeRouteLeave (to, from, next) {
+    console.log('clear')
     // 删除监听
     document.removeEventListener('scroll', throttleScrollHandle)
     // 恢复背景色为黑色
@@ -289,7 +289,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 #artist {
   --background-noise: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=");
   height: 100%;

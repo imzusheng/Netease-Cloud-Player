@@ -135,11 +135,12 @@ export default {
 
   mounted () {
     this.lazyLoadimg()
+    this.setLoading(false)
   },
 
   methods: {
     ...mapGetters(['playQueue', 'playQueueIndex']),
-    ...mapMutations(['pushPlayQueue', 'setCurSongid']),
+    ...mapMutations(['pushPlayQueue', 'setLoading', 'setCurSongid']),
     // 实现图片懒加载
     lazyLoadimg () {
       // IntersectionObserver
@@ -190,11 +191,11 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 #play-queue {
-  background: #000;
   position: relative;
   height: 100%;
+  box-sizing: border-box;
   .play-queue-spacing {
     padding: 0 40px 10px;
     box-sizing: border-box;
@@ -205,9 +206,9 @@ export default {
     .play-queue-title {
       padding-top: 32px;
       position: sticky;
-      top: 68px;
-      background: #000;
+      top: 0;
       z-index: 1;
+      background-color: rgb(12, 12, 12);
       border-bottom: 1px solid rgba(255, 255green, 255, 0.1);
       h1 {
         padding: 0 10px;
@@ -246,9 +247,8 @@ export default {
       // 发现更多按钮
       .find-more {
         border: none;
-        // background: rgba(240, 0, 0, 0.9);
         background: rgba(255, 255, 255, 0.9);
-        color: #000;
+        color: rgb(50, 50, 50);
         font-size: 16px;
         height: 48px;
         padding: 0 32px;
@@ -261,6 +261,7 @@ export default {
           color: #b3b3b3;
           font-size: 14px;
         }
+        padding: 2px 0 72px;
         // li
         .table-row {
           display: grid;

@@ -22,14 +22,21 @@ const routes = [
       name: 'playlist',
       component: () => import('@/views/DetailPlayList.vue')
     }, {
-      path: 'playqueue',
-      name: 'playqueue',
-      component: () => import('@/views/DetailPlayQueue.vue')
-    }, {
       path: 'artist',
       name: 'artist',
       component: () => import('@/views/DetailArtist.vue')
     }]
+  },
+  {
+
+    path: '/',
+    component: () => import('@/views/LayoutHeadless.vue'),
+    children: [
+      {
+        path: 'playqueue',
+        name: 'playqueue',
+        component: () => import('@/views/DetailPlayQueue.vue')
+      }]
   }]
 
 const router = new VueRouter({
