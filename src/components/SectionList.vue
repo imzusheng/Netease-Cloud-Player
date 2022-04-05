@@ -12,6 +12,7 @@
     </div>
     <ul class="section-row">
       <li
+        @click="toDetail(item)"
         class="section-column"
         v-for="(item, index) in getListData"
         :key="`${getTitle}-${index}`"
@@ -26,10 +27,10 @@
             alt=""
           />
           <div class="column-info">
-            <div class="column-name">
+            <div class="column-name" :title="item.name">
               {{ item.name }}
             </div>
-            <div class="column-desc">
+            <div class="column-desc" :title="item.desc">
               {{ item.desc }}
             </div>
           </div>
@@ -56,7 +57,7 @@ export default {
 
   mounted () {
     const route = {
-      '(min-width: 1068px)': 6,
+      '(min-width: 1200px)': 6,
       '(min-width: 968px)': 5,
       '(min-width: 728px)': 4,
       '(min-width: 528px)': 3,
@@ -89,6 +90,18 @@ export default {
       // dom更新完成
       this.$nextTick(() => {
         lazyLoadImg(this.$refs['lazyload-img'])
+      })
+    },
+    toDetail ({ query: name, payload: id }) {
+      if (!name) {
+        console.error('query 为空')
+        return
+      }
+      this.$router.push({
+        name,
+        query: {
+          id
+        }
       })
     }
   },
@@ -215,7 +228,7 @@ export default {
     --column-count: 5;
   }
 
-  @media screen and (min-width: 1068px) {
+  @media screen and (min-width: 1200px) {
     // 列间距
     --grid-gap: 24px;
     // 每行的列数

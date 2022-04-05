@@ -148,8 +148,8 @@ import { mapActions, mapMutations } from 'vuex'
 let playlistMaskRef
 let playlistBannerRef
 let headerMaskRef
-let playlistTitleRef
 let targetHeight
+let playlistTitleRef
 // 卸载外面是为了退出页面时移除监听 removeEventListener
 const scrollHandle = () => {
   const curScrollTop = document.documentElement.scrollTop
@@ -296,7 +296,7 @@ export default {
   // 离开时清理一下
   beforeRouteLeave (to, from, next) {
     // 恢复背景色为黑色
-    this.setCurPlaylistColor('0, 0, 0, 1')
+    this.setCurPlaylistColor('12, 12, 12, 1')
     // 删除监听
     document.removeEventListener('scroll', scrollHandle)
     next()

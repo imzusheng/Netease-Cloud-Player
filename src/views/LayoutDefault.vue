@@ -13,7 +13,7 @@
     :style="{ '--color-playlist': $store.state.curPlaylistColor }"
   >
     <!-- 头部 -->
-    <header>
+    <header id="header">
       <nav>
         <!-- logo -->
         <div class="logo">
@@ -138,7 +138,7 @@ export default {
   background-color: rgba(var(--color-playlist));
   transition: background-color 0.65s;
 
-  header {
+  #header {
     position: fixed;
     top: 0;
     width: 100%;
@@ -162,6 +162,8 @@ export default {
     // 后期全部改成class
 
     nav {
+      position: relative;
+      z-index: 4;
       width: 100%;
       height: 100%;
       display: flex;

@@ -139,17 +139,14 @@ const refs = {
 }
 // 监听滚动条
 const scrollHandle = () => {
-  const targetHeight = refs.artistPlaylistRef.offsetTop - 68
   const curScrollTop = document.documentElement.scrollTop
-  if (targetHeight < 0) return
   let curValue
-  if (targetHeight > curScrollTop) {
-    curValue = 1 - (targetHeight - curScrollTop) / targetHeight
+  if (refs.targetHeight > curScrollTop) {
+    curValue = 1 - (refs.targetHeight - curScrollTop) / refs.targetHeight
   } else {
     curValue = 1
   }
   curValue = curValue.toFixed(3)
-
   refs.underPosterRef.style.transform = `scale(${1.05 - 0.05 * curValue})`
   refs.MaskTransRef.style.opacity = curValue * 1.7 > 1 ? 1 : curValue * 1.7
   refs.headerMaskRef.style.opacity = curValue
@@ -203,6 +200,7 @@ export default {
     refs.headerMaskRef = this.$parent.$refs['main-header-mask']
     refs.MaskTransRef = this.$refs['under-poster-mask-trans']
     refs.underPosterRef = this.$refs['under-poster']
+    refs.targetHeight = refs.artistPlaylistRef.offsetTop - 68
 
     this.setLoading(true)
     // 获取id
@@ -282,7 +280,7 @@ export default {
     // 删除监听
     document.removeEventListener('scroll', throttleScrollHandle)
     // 恢复背景色为黑色
-    this.setCurPlaylistColor('0, 0, 0, 1')
+    this.setCurPlaylistColor('12, 12, 12, 1')
     this.setLoading(true)
     this.$nextTick(() => {
       next()
