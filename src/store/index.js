@@ -96,6 +96,7 @@ export default new Vuex.Store({
     reset (state) {
       state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []
       state.curSong.id = localStorage.getItem('songid') || null
+      state.audioDisplay = !!localStorage.getItem('songid')
     }
   },
   actions: {
@@ -162,6 +163,8 @@ export default new Vuex.Store({
           const data = resJson.result.map((v) => {
             v.desc1 = v.song.album.type
             v.desc2 = pickUpName(v.song.artists)
+            v.payload = v.id
+            console.log(v)
             return v
           })
           resolve({

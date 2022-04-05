@@ -317,8 +317,11 @@ export default {
   .under-poster-mask {
     // background: linear-gradient(transparent 0, rgba(0, 0, 0, 0.5) 100%),
     //   var(--background-noise);
-    background: linear-gradient(rgba(0, 0, 0, 0.4) 0, rgba(0, 0, 0, 0.3) 100%),
-      var(--background-noise);
+    background-image: linear-gradient(
+      rgba(0, 0, 0, 0.3) 0,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+    background-color: var(--background-noise);
   }
   .under-poster-mask-trans {
     background-color: rgba(var(--color-playlist));
@@ -371,7 +374,7 @@ export default {
       height: 100%;
       position: relative;
       z-index: 2;
-      padding: 0 52px 52px;
+      padding: 0 52px 72px;
       box-sizing: border-box;
       &::after {
         content: "";

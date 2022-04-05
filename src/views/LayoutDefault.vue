@@ -136,7 +136,7 @@ export default {
       }
     },
     refreshKey () {
-      console.log('run')
+      console.log('refreshKey')
       if (this.$route.query.id) {
         return Date.now() + this.$route.query.id
       } else {

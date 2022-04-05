@@ -3,6 +3,7 @@
 -->
 <template>
   <section
+    v-if="getListData.length"
     class="section-common"
     :style="{ '--shape-round': $props.round ? '50%' : '4px' }"
   >

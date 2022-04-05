@@ -9,16 +9,32 @@
       <div class="section-common-title">
         <div class="section-common-spacing">
           <p class="section-title-sub">为你准备的新曲</p>
-          <h2 class="section-title-main">专属推荐</h2>
+          <h2 class="section-title-main">新歌精选</h2>
         </div>
         <div>
           <a class="section-title-more" href="#">查看更多</a>
         </div>
       </div>
       <ul class="section-newSong-list">
-        <li v-for="rmdItem in listData.newsong" :key="rmdItem.id">
-          <figure>
-            <img :src="rmdItem.picUrl" alt="" />
+        <li
+          class="section-newSong-item"
+          v-for="rmdItem in listData.newsong"
+          :key="rmdItem.id"
+          @click="playSong(rmdItem.id)"
+        >
+          <figure class="item-figure">
+            <img class="item-poster" :src="rmdItem.picUrl" alt="" />
+            <span class="icon-play">
+              <svg
+                height="32"
+                role="img"
+                width="32"
+                viewBox="0 0 24 24"
+                class="icon-play-svg"
+              >
+                <polygon points="21.57 12 5.98 3 5.98 21 21.57 12"></polygon>
+              </svg>
+            </span>
             <div class="section-newSong-desc">
               <p>{{ rmdItem.name }}</p>
               <p>{{ rmdItem.desc2 }}</p>
@@ -27,6 +43,7 @@
         </li>
       </ul>
     </section>
+    <!-- 模板 -->
     <SectionList :title="'为你推荐'" :listData="listData.recommends" />
     <SectionList
       :title="'热门歌手'"
@@ -44,88 +61,6 @@
       :round="false"
     />
     <SectionList :title="'推荐电台'" :listData="listData.dj" :round="false" />
-
-    <!-- 模板 -->
-    <!-- <section
-      class="section-common"
-      v-for="(sectionItem, sectionIndex) in sectionScreen"
-      :key="`section-${sectionIndex}`"
-    >
-      <div class="section-common-title">
-        <div>
-          <p>{{ sectionItem.subTitle }}</p>
-          <h2>{{ sectionItem.title }}</h2>
-        </div>
-        <div>
-          <a href="#">查看更多</a>
-        </div>
-      </div>
-      <ul class="section-common-list">
-        <li
-          v-for="(listItem, listKey) in listData[sectionItem.li.source]"
-          :key="`${sectionIndex}-${listKey}`"
-          :class="`${sectionItem.li.class}`"
-          @click="toPlaylistDetail(sectionItem.query, listItem.payload)"
-        >
-          <figure>
-            <span>
-              <img
-                src="../assets/empty_black.png"
-                alt=""
-                :data-source-src="listItem.picUrl"
-                :data-img-class="sectionItem.id"
-              />
-            </span>
-            <p>{{ listItem.name }}</p>
-            <p>
-              {{ listItem.desc1 }}
-              {{ listItem.desc2 ? ` ${sectionItem.li.join} ` : "" }}
-              {{ listItem.desc2 || "" }}
-            </p>
-          </figure>
-        </li>
-      </ul>
-    </section> -->
-    <!-- 电台 -->
-    <!-- <section class="section-common">
-      <div class="section-common-title sub-title">
-        <div>
-          <h2>电台</h2>
-        </div>
-        <div>
-          <SubTabs :sourceData="config.dj.djTabsData" @change="subTabsChange" />
-        </div>
-      </div>
-      <ul class="section-common-list">
-        <li v-for="rmdItem in listData.dj" :key="rmdItem.id">
-          <figure v-if="config.dj.type === '推荐'">
-            <span>
-              <img
-                :data-source-src="rmdItem.picUrl"
-                src="../assets/empty_black.png"
-                alt=""
-              />
-            </span>
-            <p>{{ rmdItem.name }}</p>
-            <p>{{ rmdItem.lastProgramName }}</p>
-          </figure>
-          <figure v-else-if="config.dj.type === '热门'">
-            <span> <img :src="rmdItem.picUrl" alt="" /></span>
-            <p>{{ rmdItem.name }}</p>
-            <p>{{ rmdItem.copywriter }}</p>
-          </figure>
-          <figure v-else-if="config.dj.type === '新晋热榜'">
-            <span> <img :src="rmdItem.picUrl" alt="" /></span>
-            <p>{{ rmdItem.name }}</p>
-            <p>{{ rmdItem.rcmdtext }}</p>
-          </figure>
-          <figure v-else-if="config.dj.type === '最热主播'">
-            <span> <img :src="rmdItem.avatarUrl" alt="" /></span>
-            <p>{{ rmdItem.nickName }}</p>
-          </figure>
-        </li>
-      </ul>
-    </section> -->
   </main>
 </template>
 
@@ -178,7 +113,10 @@ export default {
       'getNewsong',
       'getMv'
     ]),
-    ...mapMutations(['setLoading'])
+    ...mapMutations(['setLoading', 'setCurSongid']),
+    playSong (id) {
+      this.setCurSongid(id)
+    }
   },
 
   created () {
@@ -258,42 +196,68 @@ export default {
       }
     }
 
+    // ul
     .section-newSong-list {
       display: flex;
       flex-wrap: wrap;
-      li {
+      // li
+      .section-newSong-item {
         box-sizing: border-box;
         width: calc(100% / 3);
         margin-bottom: 12px;
         padding: 0 12px;
         cursor: pointer;
-        figure {
+        .item-figure {
           padding: 4px;
           box-sizing: border-box;
           border-radius: 6px;
           width: 100%;
           display: flex;
           transition: all 0.2s;
-          &:hover {
-            background: #141414;
-          }
-          img {
+          position: relative;
+          .item-poster {
             height: 50px;
             border-radius: 6px;
             margin-right: 12px;
           }
-          .section-newSong-desc {
-            flex: 1;
+          .icon-play {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: 50px;
+            width: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .icon-play-svg {
+              height: 24px;
+              width: 24px;
+              fill: #fff;
+              display: none;
+            }
+          }
+        }
+        // 文字描述
+        .section-newSong-desc {
+          flex: 1;
+          overflow: hidden;
+          p {
+            white-space: nowrap;
             overflow: hidden;
-            p {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              height: 50%;
-              &:last-child {
-                font-size: 14px;
-                color: rgba(255, 255, 255, 0.5);
-              }
+            text-overflow: ellipsis;
+            height: 50%;
+            &:last-child {
+              font-size: 14px;
+              color: rgba(255, 255, 255, 0.5);
+            }
+          }
+        }
+        &:hover {
+          background: #141414;
+          .icon-play {
+            background: rgba(0, 0, 0, 0.8);
+            .icon-play-svg {
+              display: block;
             }
           }
         }
@@ -314,7 +278,6 @@ export default {
   }
 
   .section-common {
-    // padding: 32px 40px 56px;
     padding: 40px 50px 0;
   }
 }
