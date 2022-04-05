@@ -103,3 +103,20 @@ export const getMainColor = (imgSrc) => {
     }
   })
 }
+
+export const throttle = (func, delay) => {
+  let last, timer
+  return function () {
+    const now = Date.now()
+    if (last && now - last < delay) {
+      clearTimeout(timer)
+      timer = setTimeout(function () {
+        last = now
+        func()
+      }, delay)
+    } else {
+      last = now
+      func()
+    }
+  }
+}
