@@ -308,6 +308,10 @@ export default {
     // 下一首
     next () {
       const playQueue = this.playQueue()
+      if (playQueue.length === 0) {
+        this.setTips('没有下一首')
+        return
+      }
       const playQueueIndex = this.playQueueIndex()
       // 判断是否开启了随机播放
       if (this.random) {
@@ -330,6 +334,10 @@ export default {
     // 上一首
     prev () {
       const playQueue = this.playQueue()
+      if (playQueue.length === 0) {
+        this.setTips('没有上一首')
+        return
+      }
       const playQueueIndex = this.playQueueIndex()
       // 如果播放到尾，则从头开始
       const prevIndex =

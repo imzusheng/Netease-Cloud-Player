@@ -283,7 +283,7 @@ export default new Vuex.Store({
     getArtistSong ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
-          const data = resJson.hotSongs.splice(0, 5)
+          const data = resJson.hotSongs.splice(0, 50)
           resolve({
             data,
             type: 'hotSongs'
@@ -332,7 +332,6 @@ export default new Vuex.Store({
     getArtistVideo ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_VIDEO}?id=${id}&order=${1}`).then((resJson) => {
-          console.log(resJson)
           const data = resJson.data.records.splice(0, 7).map(v => {
             if (v.picUrl) {
               v.picUrl = v.imgurl
@@ -342,7 +341,6 @@ export default new Vuex.Store({
               v.desc = v.resource.mlogBaseData.desc
               v.picUrl = v.resource.mlogBaseData.coverUrl
             }
-            console.log(v)
             return v
           })
           resolve({

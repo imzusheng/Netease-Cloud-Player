@@ -29,7 +29,6 @@ export default {
   watch: {
     '$store.state.tips': {
       handler (newVal) {
-        console.log(this.timer)
         this.setTips(newVal)
         this.isShow = true
         if (this.timer) {

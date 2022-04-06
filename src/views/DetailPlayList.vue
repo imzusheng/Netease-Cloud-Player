@@ -182,11 +182,11 @@ export default {
       'pushPlayQueue',
       'setCurSongid',
       'setLoading',
-      'setError'
+      'setError',
+      'setTips'
     ]),
     // 选择歌曲，并开始播放
     playlistSelect (data) {
-      localStorage.setItem('songid', data.id)
       this.setCurSongid(data.id)
     },
     // 加载全部歌曲到列表
@@ -195,6 +195,7 @@ export default {
       this.pushPlayQueue(null)
       this.pushPlayQueue(this.curPlaylist)
       this.setCurSongid(this.curPlaylist[0].id)
+      this.setTips('添加到播放队列')
     },
     // 提取颜色
     getPicMainColor (url) {

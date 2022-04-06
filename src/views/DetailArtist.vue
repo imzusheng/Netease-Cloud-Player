@@ -33,9 +33,14 @@
     <!-- 歌单列表 -->
     <div class="artist-playlist">
       <div class="artist-playlist-main">
+        <!-- 操作按钮 -->
         <div class="artist-playlist-action">
           <div class="artist-playlist-action-content">
-            <button aria-label="播放全部" class="action-btn-play">
+            <button
+              aria-label="播放全部"
+              class="action-btn-play"
+              @click="actionPlayAll"
+            >
               <svg role="img" height="28" width="28" viewBox="0 0 24 24">
                 <path
                   d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"
@@ -47,13 +52,15 @@
             </button>
           </div>
         </div>
+
         <!-- 热门歌曲 -->
         <section class="section-hot-song">
           <h2>热门</h2>
           <ul class="hot-song-table">
             <li
               class="table-row"
-              v-for="(listItem, listIndex) in tableData.hotSongs"
+              @click="playSong(listItem.id)"
+              v-for="(listItem, listIndex) in getHotSongs"
               :key="`detailArtist-${listIndex}`"
             >
               <!-- 序号 -->
@@ -113,11 +120,20 @@
               <div>{{ getSongDt(listItem.dt) }}</div>
             </li>
           </ul>
-          <a href="#" class="more-hotSongs">查看更多</a>
+          <span
+            href="#"
+            class="more-hotSongs"
+            @click="hotSongsDisplay = !hotSongsDisplay"
+            v-html="hotSongsDisplay ? '收起' : '查看更多'"
+          ></span>
         </section>
+
         <SectionList :title="'专辑'" :listData="tableData.hotAlbums" />
+
         <SectionList :title="'MV'" :listData="tableData.mvs" />
+
         <SectionList :title="'视频'" :listData="tableData.video" />
+
         <SectionList
           :title="'粉丝也喜欢'"
           :listData="tableData.simi"
@@ -167,7 +183,13 @@ export default {
 
   data () {
     return {
-      ...mapMutations(['setLoading', 'setCurPlaylistColor']),
+      ...mapMutations([
+        'setTips',
+        'setLoading',
+        'setCurPlaylistColor',
+        'setCurSongid',
+        'pushPlayQueue'
+      ]),
       ...mapActions([
         'getArtistDetail',
         'getArtistALBUM',
@@ -187,7 +209,10 @@ export default {
         hotAlbums: []
       },
 
-      artistInfo: {}
+      artistInfo: {},
+
+      // 是否显示全部50首热门歌曲
+      hotSongsDisplay: false
     }
   },
 
@@ -198,6 +223,15 @@ export default {
       this.$nextTick(() => {
         lazyLoadImg(this.$refs['lazyload-img'])
       })
+    },
+    playSong (id) {
+      this.setCurSongid(id)
+    },
+    // 加载全部歌曲到列表
+    actionPlayAll () {
+      // 清空先前的播放列表
+      this.pushPlayQueue(null)
+      this.setTips('添加到播放队列')
     }
   },
 
@@ -278,6 +312,11 @@ export default {
           _moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
         }`
       }
+    },
+    getHotSongs () {
+      const count = this.hotSongsDisplay ? 50 : 5
+      this.lazyLoadimg()
+      return this.tableData.hotSongs.slice(0, count)
     }
   },
 
@@ -575,6 +614,10 @@ export default {
           font-size: 14px;
           color: #b3b3b3;
           margin-top: 24px;
+          cursor: pointer;
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
     }
