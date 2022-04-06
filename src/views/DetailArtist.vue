@@ -360,7 +360,7 @@ export default {
     // background: url("https://i.scdn.co/image/ab676186000010165883f9c0c5865d49b13d75c3")
     //   center 0 no-repeat;
     background: var(--poster-url) center center no-repeat;
-    background-size: auto 100%;
+    background-size: 100% auto;
     transform: scale(1.05);
   }
   .under-poster-mask {

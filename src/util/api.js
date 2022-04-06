@@ -1,4 +1,9 @@
-const API_ROOT = 'http://localhost:3000'
+const API_ROOT =
+process.env.NODE_ENV === 'development'
+  ? 'http://localhost:3000'
+  : 'https://music.zusheng.club'
+
+// 'https://netease-cloud-music-f4u1p2cjb-imzusheng.vercel.app'
 
 export default {
   // 推荐

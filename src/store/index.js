@@ -91,6 +91,9 @@ export default new Vuex.Store({
       }
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
+    setAudioDisplay (state, status) {
+      state.audioDisplay = status
+    },
     // 从localStorage恢复数据
     reset (state) {
       state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []

@@ -9,16 +9,21 @@ import axios from '@/util/axios'
 export const fetchToJson = (url) => {
   return new Promise((resolve, reject) => {
     axios
-      .get(url)
+      .get(url, {
+        params: {
+          realIP: '127.0.0.1'
+        }
+      })
       .then(res => res.data)
       .then(resData => resolve(resData))
       .catch(err => {
+        console.error('fetch-error', err)
         store.commit('setLoading', false)
+        const msg = err?.response?.data?.msg || err?.response?.data?.message || ''
         store.commit('setError', {
           status: true,
-          msg: err.response.data.msg || err.response.data.message || ''
+          msg
         })
-        console.error('fetch-error', err)
       })
   })
 }
@@ -144,70 +149,57 @@ export const compressionImage = (imgSrc) => {
       const rawImgWidth = tempImg.width
       const rawImageHeight = tempImg.height
 
-      // 处理后的宽高 比例1:1，默认等于原始宽高
+      // 处理后的宽高，默认等于原始宽高
       let setImgWidth = rawImgWidth
       let setImgHeight = rawImageHeight
 
-      // 宽屏图时，设置为等比例
+      // 宽屏图的宽高比
+      const ratio = 4 / 3
+      // 设置图像目标宽度为250px
+      const targetWidth = 250
+
       if (rawImgWidth / rawImageHeight > 1) {
+        // 宽屏图时，设置比例为ratio
         // 重新设置宽高
-        setImgWidth = setImgHeight = rawImageHeight
+        setImgHeight = rawImageHeight
+        setImgWidth = ratio * rawImageHeight
       } else if (rawImgWidth / rawImageHeight < 1) {
-        // 重新设置宽高
+        // 竖屏图，还没遇到过
         setImgWidth = setImgHeight = rawImgWidth
       }
 
       // 创建画布
       const canvas = document.createElement('canvas')
       const context = canvas.getContext('2d')
-
-      // 压缩比例，默认等于50%
-      let compressionRatio = 0.5
-
-      switch (true) {
-        case setImgWidth > 4000:
-          compressionRatio = 0.025
-          break
-
-        case setImgWidth > 3000:
-          compressionRatio = 0.05
-          break
-
-        case setImgWidth > 2000:
-          compressionRatio = 0.075
-          break
-
-        case setImgWidth > 1000:
-          compressionRatio = 0.1
-          break
-
-        case setImgWidth > 500:
-          compressionRatio = 0.2
-          break
-
-        default:
-          break
-      }
-
-      // 画布宽高等于处理后的宽高
+      // 图像压缩比例
+      const compressionRatio = targetWidth / setImgWidth
+      // 画布宽高等于设定的比例 ratio
       canvas.width = setImgWidth * compressionRatio
       canvas.height = setImgHeight * compressionRatio
 
-      // console.log(rawImgWidth, rawImageHeight, setImgWidth, setImgHeight)
+      // 再次矫正
+      // rawImgWidth / rawImageHeight > setImgWidth / setImgHeight 说明图片的宽度被压缩了，图像变形需要矫正：(rawImgWidth / rawImageHeight) * setImgHeight
+      // rawImgWidth / rawImageHeight < setImgWidth / setImgHeight 说明图片的高度度被压缩了：(rawImageHeight * setImgWidth) / rawImgWidth
+      // console.log(rawImgWidth, rawImageHeight, setImgWidth, setImgHeight, (rawImgWidth / rawImageHeight), (setImgWidth / setImgHeight))
+      if (rawImgWidth / rawImageHeight > setImgWidth / setImgHeight) {
+        setImgWidth = (rawImgWidth / rawImageHeight) * setImgHeight
+      } else if (rawImgWidth / rawImageHeight < setImgWidth / setImgHeight) {
+        setImgHeight = (rawImageHeight * setImgWidth) / rawImgWidth
+      }
 
       // 裁剪图片
       context.drawImage(
         tempImg,
-        // 裁剪起始点
         0, 0,
-        // 裁剪大小
-        setImgWidth,
-        setImgHeight,
+        // 保留图片的分辨率(裁剪)
+        rawImgWidth,
+        rawImageHeight,
         // 画布起始点
         0, 0,
-        // 画布大小
+        // canvas内图像大小(影响图片拉伸)，如果修改了图像宽高，比例还和canvas相同，图像会被拉伸
         setImgWidth * compressionRatio,
         setImgHeight * compressionRatio
+        // ((rawImageHeight * setImgWidth) / rawImgWidth) * compressionRatio
       )
       resolve(canvas.toDataURL('image/jpg'))
     }

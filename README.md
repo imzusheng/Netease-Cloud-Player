@@ -1,4 +1,4 @@
-# 网易云音乐Web端
+# [高颜值网易云音乐Web端](https://demo.zusheng.club/cloud_music/#/)
 
 ## 前言
 
@@ -48,3 +48,4 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 * [ ] 歌词
 
 [我的博客](https://zusheng.club)
+[项目地址](https://demo.zusheng.club/cloud_music/#/)

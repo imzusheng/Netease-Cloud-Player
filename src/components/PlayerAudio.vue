@@ -245,9 +245,13 @@ export default {
       localStorage.removeItem('audioLength')
       localStorage.removeItem('currentTime')
       // 设置是否自动播放
+      if (!url) {
+        console.warn('歌曲url: ', url)
+        return
+      }
+      this.audioRef.src = url
       this.audioRef.autoplay = autoplay
       // this.audioRef.muted = 'muted'
-      this.audioRef.src = url
       // this.audioRef.src = 'www.baidu.com' // 测试错误
       this.audioRef.load()
     },
@@ -298,6 +302,7 @@ export default {
           this.curSongInfo[key] = curSongInfo[key]
         })
         localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
+        document.title = `Music - ${curSongInfo.name}`
         // 通过歌曲的id获取MP3的url
         this.getSongUrl(songid).then((res) => {
           this.createAudio(res.data[0].url, autoplay)
@@ -569,6 +574,10 @@ export default {
             this.audioRef.pause()
             this.idToUrl(songid, true)
             this.loading = true
+          }
+          // 显示播放器
+          if (!this.$store.state.audioDisplay) {
+            this.$store.commit('setAudioDisplay', true)
           }
         }
       }
