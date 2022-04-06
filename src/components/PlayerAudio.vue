@@ -565,7 +565,6 @@ export default {
         if (songid) {
           localStorage.setItem('songid', songid)
           this.idToUrl(songid, true)
-          this.audioRef.pause()
           this.loading = true
         }
       }

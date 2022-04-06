@@ -13,14 +13,10 @@
     <TheTips />
 
     <router-view v-show="!$store.state.loading"></router-view>
-
-    <!-- 音乐播放器 -->
-    <PlayerAudio />
   </div>
 </template>
 
 <script>
-import PlayerAudio from '@/components/PlayerAudio'
 import TheLoading from '@/components/TheLoading'
 import TheTips from '@/components/TheTips'
 import { pickUpName } from '@/util'
@@ -31,7 +27,6 @@ export default {
 
   components: {
     TheLoading,
-    PlayerAudio,
     TheTips
   },
 

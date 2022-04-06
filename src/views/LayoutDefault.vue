@@ -47,15 +47,11 @@
       v-show="!$store.state.loading && !$store.state.error.status"
       :key="refreshKey"
     />
-
-    <!-- 音乐播放器 -->
-    <PlayerAudio />
   </div>
 </template>
 
 <script>
 import SubTabs from '@/components/SubTabs'
-import PlayerAudio from '@/components/PlayerAudio'
 import TheLoading from '@/components/TheLoading'
 import TheTips from '@/components/TheTips'
 import TheError from '@/components/TheError'
@@ -68,7 +64,6 @@ export default {
   components: {
     SubTabs,
     TheLoading,
-    PlayerAudio,
     TheError,
     TheTips
   },

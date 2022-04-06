@@ -89,7 +89,6 @@ export default new Vuex.Store({
       } else {
         state.playQueue = []
       }
-      console.log(state.playQueue)
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
     // 从localStorage恢复数据

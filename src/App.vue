@@ -1,8 +1,22 @@
 <template>
   <div id="app">
     <router-view />
+
+    <!-- 音乐播放器 -->
+    <PlayerAudio />
   </div>
 </template>
+
+<script>
+import PlayerAudio from '@/components/PlayerAudio'
+export default {
+  name: 'App',
+
+  components: {
+    PlayerAudio
+  }
+}
+</script>
 
 <style lang="less">
 * {
