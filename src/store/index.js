@@ -164,7 +164,6 @@ export default new Vuex.Store({
             v.desc1 = v.song.album.type
             v.desc2 = pickUpName(v.song.artists)
             v.payload = v.id
-            console.log(v)
             return v
           })
           resolve({
@@ -315,13 +314,40 @@ export default new Vuex.Store({
         fetchToJson(`${API.GET_ARTIST_MV}?id=${id}`).then((resJson) => {
           const data = resJson.mvs.splice(0, 7).map(v => {
             v.picUrl = v.imgurl
-            // v.desc = ` ${v.playCount}次观看`
-            v.desc = v.name
+            let playCount = v.playCount
+            if (playCount > 10000) {
+              playCount = (playCount / 10000).toFixed(1) + '万'
+            }
+            v.desc = ` ${playCount}次观看`
             return v
           })
           resolve({
             data,
             type: 'mvs'
+          })
+        })
+      })
+    },
+    // 获取歌手视频
+    getArtistVideo ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ARTIST_VIDEO}?id=${id}&order=${1}`).then((resJson) => {
+          console.log(resJson)
+          const data = resJson.data.records.splice(0, 7).map(v => {
+            if (v.picUrl) {
+              v.picUrl = v.imgurl
+              v.desc = v.name
+            } else {
+              v.name = v.resource.mlogBaseData.text
+              v.desc = v.resource.mlogBaseData.desc
+              v.picUrl = v.resource.mlogBaseData.coverUrl
+            }
+            console.log(v)
+            return v
+          })
+          resolve({
+            data,
+            type: 'video'
           })
         })
       })
