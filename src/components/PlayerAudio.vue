@@ -563,9 +563,13 @@ export default {
     '$store.getters.curSongid': {
       handler (songid) {
         if (songid) {
-          localStorage.setItem('songid', songid)
-          this.idToUrl(songid, true)
-          this.loading = true
+          const locaSongid = localStorage.getItem('songid')
+          if (locaSongid !== songid.toString()) {
+            localStorage.setItem('songid', songid)
+            this.audioRef.pause()
+            this.idToUrl(songid, true)
+            this.loading = true
+          }
         }
       }
     }
