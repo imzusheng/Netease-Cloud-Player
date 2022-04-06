@@ -30,9 +30,6 @@ export default {
 
   methods: {
     goBack () {
-      this.$store.commit('setError', {
-        status: false
-      })
       this.$router.go(-1)
     }
   }

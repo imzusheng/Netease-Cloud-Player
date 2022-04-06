@@ -53,6 +53,11 @@ const router = new VueRouter({
 
 router.afterEach((to, from) => {
   store.commit('setPlayQueueStatus', to.name === 'playqueue')
+  if (store.state.error.status) {
+    store.commit('setError', {
+      status: false
+    })
+  }
 })
 
 export default router

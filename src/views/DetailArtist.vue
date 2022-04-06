@@ -117,6 +117,7 @@
         </section>
         <SectionList :title="'专辑'" :listData="tableData.hotAlbums" />
         <SectionList :title="'MV'" :listData="tableData.mvs" />
+        <SectionList :title="'视频'" :listData="tableData.video" />
         <SectionList
           :title="'粉丝也喜欢'"
           :listData="tableData.simi"
@@ -169,19 +170,21 @@ export default {
       ...mapMutations(['setLoading', 'setCurPlaylistColor']),
       ...mapActions([
         'getArtistDetail',
+        'getArtistALBUM',
+        'getArtistVideo',
         'getArtistFans',
         'getArtistSong',
-        'getArtistALBUM',
-        'getArtistMV',
-        'getArtistSimi'
+        'getArtistSimi',
+        'getArtistMV'
       ]),
 
       tableData: {
-        hotSongs: [],
-        hotAlbums: [],
         mvs: [],
         simi: [],
-        fans: {}
+        fans: {},
+        video: [],
+        hotSongs: [],
+        hotAlbums: []
       },
 
       artistInfo: {}
@@ -220,7 +223,8 @@ export default {
           this.getArtistSong(id),
           this.getArtistALBUM(id),
           this.getArtistMV(id),
-          this.getArtistFans(id)
+          this.getArtistFans(id),
+          this.getArtistVideo(id)
         ]).then((resArr) => {
           this.artistInfo = res.data
           resArr.forEach((res) => {

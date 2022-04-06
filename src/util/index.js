@@ -1,4 +1,5 @@
 import store from '@/store'
+import axios from '@/util/axios'
 
 /**
  * fetch数据转json
@@ -7,20 +8,18 @@ import store from '@/store'
  */
 export const fetchToJson = (url) => {
   return new Promise((resolve, reject) => {
-    fetch(url).then((res) => {
-      res.json().then((resJson) => {
-        if (resJson.code === 200) {
-          resolve(resJson)
-        } else {
-          store.commit('setLoading', false)
-          store.commit('setError', {
-            status: true,
-            msg: resJson.msg
-          })
-          reject(resJson)
-        }
+    axios
+      .get(url)
+      .then(res => res.data)
+      .then(resData => resolve(resData))
+      .catch(err => {
+        store.commit('setLoading', false)
+        store.commit('setError', {
+          status: true,
+          msg: err.response.data.msg || err.response.data.message || ''
+        })
+        console.error('fetch-error', err)
       })
-    })
   })
 }
 // 提取歌手名字
