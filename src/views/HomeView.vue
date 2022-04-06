@@ -44,28 +44,36 @@
       </ul>
     </section>
     <!-- 模板 -->
-    <SectionList :title="'为你推荐'" :listData="listData.recommends" />
-    <SectionList
+    <SectionListGrid
+      :title="'为你推荐'"
+      :listData="listData.recommends"
+      :round="false"
+    />
+    <SectionListGrid
       :title="'热门歌手'"
       :listData="listData.hotArtists"
       :round="true"
     />
-    <SectionList
+    <SectionListGrid
       :title="'推荐的MV'"
       :listData="listData.recommendMv"
       :round="false"
     />
-    <SectionList
+    <SectionListGrid
       :title="'社区精选'"
       :listData="listData.community"
       :round="false"
     />
-    <SectionList :title="'推荐电台'" :listData="listData.dj" :round="false" />
+    <SectionListGrid
+      :title="'推荐电台'"
+      :listData="listData.dj"
+      :round="false"
+    />
   </main>
 </template>
 
 <script>
-import SectionList from '@/components/SectionList.vue'
+import SectionListGrid from '@/components/SectionListGrid.vue'
 import { mapActions, mapMutations } from 'vuex'
 
 let headerMaskRef
@@ -85,7 +93,7 @@ const scrollHandle = () => {
 export default {
   name: 'HomeView',
   components: {
-    SectionList
+    SectionListGrid
   },
 
   data () {

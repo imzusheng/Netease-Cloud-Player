@@ -18,34 +18,26 @@
         v-for="(item, index) in getListData"
         :key="`${getTitle}-${index}`"
       >
-        <div class="section-column-spacing">
-          <!-- 懒加载封面图 未加载时使用占位图 -->
-          <img
-            src="../assets/empty_black.png"
-            :data-pic-src="item.picUrl"
-            ref="lazyload-img"
-            class="column-poster"
-            alt=""
-          />
-          <div class="column-info">
-            <div class="column-name" :title="item.name">
-              {{ item.name }}
-            </div>
-            <div class="column-desc" :title="item.desc">
-              {{ item.desc }}
-            </div>
-          </div>
-        </div>
+        <SectionListItem
+          :name="item.name"
+          :desc="item.desc"
+          :picurl="item.picUrl"
+        />
       </li>
     </ul>
   </section>
 </template>
 
 <script>
-import { lazyLoadImg } from '@/util'
+// import { lazyLoadImg } from '@/util'
+import SectionListItem from '@/components/SectionListItem'
 
 export default {
-  name: 'SectionList',
+  name: 'SectionListGrid',
+
+  components: {
+    SectionListItem
+  },
 
   data () {
     return {
@@ -86,13 +78,6 @@ export default {
   },
 
   methods: {
-    // 实现图片懒加载
-    lazyLoadimg () {
-      // dom更新完成
-      this.$nextTick(() => {
-        lazyLoadImg(this.$refs['lazyload-img'])
-      })
-    },
     toDetail ({ query: name, payload: id }) {
       if (!name) {
         console.error('query 为空')
@@ -113,7 +98,6 @@ export default {
     },
     getListData () {
       if (this.$props.listData && this.$props.listData.length > 0) {
-        this.lazyLoadimg()
         return this.$props.listData.slice(0, this.columnCount)
       } else {
         return []
@@ -165,39 +149,6 @@ export default {
         background: rgb(39, 39, 39);
       }
       border-radius: 12px;
-      .section-column-spacing {
-        padding: 12px;
-        height: 100%;
-        box-sizing: border-box;
-        // 封面
-        .column-poster {
-          width: 100%;
-          object-fit: cover;
-          margin-bottom: 16px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-          border-radius: var(--shape-round);
-        }
-        .column-info {
-          // 歌手名
-          .column-name {
-            font-size: 15px;
-            font-weight: 700;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-          }
-          .column-desc {
-            margin: 2px 0 6px;
-            font-size: 13px;
-            font-weight: 400;
-            color: #b3b3b3;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            display: -webkit-box;
-            overflow: hidden;
-          }
-        }
-      }
     }
   }
 

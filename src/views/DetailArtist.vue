@@ -128,13 +128,13 @@
           ></span>
         </section>
 
-        <SectionList :title="'专辑'" :listData="tableData.hotAlbums" />
+        <SectionListGrid :title="'专辑'" :listData="tableData.hotAlbums" />
 
-        <SectionList :title="'MV'" :listData="tableData.mvs" />
+        <SectionListGrid :title="'MV'" :listData="tableData.mvs" />
 
-        <SectionList :title="'视频'" :listData="tableData.video" />
+        <SectionListGrid :title="'视频'" :listData="tableData.video" />
 
-        <SectionList
+        <SectionListGrid
           :title="'粉丝也喜欢'"
           :listData="tableData.simi"
           :round="true"
@@ -148,7 +148,7 @@
 import moment from 'moment'
 import { getMainColor, throttle, lazyLoadImg } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
-import SectionList from '@/components/SectionList.vue'
+import SectionListGrid from '@/components/SectionListGrid.vue'
 
 // 滚动条参数
 const refs = {
@@ -178,7 +178,7 @@ export default {
   name: 'DetailArtist',
 
   components: {
-    SectionList
+    SectionListGrid
   },
 
   data () {
@@ -230,8 +230,14 @@ export default {
     // 加载全部歌曲到列表
     actionPlayAll () {
       // 清空先前的播放列表
-      this.pushPlayQueue(null)
       this.setTips('添加到播放队列')
+      this.pushPlayQueue(null)
+      this.pushPlayQueue(this.tableData.hotSongs)
+      const curSongid = localStorage.getItem('songid')
+      const lastSongid = this.tableData.hotSongs[0].id
+      if (curSongid !== lastSongid.toString()) {
+        this.setCurSongid(lastSongid)
+      }
     }
   },
 
