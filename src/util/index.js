@@ -224,7 +224,6 @@ export const lazyLoadImg = (refs) => {
     entries.forEach((item) => {
       // 图片出现，挂上src
       if (item.intersectionRatio > 0) {
-        console.log('run')
         // 停止观察
         intersectionObserver.unobserve(item.target)
         const rawSrc = item.target.getAttribute('data-pic-src')

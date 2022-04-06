@@ -2,19 +2,19 @@ const API_ROOT = 'http://localhost:3000'
 
 export default {
   // 推荐
-  GET_RECOMMENDS: `${API_ROOT}/personalized?limit=7`,
+  GET_RECOMMENDS: `${API_ROOT}/personalized`,
   // 社区(网页)推荐
-  GET_COMMUNITY: `${API_ROOT}/top/playlist?limit=7`,
+  GET_COMMUNITY: `${API_ROOT}/top/playlist`,
   // 新歌
-  GET_PERSON_NEWSONG: `${API_ROOT}/personalized/newsong?limit=9`,
+  GET_PERSON_NEWSONG: `${API_ROOT}/personalized/newsong`,
   // 推荐MV
   GET_RECOMMENDS_MV: `${API_ROOT}/personalized/mv`,
   // 最新MV
-  GET_NEW_MV: `${API_ROOT}/mv/first?limit=7`,
+  GET_NEW_MV: `${API_ROOT}/mv/first`,
   // 推荐电台
   GET_RECOMMENDS_DJ: `${API_ROOT}/personalized/djprogram`,
   // 热门歌手
-  GET_HOT_ARTISTS: `${API_ROOT}/top/artists?offset=0&limit=7`,
+  GET_HOT_ARTISTS: `${API_ROOT}/top/artists`,
   // 歌单详情
   GET_PLAYLIST_DETAIL: `${API_ROOT}/playlist/detail`,
   // 单曲详情

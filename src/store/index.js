@@ -107,9 +107,9 @@ export default new Vuex.Store({
       })
     },
     // 社区精选
-    getCommunity () {
+    getCommunity ({ state }, limit = 7) {
       return new Promise(resolve => {
-        fetchToJson(API.GET_COMMUNITY).then((resJson) => {
+        fetchToJson(`${API.GET_COMMUNITY}?limit=${limit}`).then((resJson) => {
           const data = resJson.playlists.map((v) => {
             const updateTime = v.trackUpdateTime ? moment.duration(v.trackUpdateTime).days() + '天前 • ' : ''
             const trackCount = v.trackCount + '首音乐'
@@ -121,15 +121,16 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            title: '社区精选',
             type: 'community'
           })
         })
       })
     },
     // 今日推荐
-    getRecommend () {
+    getRecommend ({ state }, limit = 7) {
       return new Promise(resolve => {
-        fetchToJson(API.GET_RECOMMENDS).then((resJson) => {
+        fetchToJson(`${API.GET_RECOMMENDS}?limit=${limit}`).then((resJson) => {
           const data = resJson.result.map((v) => {
             v.desc = moment.duration(v.trackNumberUpdateTime).days() + '天前 • ' + v.trackCount + '首音乐'
             v.payload = v.id
@@ -138,6 +139,7 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            title: '为你推荐',
             type: 'recommends'
           })
         })
@@ -157,13 +159,15 @@ export default new Vuex.Store({
       })
     },
     // 新歌
-    getNewsong () {
+    getNewsong ({ state }, limit = 9) {
       return new Promise(resolve => {
-        fetchToJson(API.GET_PERSON_NEWSONG).then((resJson) => {
+        fetchToJson(`${API.GET_PERSON_NEWSONG}?limit=${limit}`).then((resJson) => {
           const data = resJson.result.map((v) => {
             v.desc1 = v.song.album.type
             v.desc2 = pickUpName(v.song.artists)
-            v.payload = v.id
+            v.desc = v.desc2
+            v.query = 'playlist'
+            v.payload = v.song.album.id
             return v
           })
           resolve({
@@ -174,9 +178,9 @@ export default new Vuex.Store({
       })
     },
     // 推荐MV
-    getMv () {
+    getMv ({ state }, limit = 7) {
       return new Promise(resolve => {
-        fetchToJson(API.GET_NEW_MV).then((resJson) => {
+        fetchToJson(`${API.GET_NEW_MV}?limit=${limit}`).then((resJson) => {
           const data = resJson.data.map((v) => {
             let playCount
             if (Number(v.playCount) > 10000) {
@@ -192,13 +196,14 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            title: '推荐的MV',
             type: 'recommendMv'
           })
         })
       })
     },
     // 推荐电台
-    getRecommendDj () {
+    getRecommendDj ({ state }, limit = 7) {
       return new Promise(resolve => {
         fetchToJson(API.GET_RECOMMENDS_DJ).then((resJson) => {
           const data = resJson.result.map((v) => {
@@ -211,15 +216,16 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            title: '推荐电台',
             type: 'dj'
           })
         })
       })
     },
     // 获取热门歌手
-    getHotArtists () {
+    getHotArtists  ({ state }, limit = 7) {
       return new Promise(resolve => {
-        fetchToJson(API.GET_HOT_ARTISTS).then((resJson) => {
+        fetchToJson(`${API.GET_HOT_ARTISTS}?limit=${limit}`).then((resJson) => {
           const data = resJson.artists.map((v) => {
             v.picUrl = v.img1v1Url
             v.desc = '艺人'
@@ -229,6 +235,7 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            title: '热门歌手',
             type: 'hotArtists'
           })
         })

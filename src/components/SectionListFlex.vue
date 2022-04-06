@@ -1,5 +1,5 @@
 <!--
-    歌单列表组件
+    歌单列表组件 Flex布局
 -->
 <template>
   <section
@@ -7,9 +7,8 @@
     class="section-common"
     :style="{ '--shape-round': $props.round ? '50%' : '4px' }"
   >
-    <div class="section-common-title">
+    <div class="section-common-title" v-if="getTitle">
       <h2>{{ getTitle }}</h2>
-      <span v-if="$props.listData.length > 6" @click="toMore">查看更多</span>
     </div>
     <ul class="section-row">
       <li
@@ -29,70 +28,22 @@
 </template>
 
 <script>
+// import { lazyLoadImg } from '@/util'
 import SectionListItem from '@/components/SectionListItem'
 
 export default {
-  name: 'SectionListGrid',
+  name: 'SectionListFlex',
 
   components: {
     SectionListItem
   },
 
-  data () {
-    return {
-      // 行列数
-      columnCount: 6
-    }
-  },
-
-  props: {
-    // 标题
-    title: String,
-
-    // 数据
-    listData: Array,
-
-    // 图片是否圆角
-    round: Boolean,
-
-    // 查看更多的路由参数
-    type: String,
-    id: [String, Number]
-  },
-
-  mounted () {
-    const route = {
-      '(min-width: 1200px)': 6,
-      '(min-width: 968px)': 5,
-      '(min-width: 728px)': 4,
-      '(min-width: 528px)': 3,
-      '(min-width: 0)': 2
-    }
-    const mediaChangeHandle = (e) => {
-      if (e.matches === true) {
-        this.columnCount = route[e.media]
-      } else {
-        this.columnCount = route[e.media] - 1
-      }
-    }
-    let init = false
-    Object.keys(route)
-      .reverse()
-      .forEach((media) => {
-        const mm = window.matchMedia(media)
-        if (!mm.matches && !init) {
-          // console.log(media, route[media])
-          this.columnCount = route[media] - 1
-          init = true
-        }
-        mm.addEventListener('change', mediaChangeHandle)
-      })
-  },
+  props: ['title', 'listData', 'round'],
 
   methods: {
     toDetail ({ query: name, payload: id }) {
       if (!name) {
-        console.warn('query 为空，停止跳转')
+        console.error('query 为空')
         return
       }
       this.$router.push({
@@ -100,18 +51,6 @@ export default {
         query: {
           id
         }
-      })
-    },
-    toMore () {
-      const query = {}
-      if (this.$props.type) query.type = this.$props.type
-      else return console.warn('路由参数错误，停止跳转')
-
-      if (this.$props.id) query.id = this.$props.id
-
-      this.$router.push({
-        name: 'more',
-        query
       })
     }
   },
@@ -133,13 +72,11 @@ export default {
 
 <style lang="less" scoped>
 .section-common {
+  margin-bottom: 48px;
   // 列间距
   --grid-gap: 24px;
   // 每行的列数
-  --column-count: 4;
-  // 图片圆角
-  --shape-round: 4px;
-  margin-bottom: 48px;
+  --column-count: 6;
 
   > .section-common-title {
     display: flex;
@@ -160,6 +97,7 @@ export default {
       }
     }
   }
+
   > .section-row {
     display: grid;
     grid-gap: var(--grid-gap);

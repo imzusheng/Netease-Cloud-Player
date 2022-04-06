@@ -25,6 +25,10 @@ const routes = [
       path: 'artist',
       name: 'artist',
       component: () => import('@/views/DetailArtist.vue')
+    }, {
+      path: 'more',
+      name: 'more',
+      component: () => import('@/views/DetailDisplayMore.vue')
     }]
   },
   {

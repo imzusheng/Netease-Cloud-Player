@@ -12,7 +12,7 @@
           <h2 class="section-title-main">新歌精选</h2>
         </div>
         <div>
-          <a class="section-title-more" href="#">查看更多</a>
+          <span class="section-title-more" @click="toMore">查看更多</span>
         </div>
       </div>
       <ul class="section-newSong-list">
@@ -45,29 +45,34 @@
     </section>
     <!-- 模板 -->
     <SectionListGrid
-      :title="'为你推荐'"
+      :title="listTitle.recommends"
       :listData="listData.recommends"
       :round="false"
+      type="getRecommend"
     />
     <SectionListGrid
-      :title="'热门歌手'"
+      :title="listTitle.hotArtists"
       :listData="listData.hotArtists"
       :round="true"
+      type="getHotArtists"
     />
     <SectionListGrid
-      :title="'推荐的MV'"
+      :title="listTitle.recommendMv"
       :listData="listData.recommendMv"
       :round="false"
+      type="getMv"
     />
     <SectionListGrid
-      :title="'社区精选'"
+      :title="listTitle.community"
       :listData="listData.community"
       :round="false"
+      type="getCommunity"
     />
     <SectionListGrid
-      :title="'推荐电台'"
+      :title="listTitle.dj"
       :listData="listData.dj"
       :round="false"
+      type="getRecommendDj"
     />
   </main>
 </template>
@@ -107,6 +112,15 @@ export default {
         records: [], // 听歌记录
         newsong: [], // 推荐新曲
         recommendMv: [] // 推荐MV
+      },
+      listTitle: {
+        dj: '',
+        hotArtists: '',
+        community: '',
+        recommends: '',
+        records: '',
+        newsong: '',
+        recommendMv: ''
       }
     }
   },
@@ -124,6 +138,14 @@ export default {
     ...mapMutations(['setLoading', 'setCurSongid']),
     playSong (id) {
       this.setCurSongid(id)
+    },
+    toMore () {
+      this.$router.push({
+        name: 'more',
+        query: {
+          type: 'getNewsong'
+        }
+      })
     }
   },
 
@@ -149,6 +171,7 @@ export default {
     ]).then((resArr) => {
       resArr.forEach((res) => {
         this.listData[res.type] = res.data
+        this.listTitle[res.type] = res.title
       })
       this.$nextTick(() => {
         this.setLoading(false)
