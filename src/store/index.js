@@ -45,7 +45,9 @@ export default new Vuex.Store({
     error: {
       status: false,
       msg: ''
-    }
+    },
+
+    searchDisplay: false
   },
   getters: {
     userInfo: state => state.userInfo,
@@ -60,6 +62,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setSearchDisplay (state, display) {
+      state.searchDisplay = display
+    },
     setError (state, { status = false, msg = '' }) {
       state.error.status = status
       state.error.msg = msg
@@ -374,6 +379,14 @@ export default new Vuex.Store({
             data,
             type: 'simi'
           })
+        })
+      })
+    },
+    // 搜索建议
+    getSearchSuggest ({ state }, { keywords = '', type = null }) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH_SUGGEST}?keywords=${keywords}&type=${type}`).then((resJson) => {
+          resolve(resJson.result)
         })
       })
     }

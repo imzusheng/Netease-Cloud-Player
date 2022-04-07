@@ -40,6 +40,14 @@ export default {
   GET_ARTIST_VIDEO: `${API_ROOT}/artist/video`,
   // 相似歌手
   GET_ARTIST_SIMI: `${API_ROOT}/simi/artist`,
+
+  // 搜索相关
+  SEARCH: {
+    // 搜索建议
+    GET_SEARCH_SUGGEST: `${API_ROOT}/search/suggest`
+
+  },
+
   // 需要登录
   AUTH: {
     GET_RECORDS: `${API_ROOT}/user/record?type=1`

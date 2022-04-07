@@ -23,6 +23,7 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
 
   padding: 0;
   margin: 0;
@@ -33,7 +34,46 @@ export default {
   list-style: none;
   line-height: 1.6;
   z-index: 0;
-  -webkit-overflow-scrolling: touch;
+}
+
+html {
+  overflow-y: scroll;
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgb(12, 12, 12);
+  scrollbar-width: auto;
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+  background-color: rgb(12, 12, 12);
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 1px !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+::-webkit-input-placeholder {
+  /* WebKit browsers */
+  color: rgba(255, 255, 255, 0.35);
+}
+:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: rgba(255, 255, 255, 0.35);
+}
+::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: rgba(255, 255, 255, 0.35);
+}
+:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+  color: rgba(255, 255, 255, 0.35);
 }
 
 img:not([src]) {

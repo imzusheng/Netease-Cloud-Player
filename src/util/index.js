@@ -158,12 +158,12 @@ export const compressionImage = (imgSrc) => {
       // 设置图像目标宽度为250px
       const targetWidth = 250
 
-      if (rawImgWidth / rawImageHeight > 1) {
+      if (rawImgWidth / rawImageHeight > 1.1) {
         // 宽屏图时，设置比例为ratio
         // 重新设置宽高
         setImgHeight = rawImageHeight
         setImgWidth = ratio * rawImageHeight
-      } else if (rawImgWidth / rawImageHeight < 1) {
+      } else if (rawImgWidth / rawImageHeight < 1.1) {
         // 竖屏图，还没遇到过
         setImgWidth = setImgHeight = rawImgWidth
       }

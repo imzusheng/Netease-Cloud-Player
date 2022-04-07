@@ -29,6 +29,10 @@ const routes = [
       path: 'more',
       name: 'more',
       component: () => import('@/views/DetailDisplayMore.vue')
+    }, {
+      path: 'search',
+      name: 'search',
+      component: () => import('@/views/DetailSearch.vue')
     }]
   },
   {

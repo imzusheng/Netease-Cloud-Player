@@ -14,14 +14,49 @@
   >
     <!-- 头部 -->
     <header id="header">
-      <nav>
+      <nav id="nav">
         <!-- logo -->
         <div class="logo">
           <img src="../assets/logo_a.png" alt="" />
         </div>
 
         <!-- 菜单 -->
-        <SubTabs :sourceData="config.homeTabsData" @change="homeTabsChange" />
+        <ul class="sub-tabs">
+          <li class="sub-tabs-item">
+            <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
+              <div class="sub-tabs-title">首页</div>
+            </router-link>
+          </li>
+          <li class="sub-tabs-item">
+            <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
+              <div class="sub-tabs-title">探索</div>
+            </router-link>
+          </li>
+          <li class="sub-tabs-item">
+            <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
+              <div class="sub-tabs-title">媒体库</div>
+            </router-link>
+          </li>
+          <li class="sub-tabs-item" @click="toSearch">
+            <div class="sub-tabs-title">
+              <svg
+                viewBox="0 0 24 24"
+                preserveAspectRatio="xMidYMid meet"
+                focusable="false"
+                style="pointer-events: none"
+                class="icon-search"
+              >
+                <g class="icon-search">
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                    class="icon-search"
+                  ></path>
+                </g>
+              </svg>
+              搜索
+            </div>
+          </li>
+        </ul>
 
         <!-- 用户头像 -->
         <div class="avatar">
@@ -39,6 +74,43 @@
     <!-- 加载logo -->
     <TheLoading v-if="$store.state.loading" />
 
+    <div class="search" ref="search" v-if="$store.state.searchDisplay">
+      <div class="search-input-content">
+        <span>
+          <svg
+            viewBox="0 0 24 24"
+            preserveAspectRatio="xMidYMid meet"
+            focusable="false"
+            class="search-back-icon"
+          >
+            <g class="search-back-icon">
+              <path
+                class="search-back-icon"
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              ></path>
+            </g></svg
+        ></span>
+        <input
+          @keyup.enter="toSearchDetail(null)"
+          class="search-input"
+          type="text"
+          @input="searchChange"
+          v-model.trim="keywords"
+          placeholder="搜索"
+        />
+      </div>
+      <ul class="search-suggest-list" v-if="this.searchSuggest.length > 0">
+        <li
+          class="search-suggest-item"
+          v-for="(val, idx) in searchSuggest"
+          :key="`search-${idx}`"
+          @click="toSearchDetail(val.keyword)"
+        >
+          {{ val.keyword }}
+        </li>
+      </ul>
+    </div>
+
     <!-- 切换播放模式的提示 -->
     <TheTips />
 
@@ -51,18 +123,17 @@
 </template>
 
 <script>
-import SubTabs from '@/components/SubTabs'
 import TheLoading from '@/components/TheLoading'
 import TheTips from '@/components/TheTips'
 import TheError from '@/components/TheError'
 import { pickUpName } from '@/util'
+import { mapMutations } from 'vuex'
 import moment from 'moment'
 
 export default {
   name: 'LayoutDefault',
 
   components: {
-    SubTabs,
     TheLoading,
     TheError,
     TheTips
@@ -74,44 +145,65 @@ export default {
 
   data () {
     return {
-      // 菜单配置
-      config: {
-        homeTabsData: {
-          name: 'home',
-          checked: '首页',
-          list: [
-            {
-              id: 'home-tabs-tj',
-              title: '首页'
-            },
-            {
-              id: 'home-tabs-rm',
-              title: '探索'
-            },
-            {
-              id: 'home-tabs-xj',
-              title: '媒体库'
-            },
-            {
-              id: 'home-tabs-zb',
-              title: '搜索'
-            }
-          ]
-        }
-      }
+      tabsChecked: 'home',
+      keywords: '',
+      searchSuggest: []
     }
   },
 
   methods: {
-    // 主页菜单切换
-    homeTabsChange (val) {
-      const routes = {
-        首页: 'home',
-        探索: 'discovery'
+    ...mapMutations(['setSearchDisplay']),
+    searchChange () {
+      if (this.keywords) {
+        this.$store
+          .dispatch('getSearchSuggest', {
+            keywords: this.keywords,
+            type: 'mobile'
+          })
+          .then((res) => {
+            this.searchSuggest = res.allMatch
+            console.log(res)
+          })
+      } else {
+        this.searchSuggest = []
       }
-      this.$router.push({
-        name: routes[val]
-      })
+    },
+    // 点击搜索框
+    toSearch () {
+      this.setSearchDisplay(true)
+      const clickHandle = (e) => {
+        const searchRef = this.$refs.search
+        const searchRect = searchRef.getBoundingClientRect()
+        const top = searchRect.top
+        const left = searchRect.left
+        const right = searchRect.right
+        const bottom = searchRect.bottom
+        const clientX = e.clientX
+        const clientY = e.clientY
+        // 点击的位置X轴是否在范围内
+        const includeX = top < clientY && clientY < bottom
+        // 点击的位置Y轴是否在范围内
+        const includeY = left < clientX && clientX < right
+        // 当点击的位置不在在搜索框内，关闭搜索框
+        if (!(includeX && includeY)) {
+          this.setSearchDisplay(false)
+          document.removeEventListener('click', clickHandle)
+        }
+      }
+      document.addEventListener('click', clickHandle)
+    },
+    toSearchDetail (keyword) {
+      if (this.keywords) {
+        const queryKeyword = keyword ?? this.keywords
+        this.keywords = queryKeyword
+        this.searchSuggest = []
+        this.$router.push({
+          name: 'search',
+          query: {
+            keyword: queryKeyword
+          }
+        })
+      }
     }
   },
 
@@ -150,6 +242,65 @@ export default {
   background-color: rgba(var(--color-playlist));
   transition: background-color 0.65s;
 
+  .search {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 99;
+    background: rgba(33, 33, 33, 1);
+    width: 60vw;
+    border-radius: 4px;
+    padding: 5px 16px 5px;
+    box-sizing: border-box;
+    .search-input-content {
+      width: 100%;
+      height: 38px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      span {
+        display: flex;
+        align-items: center;
+        &:hover .search-back-icon {
+          fill: rgba(255, 255, 255, 0.8);
+        }
+        .search-back-icon {
+          height: 28px;
+          width: 28px;
+          fill: rgba(255, 255, 255, 0.35);
+          margin-right: 6px;
+          cursor: pointer;
+        }
+      }
+      .search-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        box-sizing: border-box;
+        padding: 0 4px;
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+    .search-suggest-list {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 68px;
+      padding: 10px 0;
+      box-sizing: border-box;
+      .search-suggest-item {
+        padding: 8px 10px;
+        font-size: 15px;
+        color: #b3b3b3;
+        cursor: pointer;
+        border-radius: 4px;
+        &:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+      }
+    }
+  }
+
   #header {
     position: fixed;
     top: 0;
@@ -173,7 +324,7 @@ export default {
 
     // 后期全部改成class
 
-    nav {
+    #nav {
       position: relative;
       z-index: 4;
       width: 100%;
@@ -181,11 +332,6 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
-
-      div {
-        font-size: 24px;
-        font-weight: 500;
-      }
 
       .logo {
         width: 100px;
@@ -206,18 +352,36 @@ export default {
         }
       }
 
-      ul {
+      .sub-tabs {
+        height: 100%;
         display: flex;
-        padding: 0;
+        align-items: center;
 
-        li {
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 20px;
-          font-weight: 500;
+        .sub-tabs-item {
           padding: 0 22px;
+          line-height: 2;
+          font-size: 20px;
+          font-weight: 400;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          position: relative;
 
-          &:first-child {
-            color: #fff;
+          .sub-tabs-title {
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 2;
+            font-size: 22px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            transition: all 0.4s;
+            .icon-search {
+              height: 22px;
+              width: 22px;
+              margin-right: 12px;
+              color: inherit;
+              fill: currentColor;
+            }
           }
         }
       }
