@@ -51,7 +51,11 @@ export default new Vuex.Store({
       msg: ''
     },
 
-    searchDisplay: false
+    // 搜索框是否显示
+    searchDisplay: false,
+
+    // 动态设置grid布局的列数，默认6列（最大）
+    columnCount: 6
   },
   getters: {
     userInfo: state => state.userInfo,
@@ -66,6 +70,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setColumnCount (state, num) {
+      state.columnCount = num
+    },
     setCurRouter (state, name) {
       state.curRouter = name
     },
@@ -239,7 +246,7 @@ export default new Vuex.Store({
       })
     },
     // 获取热门歌手
-    getHotArtists  ({ state }, limit = 7) {
+    getHotArtists ({ state }, limit = 7) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_HOT_ARTISTS}?limit=${limit}`).then((resJson) => {
           const data = resJson.artists.map((v) => {
