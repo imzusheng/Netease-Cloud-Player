@@ -39,15 +39,22 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 
 ## 特点
 
-* [x] 自动提取封面主题色
+* [x] 推荐歌单
+* [x] 推荐MV
+* [x] 推荐歌手
+* [x] 推荐新曲
+* [ ] 视频播放器
+* [x] 音乐播放器
+* [x] 显示播放进度
+* [x] 拖动调整进度
 * [x] 全局图片懒加载
+* [x] 自动提取封面主题色
 * [x] 显示缓存进度
 * [x] 播放错误重连
 * [x] 播放列表
-* [x] 音乐播放器
 * [x] 刷新恢复播放
-* [x] 拖动调整进度
-* [x] 显示播放进度
+* [x] 搜索所有内容
+* [x] 搜索提示
 * [x] vip提示
 * [ ] 登录
 * [x] 自动连播
@@ -57,5 +64,6 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 * [ ] 歌词
 
 [我的博客](https://zusheng.club)
+
 
 [项目地址](https://demo.zusheng.club/cloud_music/#/)
