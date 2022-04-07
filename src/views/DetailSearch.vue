@@ -117,7 +117,6 @@ export default {
       })
 
       this.getSearchMatch(keyword).then((res) => {
-        console.dir(res)
         res.orders.forEach((v) => {
           this.matchSearch[v] = res[v][0]
         })

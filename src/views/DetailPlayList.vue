@@ -176,7 +176,12 @@ export default {
   },
 
   methods: {
-    ...mapActions(['getPlaylistDetail', 'getSongDetail']),
+    ...mapActions([
+      'getPlaylistDetail',
+      'getSongDetail',
+      'getAlbum',
+      'getAlbumAll'
+    ]),
     ...mapMutations([
       'setCurPlaylistColor',
       'pushPlayQueue',
@@ -224,23 +229,41 @@ export default {
   },
 
   mounted () {
-    // 获取id
-    const { id } = this.$route.query
     // 设置加载状态true
     this.setLoading(true)
-    // 获取歌单详情，得到所有歌曲的id集合ids
-    this.getPlaylistDetail(id).then((playlist) => {
-      this.curPlaylistInfo = playlist
-      const ids = playlist.trackIds.map((track) => track.id).toString()
-      // 通过ids获取每首歌的详情，返回songs
-      this.getSongDetail(ids).then((res) => {
-        this.curPlaylist = res
-        // 设置加载状态false
-        this.setLoading(false)
-        // 实现图片懒加载
-        this.lazyLoadimg()
+    // 获取id
+    const { id } = this.$route.query
+
+    // 是专辑！
+    if (id.toString().length <= 5) {
+      this.getAlbumAll(id).then((res) => {
+        this.curPlaylistInfo = res.album
+        const ids = res.songs.map((track) => track.id).toString()
+        // 通过ids获取每首歌的详情，返回songs
+        this.getSongDetail(ids).then((res) => {
+          this.curPlaylist = res
+          // 设置加载状态false
+          this.setLoading(false)
+          // 实现图片懒加载
+          this.lazyLoadimg()
+        })
       })
-    })
+    } else {
+      // 歌单
+      // 获取歌单详情，得到所有歌曲的id集合ids
+      this.getPlaylistDetail(id).then((playlist) => {
+        this.curPlaylistInfo = playlist
+        const ids = playlist.trackIds.map((track) => track.id).toString()
+        // 通过ids获取每首歌的详情，返回songs
+        this.getSongDetail(ids).then((res) => {
+          this.curPlaylist = res
+          // 设置加载状态false
+          this.setLoading(false)
+          // 实现图片懒加载
+          this.lazyLoadimg()
+        })
+      })
+    }
     //
     // 以下都是小动画监听
     playlistMaskRef = this.$refs['playlist-content-mask']
@@ -281,12 +304,16 @@ export default {
     },
     playlistPicUrl () {
       // 获取到歌单的封面之后，开始提取主题色
-      const url = this.curPlaylistInfo.coverImgUrl
+      const url =
+        this.curPlaylistInfo.coverImgUrl || this.curPlaylistInfo.picUrl
       if (url) this.getPicMainColor(url)
       return url
     },
     playlistCreatorName () {
-      return this.curPlaylistInfo.creator?.nickname ?? ''
+      return (
+        this.curPlaylistInfo.creator?.nickname ||
+        this.curPlaylistInfo?.artist?.name
+      )
     },
     playlistTags () {
       return this.curPlaylistInfo.tags

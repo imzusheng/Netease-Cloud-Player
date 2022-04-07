@@ -123,12 +123,14 @@
           placeholder="搜索"
         />
       </div>
+      <!-- TODO 使li可以用上下键选中 -->
       <ul class="search-suggest-list" v-if="this.searchSuggest.length > 0">
         <li
           class="search-suggest-item"
           v-for="(val, idx) in searchSuggest"
           :key="`search-${idx}`"
           @click="toSearchDetail(val.keyword)"
+          tabindex="0"
         >
           {{ val.keyword }}
         </li>

@@ -125,7 +125,8 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_COMMUNITY}?limit=${limit}`).then((resJson) => {
           const data = resJson.playlists.map((v) => {
-            const updateTime = v.trackUpdateTime ? moment.duration(v.trackUpdateTime).days() + '天前 • ' : ''
+            const days = moment.duration(v.trackUpdateTime).days()
+            const updateTime = v.trackUpdateTime && days !== '0' ? `${days}天前 • ` : ''
             const trackCount = v.trackCount + '首音乐'
             v.desc = updateTime + trackCount
             v.payload = v.id
@@ -146,7 +147,8 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_RECOMMENDS}?limit=${limit}`).then((resJson) => {
           const data = resJson.result.map((v) => {
-            v.desc = moment.duration(v.trackNumberUpdateTime).days() + '天前 • ' + v.trackCount + '首音乐'
+            const days = moment.duration(v.trackNumberUpdateTime).days()
+            v.desc = (days !== 0 ? `${days}天前 • ` : '刚刚 • ') + `${v.trackCount}首音乐`
             v.payload = v.id
             v.query = 'playlist'
             return v
@@ -270,7 +272,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
           const songs = resJson.songs.map(v => {
-            v.al.picUrl = v.al.picUrl + '?param=40y40'
+            v.al.picUrl = v.al.picUrl + '?param=250y250'
             return v
           })
           resolve(songs)
@@ -309,7 +311,10 @@ export default new Vuex.Store({
     getArtistSong ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
-          const data = resJson.hotSongs.splice(0, 50)
+          const data = resJson.hotSongs.splice(0, 50).map(v => {
+            v.al.picUrl = v.al.picUrl + '?param=250y250'
+            return v
+          })
           resolve({
             data,
             type: 'hotSongs'
@@ -447,8 +452,8 @@ export default new Vuex.Store({
                     })
                   } else {
                     // 是单曲的结果
-                    searchSuggest.songs = res.songs.map(v => {
-                      v.picUrl = v.al.picUrl + '?param=250y250'
+                    searchSuggest.songs = res.map(v => {
+                      v.picUrl = v.al.picUrl
                       v.desc = v.al.name
                       v.payload = v.al.id
                       v.query = 'playlist'
@@ -475,6 +480,14 @@ export default new Vuex.Store({
             data: resJson.album,
             type: 'album'
           })
+        })
+      })
+    },
+    // 获取专辑所有歌曲
+    getAlbumAll ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ALBUM_All}?id=${id}`).then((resJson) => {
+          resolve(resJson)
         })
       })
     },

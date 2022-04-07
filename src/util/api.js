@@ -42,6 +42,8 @@ export default {
   GET_ARTIST_SIMI: `${API_ROOT}/simi/artist`,
   // 获取专辑信息
   GET_ALBUM_DETAIL: `${API_ROOT}/album`,
+  // 获取专辑所有歌曲
+  GET_ALBUM_All: `${API_ROOT}/album/track/all`,
 
   // 搜索相关
   SEARCH: {
