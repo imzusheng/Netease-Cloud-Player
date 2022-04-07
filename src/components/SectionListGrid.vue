@@ -50,8 +50,10 @@ export default {
     // 图片是否圆角
     round: Boolean,
 
-    // 查看更多的路由参数
-    type: String,
+    // 查看更多调用的函数名
+    action: String,
+    // 查看更多调用的函数参数
+    args: Object,
 
     // 歌曲id
     id: [String, Number]
@@ -74,14 +76,15 @@ export default {
     },
     toMore () {
       const query = {}
-      if (this.$props.type) query.type = this.$props.type
+      if (this.$props.action) query.action = this.$props.action
+      if (this.$props.args) query.action = this.$props.action
       else return console.warn('路由参数错误，停止跳转')
 
       if (this.$props.id) query.id = this.$props.id
-
+      // 跳转到查看更多页面 query是获取数据调用的函数名
       this.$router.push({
         name: 'more',
-        query
+        query: Object.assign(query, this.$props.args)
       })
     }
   },

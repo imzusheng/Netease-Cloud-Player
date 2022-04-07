@@ -41,9 +41,11 @@ export default {
 
   created () {
     this.setLoading(true)
-    const { type, id = 100 } = this.$route.query
-    if (Object.keys(this.$store._actions).includes(type)) {
-      this.$store.dispatch(type, id).then((res) => {
+    const { action } = this.$route.query
+    // store.actions中是否存在该函数名
+    if (Object.keys(this.$store._actions).includes(action)) {
+      // 调用store函数并传入参数
+      this.$store.dispatch(action, this.$route.query).then((res) => {
         this.listData = res.data
         this.title = res.title
         this.setLoading(false)

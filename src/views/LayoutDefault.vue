@@ -269,15 +269,16 @@ export default {
       this.setSearchDisplay(true)
       document.addEventListener('click', this.clickHandle)
     },
-    toSearchDetail (keyword) {
+    // 前往搜索页面
+    toSearchDetail (keywords) {
       if (this.keywords) {
-        const queryKeyword = keyword ?? this.keywords
-        this.keywords = queryKeyword
+        const queryKeywords = keywords ?? this.keywords
+        this.keywords = queryKeywords
         this.searchSuggest = []
         this.$router.push({
           name: 'search',
           query: {
-            keyword: queryKeyword
+            keywords: queryKeywords
           }
         })
       }

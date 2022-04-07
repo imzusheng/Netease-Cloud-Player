@@ -506,6 +506,117 @@ export default new Vuex.Store({
           resolve(resJson.result)
         })
       })
+    },
+    // 搜索
+    getSearch ({ state }, args) {
+      const { type = '单曲', keywords, limit = null, offset = 0 } = args
+      return new Promise(resolve => {
+        // MATCH_TYPE: {
+        //   单曲: 1,
+        //   专辑: 10,
+        //   歌手: 100,
+        //   歌单: 1000,
+        //   用户: 1002,
+        //   MV: 1004,
+        //   歌词: 1006,
+        //   电台: 1009,
+        //   视频: 1014,
+        //   综合: 1018,
+        //   声音: 2000
+        // }
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE[type],
+          keywords,
+          offset,
+          limit
+        })
+          .then((resJson) => {
+            resolve(resJson.result)
+          })
+      })
+    },
+    // 搜索专辑
+    getSearchAlbums ({ state }, args) {
+      const { keywords, limit = 7, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['专辑'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          const data = resJson.result.albums.map((v) => {
+            const days = moment.duration(v.publishTime).days()
+            v.desc = (days !== 0 ? `${days}天前 • ` : '刚刚 • ') + `${v.size}首音乐`
+            v.payload = v.id
+            v.picUrl = v.picUrl + '?param=180y180'
+            v.query = 'album'
+            return v
+          })
+          resolve({
+            data,
+            count: resJson.result.albumCount,
+            title: '所有搜索结果：专辑'
+          })
+        })
+      })
+    },
+    // 搜索歌手
+    getSearchArtists ({ state }, args) {
+      const { keywords, limit = 7, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['歌手'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          const data = resJson.result.artists.map((v) => {
+            const albumSize = v.albumSize === 0 ? '' : `${v.albumSize}张专辑`
+            const mvSize = v.mvSize === 0 ? '' : `${v.mvSize}个MV`
+            v.desc =
+              albumSize && mvSize
+                ? `${albumSize} • ${mvSize}`
+                : `${albumSize}${mvSize}`
+            v.picUrl = v.picUrl + '?param=180y180'
+            v.payload = v.id
+            v.query = 'artist'
+            return v
+          })
+          resolve({
+            data,
+            count: resJson.result.artistCount,
+            title: '所有搜索结果：歌手'
+          })
+        })
+      })
+    },
+    // 搜索歌单
+    getSearchPlaylist () {
+
+    },
+    // 搜索歌曲 TODO
+    getSearchSongs ({ state }, args) {
+      const { keywords, limit = 7, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['歌曲'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          const data = resJson.result.songs.map((v) => {
+            v.payload = v.album.id
+            v.query = 'album'
+            return v
+          })
+          resolve({
+            data,
+            count: resJson.result.songCount,
+            title: '所有搜索结果：专辑'
+          })
+        })
+      })
     }
   },
   modules: {}

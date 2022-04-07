@@ -34,19 +34,36 @@
     </section>
     <SectionListGrid
       :title="'专辑'"
-      :listData="searchSuggest.albums"
+      :listData="listData.albums.data"
       :round="false"
-      type="getRecommend"
+      :args="{ keywords, limit: listData.albums.count }"
+      action="getSearchAlbums"
     />
     <SectionListGrid
       :title="'艺人'"
-      :listData="searchSuggest.artists"
+      :listData="listData.artists.data"
+      :round="true"
+      :args="{ keywords, limit: listData.artists.count }"
+      action="getSearchArtists"
+    />
+    <SectionListGrid
+      :title="'歌曲'"
+      :listData="listData.songs.data"
       :round="false"
-      type="getRecommend"
+      :args="{ keywords, limit: listData.songs.count }"
+      action="getSearchSongs"
     />
     <SectionListGrid
       :title="'歌单'"
-      :listData="searchSuggest.playlists"
+      :listData="listData.playlists.data"
+      :round="false"
+      :args="{ keywords, limit: listData.playlists.count }"
+      action="getSearchSongs"
+    />
+    <hr />
+    <SectionListGrid
+      :title="'专辑'"
+      :listData="searchSuggest.albums"
       :round="false"
       type="getRecommend"
     />
@@ -86,12 +103,33 @@ export default {
         playlist: {},
         mv: {},
         song: {}
+      },
+      // 关键词
+      keywords: '',
+      // 数据
+      listData: {
+        // 歌手
+        artists: {
+          data: [],
+          count: ''
+        },
+        // 专辑
+        albums: {
+          data: [],
+          count: ''
+        },
+        // 歌曲
+        songs: {
+          data: [],
+          count: ''
+        }
       }
     }
   },
 
   created () {
-    this.search(this.$route.query.keyword)
+    this.keywords = this.$route.query.keywords
+    this.search()
   },
 
   mounted () {
@@ -100,34 +138,62 @@ export default {
   },
 
   methods: {
-    ...mapActions(['getSearchMatch', 'getSearchSuggest']),
+    ...mapActions([
+      'getSearchMatch',
+      'getSearchSuggest',
+      'getSearch',
+      'getSearchAlbums',
+      'getSearchSongs',
+      'getSearchArtists'
+    ]),
     ...mapMutations(['setLoading']),
-    search (keyword) {
-      if (!keyword) return
-      this.getSearchSuggest({
-        keywords: keyword
+    search () {
+      if (!this.keywords) return
+
+      this.getSearchAlbums({
+        keywords: this.keywords
       }).then((res) => {
-        this.searchSuggest = {
-          albums: [],
-          artists: [],
-          playlists: [],
-          songs: []
-        }
-        Object.assign(this.searchSuggest, res)
+        this.listData.albums.count = res.count
+        this.listData.albums.data = res.data
       })
 
-      this.getSearchMatch(keyword).then((res) => {
-        this.matchSearch = {
-          artist: {},
-          album: {},
-          playlist: {},
-          mv: {},
-          song: {}
-        }
-        res.orders.forEach((v) => {
-          this.matchSearch[v] = res[v][0]
-        })
+      this.getSearchArtists({
+        keywords: this.keywords
+      }).then((res) => {
+        this.listData.artists.count = res.count
+        this.listData.artists.data = res.data
       })
+
+      // this.getSearchSongs({
+      //   keywords: this.keywords
+      // }).then((res) => {
+      //   this.listData.songs.data = res.data
+      // })
+
+      // this.getSearchSuggest({
+      //   keywords: this.keywords
+      // }).then((res) => {
+      //   this.searchSuggest = {
+      //     albums: [],
+      //     artists: [],
+      //     playlists: [],
+      //     songs: []
+      //   }
+      //   Object.assign(this.searchSuggest, res)
+      // })
+
+      // this.getSearchMatch(this.keywords).then((res) => {
+      //   this.matchSearch = {
+      //     artist: {},
+      //     album: {},
+      //     playlist: {},
+      //     mv: {},
+      //     song: {}
+      //   }
+      //   res.orders.forEach((v) => {
+      //     this.matchSearch[v] = res[v][0]
+      //   })
+      // })
       this.setLoading(false)
     },
     toArtistDetail (id) {
@@ -141,8 +207,9 @@ export default {
   },
 
   watch: {
-    '$route.query.keyword' (keyword) {
-      this.search(keyword)
+    '$route.query.keywords' (keywords) {
+      this.keywords = keywords
+      this.search()
     }
   }
 }

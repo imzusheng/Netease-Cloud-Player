@@ -6,12 +6,13 @@ import axios from '@/util/axios'
  * @param {String} url 传入url
  * @returns Promise resJSON
  */
-export const fetchToJson = (url) => {
+export const fetchToJson = (url, params) => {
   return new Promise((resolve, reject) => {
     axios
       .get(url, {
         params: {
-          realIP: '127.0.0.1'
+          realIP: '127.0.0.1',
+          ...params
         }
       })
       .then(res => res.data)
@@ -219,13 +220,13 @@ export const lazyLoadImg = (refs) => {
         // 停止观察
         intersectionObserver.unobserve(item.target)
         const rawSrc = item.target.getAttribute('data-pic-src')
-        // item.target.src = rawSrc
+        item.target.src = rawSrc
         // 压缩图片
-        compressionImage(rawSrc).then((src) => {
-          item.target.src = src
-        }).catch(e => {
-          item.target.src = rawSrc
-        })
+        // compressionImage(rawSrc).then((src) => {
+        //   item.target.src = src
+        // }).catch(e => {
+        //   item.target.src = rawSrc
+        // })
       }
     })
   }, {

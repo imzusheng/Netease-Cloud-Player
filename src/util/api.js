@@ -1,7 +1,7 @@
 const API_ROOT =
-process.env.NODE_ENV === 'development'
-  ? 'http://localhost:3000'
-  : 'https://music.zusheng.club'
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000'
+    : 'https://music.zusheng.club'
 
 // 'https://netease-cloud-music-f4u1p2cjb-imzusheng.vercel.app'
 
@@ -47,6 +47,22 @@ export default {
 
   // 搜索相关
   SEARCH: {
+    // type: 搜索类型；默认为 1 即单曲
+    MATCH_TYPE: {
+      单曲: 1,
+      专辑: 10,
+      歌手: 100,
+      歌单: 1000,
+      用户: 1002,
+      MV: 1004,
+      歌词: 1006,
+      电台: 1009,
+      视频: 1014,
+      综合: 1018,
+      声音: 2000
+    },
+    // 搜索
+    GET_SEARCH: `${API_ROOT}/search`,
     // 搜索建议
     GET_SEARCH_SUGGEST: `${API_ROOT}/search/suggest`,
     // 最佳结果
