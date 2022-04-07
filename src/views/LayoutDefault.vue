@@ -29,7 +29,22 @@
             }"
           >
             <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
-              <div class="sub-tabs-title">首页</div>
+              <div class="sub-tabs-title">
+                <svg
+                  viewBox="0 0 24 24"
+                  preserveAspectRatio="xMidYMid meet"
+                  focusable="false"
+                  class="home-icon"
+                >
+                  <g class="home-icon">
+                    <path
+                      d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"
+                      class="home-icon"
+                    ></path>
+                  </g>
+                </svg>
+                <span>首页</span>
+              </div>
             </router-link>
           </li>
           <li
@@ -42,7 +57,22 @@
               class="sub-tabs-item-router"
               :to="{ name: 'discovery' }"
             >
-              <div class="sub-tabs-title">探索</div>
+              <div class="sub-tabs-title">
+                <svg
+                  viewBox="0 0 24 24"
+                  preserveAspectRatio="xMidYMid meet"
+                  focusable="false"
+                  class="home-icon"
+                >
+                  <g class="home-icon">
+                    <path
+                      d="M12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1c.61 0 1.1-.49 1.1-1.1s-.49-1.1-1.1-1.1zM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm2.19 12.19L6 18l3.81-8.19L18 6l-3.81 8.19z"
+                      class="home-icon"
+                    ></path>
+                  </g>
+                </svg>
+                <span>探索</span>
+              </div>
             </router-link>
           </li>
           <li
@@ -52,7 +82,22 @@
             }"
           >
             <router-link class="sub-tabs-item-router" :to="{ name: 'library' }">
-              <div class="sub-tabs-title">媒体库</div>
+              <div class="sub-tabs-title">
+                <svg
+                  viewBox="0 0 24 24"
+                  preserveAspectRatio="xMidYMid meet"
+                  focusable="false"
+                  class="home-icon"
+                >
+                  <g class="home-icon">
+                    <path
+                      d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 5h-3v5.5c0 1.38-1.12 2.5-2.5 2.5S10 13.88 10 12.5s1.12-2.5 2.5-2.5c.57 0 1.08.19 1.5.51V5h4v2zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z"
+                      class="home-icon"
+                    ></path>
+                  </g>
+                </svg>
+                <span>媒体库</span>
+              </div>
             </router-link>
           </li>
           <li
@@ -67,7 +112,6 @@
                 viewBox="0 0 24 24"
                 preserveAspectRatio="xMidYMid meet"
                 focusable="false"
-                style="pointer-events: none"
                 class="icon-search"
               >
                 <g class="icon-search">
@@ -77,7 +121,7 @@
                   ></path>
                 </g>
               </svg>
-              搜索
+              <span>搜索</span>
             </div>
           </li>
         </ul>
@@ -98,6 +142,7 @@
     <!-- 加载logo -->
     <TheLoading v-if="$store.state.loading" />
 
+    <!-- 搜索栏 TODO 独立组件 -->
     <div class="search" ref="search" v-if="$store.state.searchDisplay">
       <div class="search-input-content">
         <span @click="exitSearch">
@@ -359,8 +404,6 @@ export default {
       opacity: 0;
     }
 
-    // 后期全部改成class
-
     #nav {
       position: relative;
       z-index: 4;
@@ -412,9 +455,18 @@ export default {
             display: flex;
             align-items: center;
             transition: all 0.4s;
+            span {
+              color: inherit;
+            }
+            .home-icon {
+              height: 28px;
+              width: 28px;
+              color: inherit;
+              fill: currentColor;
+            }
             .icon-search {
-              height: 22px;
-              width: 22px;
+              height: 28px;
+              width: 28px;
               margin-right: 12px;
               color: inherit;
               fill: currentColor;
@@ -466,6 +518,16 @@ export default {
 
           .avatar {
             width: auto;
+          }
+        }
+      }
+    }
+
+    @media screen and (max-width: 728px) {
+      & {
+        .sub-tabs-title {
+          span {
+            display: none;
           }
         }
       }
