@@ -21,23 +21,47 @@
         </div>
 
         <!-- 菜单 -->
-        <ul class="sub-tabs">
-          <li class="sub-tabs-item">
+        <ul class="sub-tabs user-not-select">
+          <li
+            class="sub-tabs-item"
+            :class="{
+              'sub-tabs-item-checked': $store.state.curRouter === 'home',
+            }"
+          >
             <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
               <div class="sub-tabs-title">首页</div>
             </router-link>
           </li>
-          <li class="sub-tabs-item">
-            <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
+          <li
+            class="sub-tabs-item"
+            :class="{
+              'sub-tabs-item-checked': $store.state.curRouter === 'discovery',
+            }"
+          >
+            <router-link
+              class="sub-tabs-item-router"
+              :to="{ name: 'discovery' }"
+            >
               <div class="sub-tabs-title">探索</div>
             </router-link>
           </li>
-          <li class="sub-tabs-item">
-            <router-link class="sub-tabs-item-router" :to="{ name: 'home' }">
+          <li
+            class="sub-tabs-item"
+            :class="{
+              'sub-tabs-item-checked': $store.state.curRouter === 'library',
+            }"
+          >
+            <router-link class="sub-tabs-item-router" :to="{ name: 'library' }">
               <div class="sub-tabs-title">媒体库</div>
             </router-link>
           </li>
-          <li class="sub-tabs-item" @click="toSearch">
+          <li
+            class="sub-tabs-item"
+            @click="toSearch"
+            :class="{
+              'sub-tabs-item-checked': $store.state.curRouter === 'search',
+            }"
+          >
             <div class="sub-tabs-title">
               <svg
                 viewBox="0 0 24 24"
@@ -76,7 +100,7 @@
 
     <div class="search" ref="search" v-if="$store.state.searchDisplay">
       <div class="search-input-content">
-        <span>
+        <span @click="exitSearch">
           <svg
             viewBox="0 0 24 24"
             preserveAspectRatio="xMidYMid meet"
@@ -161,36 +185,42 @@ export default {
             type: 'mobile'
           })
           .then((res) => {
-            this.searchSuggest = res.allMatch
-            console.log(res)
+            if (this.keywords) {
+              this.searchSuggest = res.allMatch
+            }
           })
       } else {
         this.searchSuggest = []
       }
     },
+    clickHandle (e) {
+      console.log('click')
+      const searchRef = this.$refs.search
+      const searchRect = searchRef.getBoundingClientRect()
+      const top = searchRect.top
+      const left = searchRect.left
+      const right = searchRect.right
+      const bottom = searchRect.bottom
+      const clientX = e.clientX
+      const clientY = e.clientY
+      // 点击的位置X轴是否在范围内
+      const includeX = top < clientY && clientY < bottom
+      // 点击的位置Y轴是否在范围内
+      const includeY = left < clientX && clientX < right
+      // 当点击的位置不在在搜索框内，关闭搜索框
+      if (!(includeX && includeY)) {
+        this.setSearchDisplay(false)
+        document.removeEventListener('click', this.clickHandle)
+      }
+    },
+    exitSearch () {
+      this.setSearchDisplay(false)
+      document.removeEventListener('click', this.clickHandle)
+    },
     // 点击搜索框
     toSearch () {
       this.setSearchDisplay(true)
-      const clickHandle = (e) => {
-        const searchRef = this.$refs.search
-        const searchRect = searchRef.getBoundingClientRect()
-        const top = searchRect.top
-        const left = searchRect.left
-        const right = searchRect.right
-        const bottom = searchRect.bottom
-        const clientX = e.clientX
-        const clientY = e.clientY
-        // 点击的位置X轴是否在范围内
-        const includeX = top < clientY && clientY < bottom
-        // 点击的位置Y轴是否在范围内
-        const includeY = left < clientX && clientX < right
-        // 当点击的位置不在在搜索框内，关闭搜索框
-        if (!(includeX && includeY)) {
-          this.setSearchDisplay(false)
-          document.removeEventListener('click', clickHandle)
-        }
-      }
-      document.addEventListener('click', clickHandle)
+      document.addEventListener('click', this.clickHandle)
     },
     toSearchDetail (keyword) {
       if (this.keywords) {
@@ -241,6 +271,11 @@ export default {
   position: relative;
   background-color: rgba(var(--color-playlist));
   transition: background-color 0.65s;
+
+  .view-spacing {
+    box-sizing: border-box;
+    padding: 68px 32px 72px;
+  }
 
   .search {
     position: fixed;
@@ -382,6 +417,11 @@ export default {
               color: inherit;
               fill: currentColor;
             }
+          }
+        }
+        .sub-tabs-item-checked {
+          .sub-tabs-title {
+            color: rgba(240, 0, 0, 1);
           }
         }
       }

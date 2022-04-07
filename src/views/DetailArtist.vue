@@ -183,23 +183,6 @@ export default {
 
   data () {
     return {
-      ...mapMutations([
-        'setTips',
-        'setLoading',
-        'setCurPlaylistColor',
-        'setCurSongid',
-        'pushPlayQueue'
-      ]),
-      ...mapActions([
-        'getArtistDetail',
-        'getArtistALBUM',
-        'getArtistVideo',
-        'getArtistFans',
-        'getArtistSong',
-        'getArtistSimi',
-        'getArtistMV'
-      ]),
-
       tableData: {
         mvs: [],
         simi: [],
@@ -217,6 +200,22 @@ export default {
   },
 
   methods: {
+    ...mapMutations([
+      'setTips',
+      'setLoading',
+      'setCurPlaylistColor',
+      'setCurSongid',
+      'pushPlayQueue'
+    ]),
+    ...mapActions([
+      'getArtistDetail',
+      'getArtistALBUM',
+      'getArtistVideo',
+      'getArtistFans',
+      'getArtistSong',
+      'getArtistSimi',
+      'getArtistMV'
+    ]),
     // 实现图片懒加载
     lazyLoadimg () {
       // dom更新完成
@@ -246,6 +245,7 @@ export default {
     refs.MaskTransRef = this.$refs['under-poster-mask-trans']
     refs.underPosterRef = this.$refs['under-poster']
     refs.targetHeight = document.documentElement.clientHeight - 68
+    refs.headerMaskRef.style.opacity = 0
 
     this.setLoading(true)
     // 获取id
@@ -307,7 +307,9 @@ export default {
       return num ? '订阅 ' + fun(num) : ''
     },
     artistnPoster () {
-      return `url(${this.artistInfo.artist?.cover || ''})`
+      return this.artistInfo.artist?.cover
+        ? `url(${this.artistInfo.artist?.cover + '?param=1600y1200'})`
+        : null
     },
     getSongDt () {
       return function (time) {

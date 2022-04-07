@@ -57,7 +57,6 @@ export default {
   },
 
   mounted () {
-    // 以下都是小动画监听
     const headerMaskRef = this.$parent.$refs['main-header-mask']
     headerMaskRef.style.opacity = 1
   }

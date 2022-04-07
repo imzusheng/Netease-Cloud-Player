@@ -57,6 +57,8 @@ export default {
 
     // 查看更多的路由参数
     type: String,
+
+    // 歌曲id
     id: [String, Number]
   },
 
@@ -90,7 +92,9 @@ export default {
   },
 
   methods: {
-    toDetail ({ query: name, payload: id }) {
+    toDetail (data) {
+      const { query: name, payload: id } = data
+      console.log(data)
       if (!name) {
         console.warn('query 为空，停止跳转')
         return

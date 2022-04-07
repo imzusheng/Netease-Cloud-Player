@@ -36,6 +36,14 @@ export default {
   z-index: 0;
 }
 
+.user-not-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 html {
   overflow-y: scroll;
   scrollbar-color: rgba(255, 255, 255, 0.1) rgb(12, 12, 12);

@@ -3,7 +3,7 @@
 -->
 
 <template>
-  <main id="home">
+  <main id="home" class="view-spacing">
     <!-- 热门歌曲 -->
     <section class="section-common-hotSong">
       <div class="section-common-title">
@@ -190,10 +190,9 @@ export default {
 
 <style lang="less">
 #home {
-  padding: 68px 0 72px;
-
   .section-common-hotSong {
-    padding: 32px 40px 56px;
+    padding: 32px 0 56px;
+    margin: 0 -10px;
 
     // 标题
     .section-common-title {
@@ -309,7 +308,7 @@ export default {
   }
 
   .section-common {
-    padding: 40px 50px 0;
+    padding: 40px 0 0;
   }
 }
 </style>

@@ -9,7 +9,11 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
 
-    loading: false, // 全局加载动画
+    // 当前路由界面，用来更新菜单
+    curRouter: 'home',
+
+    // 全局加载动画
+    loading: false,
 
     userInfo: {
       profile: {
@@ -62,6 +66,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setCurRouter (state, name) {
+      state.curRouter = name
+    },
     setSearchDisplay (state, display) {
       state.searchDisplay = display
     },
@@ -279,6 +286,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_DETAIL}?id=${id}`).then((resJson) => {
           resolve(resJson)
+          //  + '?param=200y150'
         })
       })
     },
@@ -327,7 +335,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_MV}?id=${id}`).then((resJson) => {
           const data = resJson.mvs.splice(0, 7).map(v => {
-            v.picUrl = v.imgurl
+            v.picUrl = v.imgurl + '?param=200y150'
             let playCount = v.playCount
             if (playCount > 10000) {
               playCount = (playCount / 10000).toFixed(1) + '万'
@@ -348,7 +356,7 @@ export default new Vuex.Store({
         fetchToJson(`${API.GET_ARTIST_VIDEO}?id=${id}&order=${1}`).then((resJson) => {
           const data = resJson.data.records.splice(0, 7).map(v => {
             if (v.picUrl) {
-              v.picUrl = v.imgurl
+              v.picUrl = v.imgurl + '?param=200y150'
               v.desc = v.name
             } else {
               v.name = v.resource.mlogBaseData.text
@@ -386,6 +394,90 @@ export default new Vuex.Store({
     getSearchSuggest ({ state }, { keywords = '', type = null }) {
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH_SUGGEST}?keywords=${keywords}&type=${type}`).then((resJson) => {
+          if (!type) {
+            const loadingQueue = {}
+            const searchSuggest = {
+              albums: [],
+              playlists: [],
+              artists: [],
+              songs: []
+            }
+            if (resJson.result.albums) {
+              resJson.result.albums.forEach((v) => {
+                loadingQueue[v.id] = this.dispatch('getAlbum', v.id)
+              })
+            }
+            if (resJson.result.playlists) {
+              searchSuggest.playlists = resJson.result.playlists.map((v) => {
+                v.picUrl = v.coverImgUrl + '?param=250y250'
+                v.desc = v.description
+                v.query = 'playlist'
+                v.payload = v.id
+                return v
+              })
+            }
+            if (resJson.result.artists) {
+              searchSuggest.artists = resJson.result.artists.map((v) => {
+                v.picUrl = v.picUrl + '?param=250y250'
+                v.desc = v.albumSize + '张专辑'
+                v.query = 'artist'
+                v.payload = v.id
+                return v
+              })
+            }
+            const allPromise = [...Object.values(loadingQueue)]
+            if (resJson.result.songs) {
+              allPromise.push(this.dispatch('getSongDetail', resJson.result.songs.map((v) => v.id).toString()))
+            }
+            if (allPromise.length > 0) {
+              Promise.all(allPromise).then(resArr => {
+                resArr.forEach(res => {
+                  // 是专辑的结果
+                  if (res?.type === 'album') {
+                    searchSuggest.albums.push({
+                      ...res.data,
+                      query: 'playlist',
+                      payload: res.data.id,
+                      picUrl: res.data.picUrl + '?param=250y250',
+                      desc: moment(res.data.publishTime).year() + ' • ' + res.data.artist.name
+                    })
+                  } else {
+                    // 是单曲的结果
+                    searchSuggest.songs = res.songs.map(v => {
+                      v.picUrl = v.al.picUrl + '?param=250y250'
+                      v.desc = v.al.name
+                      v.payload = v.al.id
+                      v.query = 'playlist'
+                      return v
+                    })
+                  }
+                })
+                resolve(searchSuggest)
+              })
+            } else {
+              resolve(searchSuggest)
+            }
+          } else {
+            resolve(resJson.result)
+          }
+        })
+      })
+    },
+    // 获取专辑
+    getAlbum ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.GET_ALBUM_DETAIL}?id=${id}`).then((resJson) => {
+          resolve({
+            data: resJson.album,
+            type: 'album'
+          })
+        })
+      })
+    },
+    // 最佳匹配结果
+    getSearchMatch ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH_MATCH}?keywords=${id}`).then((resJson) => {
           resolve(resJson.result)
         })
       })

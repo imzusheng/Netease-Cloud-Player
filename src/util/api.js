@@ -40,11 +40,15 @@ export default {
   GET_ARTIST_VIDEO: `${API_ROOT}/artist/video`,
   // 相似歌手
   GET_ARTIST_SIMI: `${API_ROOT}/simi/artist`,
+  // 获取专辑信息
+  GET_ALBUM_DETAIL: `${API_ROOT}/album`,
 
   // 搜索相关
   SEARCH: {
     // 搜索建议
-    GET_SEARCH_SUGGEST: `${API_ROOT}/search/suggest`
+    GET_SEARCH_SUGGEST: `${API_ROOT}/search/suggest`,
+    // 最佳结果
+    GET_SEARCH_MATCH: `${API_ROOT}/search/multimatch`
 
   },
 

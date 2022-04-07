@@ -154,8 +154,8 @@ export default {
     },
     // 前往播放列表
     toPlayQueue () {
-      this.$store.commit('setLoading', true)
       if (!this.$store.state.playQueueStatus) {
+        this.$store.commit('setLoading', true)
         this.$router.push({ name: 'playqueue' })
       } else {
         this.$router.go(-1)

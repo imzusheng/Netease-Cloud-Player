@@ -33,6 +33,10 @@ const routes = [
       path: 'search',
       name: 'search',
       component: () => import('@/views/DetailSearch.vue')
+    }, {
+      path: 'library',
+      name: 'library',
+      component: () => import('@/views/HomeLibrary.vue')
     }]
   },
   {
@@ -60,11 +64,14 @@ const router = new VueRouter({
 })
 
 router.afterEach((to, from) => {
-  store.commit('setPlayQueueStatus', to.name === 'playqueue')
+  // 发生错误，显示错误页面
   if (store.state.error.status) {
     store.commit('setError', {
       status: false
     })
+  } else {
+    store.commit('setPlayQueueStatus', to.name === 'playqueue')
+    store.commit('setCurRouter', to.name)
   }
 })
 
