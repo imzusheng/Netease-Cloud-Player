@@ -154,10 +154,9 @@ export default {
     .search-section-content {
       grid-gap: 22px;
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
       .search-section-left {
-        grid-column-start: 1;
-        grid-column-end: 3;
+        grid-column: 1/3;
         .search-section-left-main {
           background: #181818;
           border-radius: 8px;
@@ -193,10 +192,17 @@ export default {
         }
       }
       .search-section-right {
-        grid-column-start: 3;
-        grid-column-end: -1;
+        grid-column: 3/-1;
         .search-table-songs {
           height: 100%;
+        }
+      }
+      @media screen and (max-width: 728px) {
+        & {
+          display: block;
+          .search-section-left {
+            margin-bottom: 48px;
+          }
         }
       }
     }

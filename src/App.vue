@@ -145,7 +145,7 @@ img:not([src]) {
 ::-webkit-scrollbar {
   width: 14px;
   height: 14px;
-  background-color: rgb(12, 12, 12);
+  background-color: #121212;
 }
 
 /*定义滚动条轨道 内阴影+圆角*/
@@ -156,7 +156,7 @@ img:not([src]) {
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb {
   border-radius: 1px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 ::-webkit-input-placeholder {
