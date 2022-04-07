@@ -60,8 +60,8 @@ export default {
   methods: {
     toDetail (data) {
       const { query: name, payload: id } = data
-      console.log(data)
       if (!name) {
+        console.log(data)
         console.warn('query 为空，停止跳转')
         return
       }

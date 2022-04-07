@@ -233,9 +233,11 @@ export default {
     this.setLoading(true)
     // 获取id
     const { id } = this.$route.query
+    const { name } = this.$route
 
     // 是专辑！
-    if (id.toString().length <= 5) {
+    if (name === 'album') {
+      console.log('专辑')
       this.getAlbumAll(id).then((res) => {
         this.curPlaylistInfo = res.album
         const ids = res.songs.map((track) => track.id).toString()
@@ -249,6 +251,7 @@ export default {
         })
       })
     } else {
+      console.log('歌单')
       // 歌单
       // 获取歌单详情，得到所有歌曲的id集合ids
       this.getPlaylistDetail(id).then((playlist) => {

@@ -278,6 +278,7 @@ export default new Vuex.Store({
     getSongDetail ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
+          console.log(resJson)
           const songs = resJson.songs.map(v => {
             v.al.picUrl = v.al.picUrl + '?param=250y250'
             return v
@@ -335,7 +336,7 @@ export default new Vuex.Store({
         fetchToJson(`${API.GET_ARTIST_ALBUM}?id=${id}`).then((resJson) => {
           const data = resJson.hotAlbums.splice(0, 7).map(v => {
             v.desc = `${moment(v.publishTime).year()} • ${v.type === 'Single' ? v.type = '单曲' : v.type}`
-            v.query = 'playlist'
+            v.query = 'album'
             v.payload = v.id
             return v
           })
@@ -452,7 +453,7 @@ export default new Vuex.Store({
                   if (res?.type === 'album') {
                     searchSuggest.albums.push({
                       ...res.data,
-                      query: 'playlist',
+                      query: 'album',
                       payload: res.data.id,
                       picUrl: res.data.picUrl + '?param=250y250',
                       desc: moment(res.data.publishTime).year() + ' • ' + res.data.artist.name
@@ -463,7 +464,7 @@ export default new Vuex.Store({
                       v.picUrl = v.al.picUrl
                       v.desc = v.al.name
                       v.payload = v.al.id
-                      v.query = 'playlist'
+                      v.query = 'album'
                       return v
                     })
                   }

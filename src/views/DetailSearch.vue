@@ -117,6 +117,13 @@ export default {
       })
 
       this.getSearchMatch(keyword).then((res) => {
+        this.matchSearch = {
+          artist: {},
+          album: {},
+          playlist: {},
+          mv: {},
+          song: {}
+        }
         res.orders.forEach((v) => {
           this.matchSearch[v] = res[v][0]
         })

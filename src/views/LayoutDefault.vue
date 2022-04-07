@@ -463,6 +463,7 @@ export default {
               width: 28px;
               color: inherit;
               fill: currentColor;
+              display: none;
             }
             .icon-search {
               height: 28px;

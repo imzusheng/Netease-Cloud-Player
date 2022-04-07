@@ -11,6 +11,9 @@ axios.defaults.headers.post['Content-Type'] = 'application/json'
 
 // 响应拦截器
 axios.interceptors.response.use(async function (response) {
+  if (response.data.code !== 200) {
+    return Promise.reject(response.data)
+  }
   return response
 }, error => {
   return Promise.reject(error)
