@@ -269,7 +269,11 @@ export default new Vuex.Store({
     getSongDetail ({ state }, id) {
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
-          resolve(resJson)
+          const songs = resJson.songs.map(v => {
+            v.al.picUrl = v.al.picUrl + '?param=40y40'
+            return v
+          })
+          resolve(songs)
         })
       })
     },

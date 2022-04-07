@@ -234,7 +234,7 @@ export default {
       const ids = playlist.trackIds.map((track) => track.id).toString()
       // 通过ids获取每首歌的详情，返回songs
       this.getSongDetail(ids).then((res) => {
-        this.curPlaylist = res.songs
+        this.curPlaylist = res
         // 设置加载状态false
         this.setLoading(false)
         // 实现图片懒加载

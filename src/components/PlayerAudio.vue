@@ -290,7 +290,7 @@ export default {
     idToUrl (songid, autoplay) {
       // 获取歌曲详情，返回只有一个元素的songs
       this.getSongDetail(songid).then((res) => {
-        const data = res.songs[0]
+        const data = res[0]
         const curSongInfo = {
           name: data.name,
           picUrl: data.al.picUrl,
