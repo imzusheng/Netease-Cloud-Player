@@ -12,7 +12,7 @@
         </span>
       </div>
       <!-- 列表 -->
-      <SectionListFlex :listData="listData" :round="false" />
+      <SectionListFlex :listData="listData" />
     </div>
     <div class="loading-spacing">
       <TheLoading
@@ -44,7 +44,7 @@ export default {
       title: '',
 
       // 当前页
-      offset: 0,
+      pageIndex: 0,
 
       // 是否还有更多
       more: true
@@ -67,12 +67,19 @@ export default {
         this.$store
           .dispatch(this.$route.query.action, {
             ...this.$route.query,
-            offset: this.offset
+            pageIndex: this.pageIndex
           })
           .then((res) => {
-            this.listData.push(...res.data)
+            const listDataIds = this.listData.map((v) => v.payload)
+            // 用id来排除重复值
+            res.data.forEach((resVal) => {
+              if (!listDataIds.includes(resVal.payload)) {
+                this.listData.push(resVal)
+              }
+            })
             this.title = res.title
             this.setLoading(false)
+            console.log('\n\n\n', res.data, '\n\n\n')
             if (res.data.length === 0) {
               this.more = false
             }
@@ -96,9 +103,9 @@ export default {
           // 图片出现，挂上src
           if (item.intersectionRatio > 0) {
             // 停止观察
-            this.offset += 1
+            this.pageIndex += 1
             this.getData()
-            if (this.offset > 10) {
+            if (this.pageIndex > 10) {
               intersectionObserver.unobserve(item.target)
               this.more = false
             }

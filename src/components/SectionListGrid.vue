@@ -77,7 +77,6 @@ export default {
     toMore () {
       const query = {}
       if (this.$props.action) query.action = this.$props.action
-      if (this.$props.args) query.action = this.$props.action
       else return console.warn('路由参数错误，停止跳转')
 
       if (this.$props.id) query.id = this.$props.id

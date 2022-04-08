@@ -5,7 +5,7 @@
   <section
     v-if="getListData.length"
     class="section-common"
-    :style="{ '--shape-round': $props.round ? '50%' : '4px' }"
+    :style="{ '--shape-round': round ? '50%' : '4px' }"
   >
     <div class="section-common-title" v-if="getTitle">
       <h2>{{ getTitle }}</h2>
@@ -28,7 +28,6 @@
 </template>
 
 <script>
-// import { lazyLoadImg } from '@/util'
 import SectionListItem from '@/components/SectionListItem'
 
 export default {
@@ -38,7 +37,13 @@ export default {
     SectionListItem
   },
 
-  props: ['title', 'listData', 'round'],
+  data () {
+    return {
+      round: false
+    }
+  },
+
+  props: ['title', 'listData'],
 
   methods: {
     toDetail ({ query: name, payload: id }) {
@@ -52,6 +57,10 @@ export default {
           id
         }
       })
+    },
+    // 是否头像是否圆角，艺人的封面要圆角
+    setRound (status) {
+      this.round = status
     }
   },
 
@@ -61,6 +70,9 @@ export default {
     },
     getListData () {
       if (this.$props.listData && this.$props.listData.length > 0) {
+        this.setRound(
+          ['artist', 'users'].includes(this.$props.listData[0].query)
+        )
         return this.$props.listData.slice(0, this.columnCount)
       } else {
         return []

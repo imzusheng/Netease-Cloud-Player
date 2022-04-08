@@ -150,9 +150,13 @@ export default new Vuex.Store({
       })
     },
     // 今日推荐
-    getRecommend ({ state }, limit = 7) {
+    getRecommend ({ state }, args) {
+      const { limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_RECOMMENDS}?limit=${limit}`).then((resJson) => {
+        fetchToJson(`${API.GET_RECOMMENDS}`, {
+          limit,
+          offset: limit * pageIndex
+        }).then((resJson) => {
           const data = resJson.result.map((v) => {
             const days = moment.duration(v.trackNumberUpdateTime).days()
             v.desc = (days !== 0 ? `${days}天前 • ` : '刚刚 • ') + `${v.trackCount}首音乐`
@@ -247,9 +251,13 @@ export default new Vuex.Store({
       })
     },
     // 获取热门歌手
-    getHotArtists ({ state }, limit = 7) {
+    getHotArtists ({ state }, args) {
+      const { limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_HOT_ARTISTS}?limit=${limit}`).then((resJson) => {
+        fetchToJson(`${API.GET_HOT_ARTISTS}`, {
+          limit,
+          offset: pageIndex * limit
+        }).then((resJson) => {
           const data = resJson.artists.map((v) => {
             v.picUrl = v.img1v1Url + '?param=180y180'
             v.desc = '艺人'
@@ -457,12 +465,12 @@ export default new Vuex.Store({
     // }
     // 搜索专辑
     getSearchAlbums ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['专辑'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           const data = resJson.result.albums.map((v) => {
@@ -483,12 +491,12 @@ export default new Vuex.Store({
     },
     // 搜索歌手
     getSearchArtists ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌手'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           const data = resJson.result.artists.map((v) => {
@@ -514,12 +522,12 @@ export default new Vuex.Store({
     },
     // 搜索歌单
     getSearchPlaylist ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌单'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           const data = resJson.result.playlists.map((v) => {
@@ -540,12 +548,12 @@ export default new Vuex.Store({
     },
     // 搜索用户 TODO 用户详情页还没做
     getSearchUsers ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['用户'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           const data = resJson.result.userprofiles.map((v) => {
@@ -567,12 +575,12 @@ export default new Vuex.Store({
     },
     // 搜索用户 TODO MV详情页还没做
     getSearchMV ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE.MV,
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           const data = resJson.result.mvs.map((v) => {
@@ -593,12 +601,12 @@ export default new Vuex.Store({
     },
     // 搜索电台 TODO 电台详情页还没做
     getSearchDj ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['电台'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           let data = []
@@ -622,12 +630,12 @@ export default new Vuex.Store({
     },
     // 搜索视频 TODO 视频详情页还没做
     getSearchVideos ({ state }, args) {
-      const { keywords, limit = 30, offset = 0 } = args
+      const { keywords, limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['视频'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           let data = []
@@ -652,12 +660,12 @@ export default new Vuex.Store({
     },
     // 搜索歌曲 TODO 不知道跳转到哪里
     getSearchSongs ({ state }, args) {
-      const { keywords, limit = 7, offset = 0 } = args
+      const { keywords, limit = 7, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌曲'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           const ids = resJson.result.songs.map((v) => v.id)
@@ -678,12 +686,12 @@ export default new Vuex.Store({
     },
     // 搜索播客（声音） TODO 不知道跳转到哪里
     getSearchVoices ({ state }, args) {
-      const { keywords, limit = 7, offset = 0 } = args
+      const { keywords, limit = 7, pageIndex = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['声音'],
           keywords,
-          offset,
+          offset: limit * pageIndex,
           limit
         }).then((resJson) => {
           let data = []

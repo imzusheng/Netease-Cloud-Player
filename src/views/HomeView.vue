@@ -48,31 +48,31 @@
       :title="listTitle.recommends"
       :listData="listData.recommends"
       :round="false"
-      type="getRecommend"
+      action="getRecommend"
     />
     <SectionListGrid
       :title="listTitle.hotArtists"
       :listData="listData.hotArtists"
       :round="true"
-      type="getHotArtists"
+      action="getHotArtists"
     />
     <SectionListGrid
       :title="listTitle.recommendMv"
       :listData="listData.recommendMv"
       :round="false"
-      type="getMv"
+      action="getMv"
     />
     <SectionListGrid
       :title="listTitle.community"
       :listData="listData.community"
       :round="false"
-      type="getCommunity"
+      action="getCommunity"
     />
     <SectionListGrid
       :title="listTitle.dj"
       :listData="listData.dj"
       :round="false"
-      type="getRecommendDj"
+      action="getRecommendDj"
     />
   </main>
 </template>
@@ -162,17 +162,20 @@ export default {
     // 监听滚动条事件 目的为了驱动header遮罩透明度变化
     document.addEventListener('scroll', scrollHandle)
 
-    Promise.all([
+    const args = { limit: 7 }
+    Promise.allSettled([
       this.getRecommendDj(),
       this.getCommunity(),
-      this.getRecommend(),
+      this.getRecommend(args),
       this.getNewsong(),
       this.getMv(),
-      this.getHotArtists()
+      this.getHotArtists(args)
     ]).then((resArr) => {
-      resArr.forEach((res) => {
-        this.listData[res.type] = res.data
-        this.listTitle[res.type] = res.title
+      resArr.forEach(({ status, value: res }) => {
+        if (status === 'fulfilled') {
+          this.listData[res.type] = res.data
+          this.listTitle[res.type] = res.title
+        }
       })
       this.$nextTick(() => {
         this.setLoading(false)
