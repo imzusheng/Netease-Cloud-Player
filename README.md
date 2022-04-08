@@ -22,11 +22,15 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 
 ![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/03.png)
 
-3. 艺人详情
+3. 播放mv
+
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/07.png)
+
+4. 艺人详情
 
 ![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/gif_01.gif)
 
-4. 播放列表
+5. 播放列表
 
 ![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/05.png)
 
@@ -43,7 +47,7 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 * [x] 推荐MV
 * [x] 推荐歌手
 * [x] 推荐新曲
-* [ ] 视频播放器
+* [x] 视频播放器
 * [x] 音乐播放器
 * [x] 显示播放进度
 * [x] 拖动调整进度
@@ -58,7 +62,7 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 * [x] vip提示
 * [ ] 登录
 * [x] 自动连播
-* [ ] 选择码率
+* [x] 选择码率
 * [x] 随机播放
 * [x] 播放模式
 * [ ] 歌词

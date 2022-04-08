@@ -1,5 +1,6 @@
 import store from '@/store'
 import axios from '@/util/axios'
+import moment from 'moment'
 
 /**
  * fetch数据转json
@@ -38,6 +39,19 @@ export const pickUpName = (artists, Separator = '/') => {
   } else {
     return null
   }
+}
+
+// 转换播放数量单位为：万
+export const countConvert = (count) => {
+  return count > 10000 ? `${(count / 10000).toFixed(1)}万` : count
+}
+
+// 时间转换为格式04:31
+export const durationConvert = (time) => {
+  const _moment = moment.duration(time)
+  return `${_moment.minutes() < 10 ? `0${_moment.minutes()}` : _moment.minutes()
+    }:${_moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
+    }`
 }
 
 /**

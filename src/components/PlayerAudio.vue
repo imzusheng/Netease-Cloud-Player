@@ -461,7 +461,8 @@ export default {
 
     // 读取上次播放的歌曲id
     const songid = localStorage.getItem('songid')
-    if (songid) this.idToUrl(songid, false)
+    // id存在且播放器是显示状态时，才加载歌曲
+    if (songid && this.$store.state.audioDisplay) this.idToUrl(songid, false)
 
     // 读取上次播放的歌曲
     const curSongInfo = localStorage.getItem('curSongInfo')
@@ -568,16 +569,19 @@ export default {
     '$store.getters.curSongid': {
       handler (songid) {
         if (songid) {
-          const locaSongid = localStorage.getItem('songid')
-          if (locaSongid !== songid.toString()) {
-            localStorage.setItem('songid', songid)
-            this.audioRef.pause()
-            this.idToUrl(songid, true)
-            this.loading = true
-          }
           // 显示播放器
           if (!this.$store.state.audioDisplay) {
             this.$store.commit('setAudioDisplay', true)
+          }
+          // 播放器显示成功才加载音乐
+          if (this.$store.state.audioDisplay) {
+            const locaSongid = localStorage.getItem('songid')
+            if (locaSongid !== songid.toString()) {
+              localStorage.setItem('songid', songid)
+              this.audioRef.pause()
+              this.idToUrl(songid, true)
+              this.loading = true
+            }
           }
         }
       }
