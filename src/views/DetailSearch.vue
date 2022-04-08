@@ -23,11 +23,11 @@
           </div>
         </div>
         <!-- 歌曲列表 -->
-        <div class="search-section-right" v-if="searchSuggest.songs.length > 0">
+        <div class="search-section-right" v-if="listData.songs.data.length > 0">
           <h2>歌曲</h2>
           <TableListSongs
             class="search-table-songs"
-            :listData="searchSuggest.songs"
+            :listData="listData.songs.data.slice(0, 4)"
           />
         </div>
       </div>
@@ -61,31 +61,53 @@
       action="getSearchPlaylist"
     />
     <SectionListGrid
+      :title="'单曲'"
+      :listData="listData.songs.data"
+      :round="false"
+      :args="{ keywords }"
+      action="getSearchSongs"
+    />
+    <SectionListGrid
       :title="'用户'"
       :listData="listData.users.data"
-      :round="false"
+      :round="true"
       :args="{ keywords }"
       action="getSearchUsers"
     />
-    <hr />
     <SectionListGrid
-      :title="'专辑'"
-      :listData="searchSuggest.albums"
+      :title="'MV'"
+      :listData="listData.mvs.data"
       :round="false"
-      type="getRecommend"
+      :args="{ keywords }"
+      action="getSearchMV"
     />
     <SectionListGrid
-      :title="'单曲'"
-      :listData="searchSuggest.songs"
+      :title="'电台'"
+      :listData="listData.djs.data"
       :round="false"
-      type="getRecommend"
+      :args="{ keywords }"
+      action="getSearchDj"
+    />
+    <SectionListGrid
+      :title="'视频'"
+      :listData="listData.videos.data"
+      :round="false"
+      :args="{ keywords }"
+      action="getSearchVideos"
+    />
+    <SectionListGrid
+      :title="'播客'"
+      :listData="listData.voices.data"
+      :round="false"
+      :args="{ keywords }"
+      action="getSearchVoices"
     />
   </div>
 </template>
 
 <script>
 import SectionListGrid from '@/components/SectionListGrid.vue'
-import TableListSongs from '@/components/TableListSongs'
+import TableListSongs from '@/components/TableListSongs.vue'
 import { mapActions, mapMutations } from 'vuex'
 
 export default {
@@ -98,12 +120,6 @@ export default {
 
   data () {
     return {
-      searchSuggest: {
-        albums: [],
-        artists: [],
-        playlists: [],
-        songs: []
-      },
       matchSearch: {
         artist: {},
         album: {},
@@ -138,6 +154,26 @@ export default {
         users: {
           data: [],
           count: ''
+        },
+        // mv
+        mvs: {
+          data: [],
+          count: ''
+        },
+        // 电台
+        djs: {
+          data: [],
+          count: ''
+        },
+        // 视频
+        videos: {
+          data: [],
+          count: ''
+        },
+        // 播客（声音）
+        voices: {
+          data: [],
+          count: ''
         }
       }
     }
@@ -156,81 +192,62 @@ export default {
   methods: {
     ...mapActions([
       'getSearchMatch',
-      'getSearchSuggest',
-      'getSearch',
       'getSearchAlbums',
       'getSearchSongs',
       'getSearchArtists',
       'getSearchPlaylist',
-      'getSearchUsers'
+      'getSearchVideos',
+      'getSearchUsers',
+      'getSearchMV',
+      'getSearchDj',
+      'getSearchVoices'
     ]),
     ...mapMutations(['setLoading']),
     search () {
       if (!this.keywords) return
 
-      this.getSearchAlbums({
+      this.setLoading(true)
+      Object.assign(this.$data.listData, this.$options.data().listData)
+
+      const args = {
         keywords: this.keywords,
         limit: 7
-      }).then((res) => {
-        this.listData.albums.count = res.count
-        this.listData.albums.data = res.data
+      }
+
+      Promise.allSettled([
+        this.getSearchSongs(args),
+        this.getSearchAlbums(args),
+        this.getSearchArtists(args),
+        this.getSearchPlaylist(args),
+        this.getSearchUsers(args),
+        this.getSearchMV(args),
+        this.getSearchDj(args),
+        this.getSearchVideos(args),
+        this.getSearchVoices(args)
+      ]).then((resArr) => {
+        resArr.forEach(({ status, value: res }) => {
+          if (status === 'fulfilled') {
+            this.listData[res.key].title = res.title
+            this.listData[res.key].data = res.data
+            this.listData[res.key].count = res.count
+          }
+        })
+        this.setLoading(false)
       })
 
-      this.getSearchArtists({
-        keywords: this.keywords,
-        limit: 7
-      }).then((res) => {
-        this.listData.artists.count = res.count
-        this.listData.artists.data = res.data
+      this.getSearchMatch(this.keywords).then((res) => {
+        this.matchSearch = {
+          artist: {},
+          album: {},
+          playlist: {},
+          mv: {},
+          song: {}
+        }
+        res.orders.forEach((v) => {
+          this.matchSearch[v] = res[v][0]
+        })
+        console.log('\n\n\n', '最佳搜索', res, '\n\n\n')
       })
-
-      this.getSearchPlaylist({
-        keywords: this.keywords,
-        limit: 7
-      }).then((res) => {
-        this.listData.playlists.count = res.count
-        this.listData.playlists.data = res.data
-      })
-
-      this.getSearchUsers({
-        keywords: this.keywords,
-        limit: 7
-      }).then((res) => {
-        this.listData.users.count = res.count
-        this.listData.users.data = res.data
-      })
-
-      // this.getSearchSongs({
-      //   keywords: this.keywords
-      // }).then((res) => {
-      //   this.listData.songs.data = res.data
-      // })
-
-      // this.getSearchSuggest({
-      //   keywords: this.keywords
-      // }).then((res) => {
-      //   this.searchSuggest = {
-      //     albums: [],
-      //     artists: [],
-      //     playlists: [],
-      //     songs: []
-      //   }
-      //   Object.assign(this.searchSuggest, res)
-      // })
-
-      // this.getSearchMatch(this.keywords).then((res) => {
-      //   this.matchSearch = {
-      //     artist: {},
-      //     album: {},
-      //     playlist: {},
-      //     mv: {},
-      //     song: {}
-      //   }
-      //   res.orders.forEach((v) => {
-      //     this.matchSearch[v] = res[v][0]
-      //   })
-      // })
-      this.setLoading(false)
     },
     toArtistDetail (id) {
       this.$router.push({

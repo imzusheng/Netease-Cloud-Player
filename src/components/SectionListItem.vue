@@ -39,7 +39,7 @@ export default {
 
 <style lang="less">
 .section-column-spacing {
-  padding: 12px;
+  padding: 14px;
   height: 100%;
   box-sizing: border-box;
   // 封面

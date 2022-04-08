@@ -73,6 +73,9 @@ export default {
             this.listData.push(...res.data)
             this.title = res.title
             this.setLoading(false)
+            if (res.data.length === 0) {
+              this.more = false
+            }
           })
       } else {
         this.setError({

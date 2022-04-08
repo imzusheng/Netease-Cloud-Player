@@ -258,7 +258,7 @@ export default {
       this.setCurPlaylistColor(color)
       this.$nextTick(() => {
         // 获取专辑、MV等其余所有数据
-        Promise.all([
+        Promise.allSettled([
           this.getArtistSimi(id),
           this.getArtistSong(id),
           this.getArtistALBUM(id),
@@ -267,8 +267,10 @@ export default {
           this.getArtistVideo(id)
         ]).then((resArr) => {
           this.artistInfo = res.data
-          resArr.forEach((res) => {
-            this.tableData[res.type] = res.data
+          resArr.forEach(({ status, value: res }) => {
+            if (status === 'fulfilled') {
+              this.tableData[res.type] = res.data
+            }
           })
           this.lazyLoadimg()
           this.setLoading(false)

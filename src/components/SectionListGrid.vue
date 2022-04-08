@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import SectionListItem from '@/components/SectionListItem'
+import SectionListItem from '@/components/SectionListItem.vue'
 
 export default {
   name: 'SectionListGrid',
@@ -140,7 +140,7 @@ export default {
           will-change: auto;
           background: rgb(39, 39, 39);
         }
-        border-radius: 12px;
+        border-radius: 6px;
       }
     }
   }

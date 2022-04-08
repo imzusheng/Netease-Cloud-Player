@@ -142,45 +142,8 @@
     <!-- 加载logo -->
     <TheLoading v-if="$store.state.loading" />
 
-    <!-- 搜索栏 TODO 独立组件 -->
-    <div class="search" ref="search" v-if="$store.state.searchDisplay">
-      <div class="search-input-content">
-        <span @click="exitSearch">
-          <svg
-            viewBox="0 0 24 24"
-            preserveAspectRatio="xMidYMid meet"
-            focusable="false"
-            class="search-back-icon"
-          >
-            <g class="search-back-icon">
-              <path
-                class="search-back-icon"
-                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-              ></path>
-            </g></svg
-        ></span>
-        <input
-          @keyup.enter="toSearchDetail(null)"
-          class="search-input"
-          type="text"
-          @input="searchChange"
-          v-model.trim="keywords"
-          placeholder="搜索"
-        />
-      </div>
-      <!-- TODO 使li可以用上下键选中 -->
-      <ul class="search-suggest-list" v-if="this.searchSuggest.length > 0">
-        <li
-          class="search-suggest-item"
-          v-for="(val, idx) in searchSuggest"
-          :key="`search-${idx}`"
-          @click="toSearchDetail(val.keyword)"
-          tabindex="0"
-        >
-          {{ val.keyword }}
-        </li>
-      </ul>
-    </div>
+    <!-- 搜索栏 TODO 使li可以用上下键选中-->
+    <TheSearchBar />
 
     <!-- 切换播放模式的提示 -->
     <TheTips />
@@ -194,6 +157,7 @@
 </template>
 
 <script>
+import TheSearchBar from '@/components/TheSearchBar'
 import TheLoading from '@/components/TheLoading'
 import TheTips from '@/components/TheTips'
 import TheError from '@/components/TheError'
@@ -205,6 +169,7 @@ export default {
   name: 'LayoutDefault',
 
   components: {
+    TheSearchBar,
     TheLoading,
     TheError,
     TheTips
@@ -216,72 +181,15 @@ export default {
 
   data () {
     return {
-      tabsChecked: 'home',
-      keywords: '',
-      searchSuggest: []
+      tabsChecked: 'home'
     }
   },
 
   methods: {
     ...mapMutations(['setSearchDisplay']),
-    searchChange () {
-      if (this.keywords) {
-        this.$store
-          .dispatch('getSearchSuggest', {
-            keywords: this.keywords,
-            type: 'mobile'
-          })
-          .then((res) => {
-            if (this.keywords) {
-              this.searchSuggest = res.allMatch
-            }
-          })
-      } else {
-        this.searchSuggest = []
-      }
-    },
-    clickHandle (e) {
-      console.log('click')
-      const searchRef = this.$refs.search
-      const searchRect = searchRef.getBoundingClientRect()
-      const top = searchRect.top
-      const left = searchRect.left
-      const right = searchRect.right
-      const bottom = searchRect.bottom
-      const clientX = e.clientX
-      const clientY = e.clientY
-      // 点击的位置X轴是否在范围内
-      const includeX = top < clientY && clientY < bottom
-      // 点击的位置Y轴是否在范围内
-      const includeY = left < clientX && clientX < right
-      // 当点击的位置不在在搜索框内，关闭搜索框
-      if (!(includeX && includeY)) {
-        this.setSearchDisplay(false)
-        document.removeEventListener('click', this.clickHandle)
-      }
-    },
-    exitSearch () {
-      this.setSearchDisplay(false)
-      document.removeEventListener('click', this.clickHandle)
-    },
     // 点击搜索框
     toSearch () {
       this.setSearchDisplay(true)
-      document.addEventListener('click', this.clickHandle)
-    },
-    // 前往搜索页面
-    toSearchDetail (keywords) {
-      if (this.keywords) {
-        const queryKeywords = keywords ?? this.keywords
-        this.keywords = queryKeywords
-        this.searchSuggest = []
-        this.$router.push({
-          name: 'search',
-          query: {
-            keywords: queryKeywords
-          }
-        })
-      }
     }
   },
 

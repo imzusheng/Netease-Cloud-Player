@@ -137,7 +137,7 @@ export default new Vuex.Store({
             const trackCount = v.trackCount + '首音乐'
             v.desc = updateTime + trackCount
             v.payload = v.id
-            v.picUrl = v.coverImgUrl
+            v.picUrl = v.coverImgUrl + '?param=180y180'
             v.query = 'playlist'
             return v
           })
@@ -157,6 +157,7 @@ export default new Vuex.Store({
             const days = moment.duration(v.trackNumberUpdateTime).days()
             v.desc = (days !== 0 ? `${days}天前 • ` : '刚刚 • ') + `${v.trackCount}首音乐`
             v.payload = v.id
+            v.picUrl = v.picUrl + '?param=180y180'
             v.query = 'playlist'
             return v
           })
@@ -175,7 +176,7 @@ export default new Vuex.Store({
           resolve(resJson.weekData.map((v) => {
             v.desc1 = pickUpName(v.song.ar)
             v.desc2 = v.song.al.name
-            v.picUrl = v.song.al.picUrl
+            v.picUrl = v.song.al.picUrl + '?param=180y180'
             return v
           }))
         })
@@ -186,6 +187,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_PERSON_NEWSONG}?limit=${limit}`).then((resJson) => {
           const data = resJson.result.map((v) => {
+            v.picUrl = v.picUrl + '?param=180y180'
             v.desc1 = v.song.album.type
             v.desc2 = pickUpName(v.song.artists)
             v.desc = v.desc2
@@ -213,7 +215,7 @@ export default new Vuex.Store({
             }
             v.desc = v.artistName + ' • ' + playCount + '次播放'
             v.payload = v.id
-            v.picUrl = v.cover
+            v.picUrl = v.cover + '?param=180y180'
             v.query = 'mv'
             return v
           })
@@ -230,8 +232,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(API.GET_RECOMMENDS_DJ).then((resJson) => {
           const data = resJson.result.map((v) => {
-            // v.desc = v.artistName + ' • ' + v.playCount + '万次播放'
-            // v.desc = v.copywriter
+            v.picUrl = v.picUrl + '?param=180y180'
             v.desc = v.program.description
             v.payload = v.id
             v.query = 'playlist'
@@ -250,7 +251,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_HOT_ARTISTS}?limit=${limit}`).then((resJson) => {
           const data = resJson.artists.map((v) => {
-            v.picUrl = v.img1v1Url
+            v.picUrl = v.img1v1Url + '?param=180y180'
             v.desc = '艺人'
             v.query = 'artist'
             v.payload = v.id
@@ -275,10 +276,9 @@ export default new Vuex.Store({
       })
     },
     // 获取单曲详情
-    getSongDetail ({ state }, id) {
+    getSongDetail ({ state }, ids) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_SONG_DETAIL}?ids=${id}`).then((resJson) => {
-          console.log(resJson)
+        fetchToJson(`${API.GET_SONG_DETAIL}?ids=${ids}`).then((resJson) => {
           const songs = resJson.songs.map(v => {
             v.al.picUrl = v.al.picUrl + '?param=250y250'
             return v
@@ -408,75 +408,10 @@ export default new Vuex.Store({
       })
     },
     // 搜索建议
-    getSearchSuggest ({ state }, { keywords = '', type = null }) {
+    getSearchSuggest ({ state }, { keywords = '' }) {
       return new Promise(resolve => {
-        fetchToJson(`${API.SEARCH.GET_SEARCH_SUGGEST}?keywords=${keywords}&type=${type}`).then((resJson) => {
-          if (!type) {
-            const loadingQueue = {}
-            const searchSuggest = {
-              albums: [],
-              playlists: [],
-              artists: [],
-              songs: []
-            }
-            if (resJson.result.albums) {
-              resJson.result.albums.forEach((v) => {
-                loadingQueue[v.id] = this.dispatch('getAlbum', v.id)
-              })
-            }
-            if (resJson.result.playlists) {
-              searchSuggest.playlists = resJson.result.playlists.map((v) => {
-                v.picUrl = v.coverImgUrl + '?param=250y250'
-                v.desc = v.description
-                v.query = 'playlist'
-                v.payload = v.id
-                return v
-              })
-            }
-            if (resJson.result.artists) {
-              searchSuggest.artists = resJson.result.artists.map((v) => {
-                v.picUrl = v.picUrl + '?param=250y250'
-                v.desc = v.albumSize + '张专辑'
-                v.query = 'artist'
-                v.payload = v.id
-                return v
-              })
-            }
-            const allPromise = [...Object.values(loadingQueue)]
-            if (resJson.result.songs) {
-              allPromise.push(this.dispatch('getSongDetail', resJson.result.songs.map((v) => v.id).toString()))
-            }
-            if (allPromise.length > 0) {
-              Promise.all(allPromise).then(resArr => {
-                resArr.forEach(res => {
-                  // 是专辑的结果
-                  if (res?.type === 'album') {
-                    searchSuggest.albums.push({
-                      ...res.data,
-                      query: 'album',
-                      payload: res.data.id,
-                      picUrl: res.data.picUrl + '?param=250y250',
-                      desc: moment(res.data.publishTime).year() + ' • ' + res.data.artist.name
-                    })
-                  } else {
-                    // 是单曲的结果
-                    searchSuggest.songs = res.map(v => {
-                      v.picUrl = v.al.picUrl
-                      v.desc = v.al.name
-                      v.payload = v.al.id
-                      v.query = 'album'
-                      return v
-                    })
-                  }
-                })
-                resolve(searchSuggest)
-              })
-            } else {
-              resolve(searchSuggest)
-            }
-          } else {
-            resolve(resJson.result)
-          }
+        fetchToJson(`${API.SEARCH.GET_SEARCH_SUGGEST}?keywords=${keywords}&type=mobile`).then((resJson) => {
+          resolve(resJson.result)
         })
       })
     },
@@ -507,34 +442,19 @@ export default new Vuex.Store({
         })
       })
     },
-    // 搜索
-    getSearch ({ state }, args) {
-      const { type = '单曲', keywords, limit = null, offset = 0 } = args
-      return new Promise(resolve => {
-        // MATCH_TYPE: {
-        //   单曲: 1,
-        //   专辑: 10,
-        //   歌手: 100,
-        //   歌单: 1000,
-        //   用户: 1002,
-        //   MV: 1004,
-        //   歌词: 1006,
-        //   电台: 1009,
-        //   视频: 1014,
-        //   综合: 1018,
-        //   声音: 2000
-        // }
-        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
-          type: API.SEARCH.MATCH_TYPE[type],
-          keywords,
-          offset,
-          limit
-        })
-          .then((resJson) => {
-            resolve(resJson.result)
-          })
-      })
-    },
+    // MATCH_TYPE: {
+    //   单曲: 1,
+    //   专辑: 10,
+    //   歌手: 100,
+    //   歌单: 1000,
+    //   用户: 1002,
+    //   MV: 1004,
+    //   歌词: 1006,
+    //   电台: 1009,
+    //   视频: 1014,
+    //   综合: 1018,
+    //   声音: 2000
+    // }
     // 搜索专辑
     getSearchAlbums ({ state }, args) {
       const { keywords, limit = 30, offset = 0 } = args
@@ -552,9 +472,9 @@ export default new Vuex.Store({
             v.query = 'album'
             return v
           })
-          // console.log(resJson)
           resolve({
             data,
+            key: 'albums',
             count: resJson.result.albumCount,
             title: '所有搜索结果：专辑'
           })
@@ -585,6 +505,7 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            key: 'artists',
             count: resJson.result.artistCount,
             title: '所有搜索结果：歌手'
           })
@@ -610,13 +531,14 @@ export default new Vuex.Store({
           })
           resolve({
             data,
+            key: 'playlists',
             count: resJson.result.playlistCount,
             title: '所有搜索结果：歌单'
           })
         })
       })
     },
-    // 搜索用户
+    // 搜索用户 TODO 用户详情页还没做
     getSearchUsers ({ state }, args) {
       const { keywords, limit = 30, offset = 0 } = args
       return new Promise(resolve => {
@@ -631,19 +553,104 @@ export default new Vuex.Store({
             v.payload = v.userId
             v.desc = v.signature
             v.name = v.nickname
-            // v.query = 'playlist'
-            console.log(v)
+            v.query = 'users'
             return v
           })
           resolve({
             data,
+            key: 'users',
             count: resJson.result.userprofileCount,
             title: '所有搜索结果：用户'
           })
         })
       })
     },
-    // 搜索歌曲 TODO
+    // 搜索用户 TODO MV详情页还没做
+    getSearchMV ({ state }, args) {
+      const { keywords, limit = 30, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE.MV,
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          const data = resJson.result.mvs.map((v) => {
+            v.picUrl = v.cover + '?param=180y180'
+            v.payload = v.id
+            v.desc = v.artistName
+            v.query = 'mvs'
+            return v
+          })
+          resolve({
+            data,
+            key: 'mvs',
+            count: resJson.result.mvCount,
+            title: '所有搜索结果：MV'
+          })
+        })
+      })
+    },
+    // 搜索电台 TODO 电台详情页还没做
+    getSearchDj ({ state }, args) {
+      const { keywords, limit = 30, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['电台'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          let data = []
+          if (resJson.result.djRadios) {
+            data = resJson.result.djRadios.map((v) => {
+              v.picUrl = v.picUrl + '?param=180y180'
+              v.payload = v.id
+              v.desc = v.dj.nickname
+              v.query = 'djs'
+              return v
+            })
+          }
+          resolve({
+            data,
+            key: 'djs',
+            count: resJson.result.djRadiosCount,
+            title: '所有搜索结果：电台'
+          })
+        })
+      })
+    },
+    // 搜索视频 TODO 视频详情页还没做
+    getSearchVideos ({ state }, args) {
+      const { keywords, limit = 30, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['视频'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          let data = []
+          if (resJson.result.videos) {
+            data = resJson.result.videos.map((v) => {
+              v.picUrl = v.coverUrl + '?param=180y180'
+              v.payload = v.id
+              v.name = v.title
+              v.desc = `${pickUpName(v.creator)}`
+              v.query = 'videos'
+              return v
+            })
+          }
+          resolve({
+            data,
+            key: 'videos',
+            count: resJson.result.videoCount,
+            title: '所有搜索结果：视频'
+          })
+        })
+      })
+    },
+    // 搜索歌曲 TODO 不知道跳转到哪里
     getSearchSongs ({ state }, args) {
       const { keywords, limit = 7, offset = 0 } = args
       return new Promise(resolve => {
@@ -653,15 +660,48 @@ export default new Vuex.Store({
           offset,
           limit
         }).then((resJson) => {
-          const data = resJson.result.songs.map((v) => {
-            v.payload = v.album.id
-            v.query = 'album'
-            return v
+          const ids = resJson.result.songs.map((v) => v.id)
+          return this.dispatch('getSongDetail', ids.toString())
+        }).then(res => {
+          resolve({
+            data: res.map(v => {
+              v.picUrl = v.al.picUrl + '?param=180y180'
+              v.desc = `${v.al.name}}`
+              return v
+            }),
+            key: 'songs',
+            count: 0,
+            title: '所有搜索结果：单曲'
           })
+        })
+      })
+    },
+    // 搜索播客（声音） TODO 不知道跳转到哪里
+    getSearchVoices ({ state }, args) {
+      const { keywords, limit = 7, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['声音'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          let data = []
+          if (resJson.data.resources.length > 0) {
+            data = resJson.data.resources.map((v) => {
+              v.payload = v.baseInfo.id
+              v.name = v.baseInfo.name
+              v.desc = v.baseInfo.description
+              v.picUrl = v.baseInfo.coverUrl + '?param=180y180'
+              v.query = 'voices'
+              return v
+            })
+          }
           resolve({
             data,
-            count: resJson.result.songCount,
-            title: '所有搜索结果：专辑'
+            key: 'voices',
+            count: resJson.data.totalCount,
+            title: '所有搜索结果：播客'
           })
         })
       })

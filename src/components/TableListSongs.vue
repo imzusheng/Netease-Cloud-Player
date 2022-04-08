@@ -29,7 +29,7 @@
         <img
           ref="lazyload-img"
           class="table-cell-desc-pic"
-          :data-pic-src="listItem.al.picUrl"
+          :data-pic-src="listItem.picUrl"
           alt=""
         />
         <div class="table-cell-desc-info">

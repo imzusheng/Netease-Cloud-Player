@@ -33,10 +33,7 @@ export const pickUpName = (artists, Separator = '/') => {
   // 判断是否是数组
   if (Object.prototype.toString.call(artists) === '[object Array]') {
     return artists
-      .map((n) => {
-        if (n.name) return n.name
-        else return n
-      })
+      .map((n) => n.name || n.userName || n)
       .join(Separator)
   } else {
     return null
