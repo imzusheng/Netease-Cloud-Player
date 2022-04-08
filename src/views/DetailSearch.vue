@@ -36,29 +36,36 @@
       :title="'专辑'"
       :listData="listData.albums.data"
       :round="false"
-      :args="{ keywords, limit: listData.albums.count }"
+      :args="{ keywords }"
       action="getSearchAlbums"
     />
     <SectionListGrid
       :title="'艺人'"
       :listData="listData.artists.data"
       :round="true"
-      :args="{ keywords, limit: listData.artists.count }"
+      :args="{ keywords }"
       action="getSearchArtists"
     />
     <SectionListGrid
       :title="'歌曲'"
       :listData="listData.songs.data"
       :round="false"
-      :args="{ keywords, limit: listData.songs.count }"
+      :args="{ keywords }"
       action="getSearchSongs"
     />
     <SectionListGrid
       :title="'歌单'"
       :listData="listData.playlists.data"
       :round="false"
-      :args="{ keywords, limit: listData.playlists.count }"
-      action="getSearchSongs"
+      :args="{ keywords }"
+      action="getSearchPlaylist"
+    />
+    <SectionListGrid
+      :title="'用户'"
+      :listData="listData.users.data"
+      :round="false"
+      :args="{ keywords }"
+      action="getSearchUsers"
     />
     <hr />
     <SectionListGrid
@@ -118,8 +125,17 @@ export default {
           data: [],
           count: ''
         },
+        playlists: {
+          data: [],
+          count: ''
+        },
         // 歌曲
         songs: {
+          data: [],
+          count: ''
+        },
+        // 用户
+        users: {
           data: [],
           count: ''
         }
@@ -144,24 +160,44 @@ export default {
       'getSearch',
       'getSearchAlbums',
       'getSearchSongs',
-      'getSearchArtists'
+      'getSearchArtists',
+      'getSearchPlaylist',
+      'getSearchUsers'
     ]),
     ...mapMutations(['setLoading']),
     search () {
       if (!this.keywords) return
 
       this.getSearchAlbums({
-        keywords: this.keywords
+        keywords: this.keywords,
+        limit: 7
       }).then((res) => {
         this.listData.albums.count = res.count
         this.listData.albums.data = res.data
       })
 
       this.getSearchArtists({
-        keywords: this.keywords
+        keywords: this.keywords,
+        limit: 7
       }).then((res) => {
         this.listData.artists.count = res.count
         this.listData.artists.data = res.data
+      })
+
+      this.getSearchPlaylist({
+        keywords: this.keywords,
+        limit: 7
+      }).then((res) => {
+        this.listData.playlists.count = res.count
+        this.listData.playlists.data = res.data
+      })
+
+      this.getSearchUsers({
+        keywords: this.keywords,
+        limit: 7
+      }).then((res) => {
+        this.listData.users.count = res.count
+        this.listData.users.data = res.data
       })
 
       // this.getSearchSongs({

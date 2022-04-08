@@ -537,7 +537,7 @@ export default new Vuex.Store({
     },
     // 搜索专辑
     getSearchAlbums ({ state }, args) {
-      const { keywords, limit = 7, offset = 0 } = args
+      const { keywords, limit = 30, offset = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['专辑'],
@@ -546,13 +546,13 @@ export default new Vuex.Store({
           limit
         }).then((resJson) => {
           const data = resJson.result.albums.map((v) => {
-            const days = moment.duration(v.publishTime).days()
-            v.desc = (days !== 0 ? `${days}天前 • ` : '刚刚 • ') + `${v.size}首音乐`
+            v.desc = `${v.artist.name} • ` + `${v.size}首音乐`
             v.payload = v.id
             v.picUrl = v.picUrl + '?param=180y180'
             v.query = 'album'
             return v
           })
+          // console.log(resJson)
           resolve({
             data,
             count: resJson.result.albumCount,
@@ -563,7 +563,7 @@ export default new Vuex.Store({
     },
     // 搜索歌手
     getSearchArtists ({ state }, args) {
-      const { keywords, limit = 7, offset = 0 } = args
+      const { keywords, limit = 30, offset = 0 } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌手'],
@@ -592,8 +592,56 @@ export default new Vuex.Store({
       })
     },
     // 搜索歌单
-    getSearchPlaylist () {
-
+    getSearchPlaylist ({ state }, args) {
+      const { keywords, limit = 30, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['歌单'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          const data = resJson.result.playlists.map((v) => {
+            v.picUrl = v.coverImgUrl + '?param=180y180'
+            v.payload = v.id
+            v.query = 'playlist'
+            v.desc = v.creator.nickname
+            return v
+          })
+          resolve({
+            data,
+            count: resJson.result.playlistCount,
+            title: '所有搜索结果：歌单'
+          })
+        })
+      })
+    },
+    // 搜索用户
+    getSearchUsers ({ state }, args) {
+      const { keywords, limit = 30, offset = 0 } = args
+      return new Promise(resolve => {
+        fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
+          type: API.SEARCH.MATCH_TYPE['用户'],
+          keywords,
+          offset,
+          limit
+        }).then((resJson) => {
+          const data = resJson.result.userprofiles.map((v) => {
+            v.picUrl = v.avatarUrl + '?param=180y180'
+            v.payload = v.userId
+            v.desc = v.signature
+            v.name = v.nickname
+            // v.query = 'playlist'
+            console.log(v)
+            return v
+          })
+          resolve({
+            data,
+            count: resJson.result.userprofileCount,
+            title: '所有搜索结果：用户'
+          })
+        })
+      })
     },
     // 搜索歌曲 TODO
     getSearchSongs ({ state }, args) {

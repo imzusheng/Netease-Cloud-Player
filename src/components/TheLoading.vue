@@ -2,7 +2,7 @@
 css3全局加载动画
 -->
 <template>
-  <div class="g-loading">
+  <div class="g-loading" ref="g-loading">
     <div></div>
   </div>
 </template>
