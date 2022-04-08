@@ -288,7 +288,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${ids}`).then((resJson) => {
           const songs = resJson.songs.map(v => {
-            v.al.picUrl = v.al.picUrl + '?param=250y250'
+            v.al.picUrl = v.al.picUrl + '?param=50y50'
             return v
           })
           resolve(songs)
@@ -328,7 +328,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
           const data = resJson.hotSongs.splice(0, 50).map(v => {
-            v.al.picUrl = v.al.picUrl + '?param=250y250'
+            v.al.picUrl = v.al.picUrl + '?param=50y50'
             return v
           })
           resolve({
@@ -345,6 +345,7 @@ export default new Vuex.Store({
           const data = resJson.hotAlbums.splice(0, 7).map(v => {
             v.desc = `${moment(v.publishTime).year()} • ${v.type === 'Single' ? v.type = '单曲' : v.type}`
             v.query = 'album'
+            v.picUrl = v.picUrl + '?param=200y200'
             v.payload = v.id
             return v
           })
@@ -386,7 +387,7 @@ export default new Vuex.Store({
             } else {
               v.name = v.resource.mlogBaseData.text
               v.desc = v.resource.mlogBaseData.desc
-              v.picUrl = v.resource.mlogBaseData.coverUrl
+              v.picUrl = v.resource.mlogBaseData.coverUrl + '?param=200y150'
             }
             return v
           })
