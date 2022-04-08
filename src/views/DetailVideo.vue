@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex'
 import { countConvert } from '@/util'
+import { mapMutations, mapActions } from 'vuex'
 import ListComments from '@/components/VideoPlayer/ListComments'
 import CardAuthor from '@/components/VideoPlayer/CardAuthor'
 import ListVideo from '@/components/VideoPlayer/ListVideo'
@@ -110,17 +110,17 @@ export default {
     const player = new Player({
       id: 'xgplayer',
       fluid: true,
-      videoInit: true,
+      videoInit: true
       //   playbackRate: [0.5, 0.75, 1, 1.5, 2], // 可调整倍数
       //   defaultPlaybackRate: 1, // 默认倍数
       //   download: true, // 设置download控件显示
       //   pip: true, // 小窗口
-      miniplayerConfig: {
-        bottom: 200,
-        right: 0,
-        width: 320,
-        height: 180
-      }
+      // miniplayerConfig: {
+      //   bottom: 200,
+      //   right: 0,
+      //   width: 320,
+      //   height: 180
+      // }
       //   lastPlayTime: 20, // 视频起播时间（单位：秒）
       //   lastPlayTimeHideDelay: 5 // 提示文字展示时长（单位：秒）
     })

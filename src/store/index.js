@@ -111,12 +111,13 @@ export default new Vuex.Store({
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
     setAudioDisplay (state, status) {
+      state.audioDisplay = status
       // 在video和mv页面下，不允许显示播放器
-      if (['video', 'mv'].includes(state.curRouter)) {
-        state.audioDisplay = false
-      } else {
-        state.audioDisplay = status
-      }
+      // if (['video', 'mv'].includes(state.curRouter)) {
+      //   state.audioDisplay = false
+      // } else {
+      //   state.audioDisplay = status
+      // }
     },
     // 从localStorage恢复数据
     reset (state) {
@@ -414,7 +415,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_SIMI}?id=${id}`).then((resJson) => {
           const data = resJson.artists.splice(0, 7).map(v => {
-            v.picUrl = v.img1v1Url
+            v.picUrl = v.img1v1Url + '?param=180y180'
             v.desc = '艺人'
             v.query = 'artist'
             v.payload = v.id
