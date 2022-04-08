@@ -375,6 +375,8 @@ export default new Vuex.Store({
             if (playCount > 10000) {
               playCount = (playCount / 10000).toFixed(1) + '万'
             }
+            v.query = 'mv'
+            v.payload = v.id
             v.desc = ` ${playCount}次观看`
             return v
           })
@@ -597,7 +599,7 @@ export default new Vuex.Store({
             v.picUrl = v.cover + '?param=180y180'
             v.payload = v.id
             v.desc = v.artistName
-            v.query = 'mvs'
+            v.query = 'mv'
             return v
           })
           resolve({

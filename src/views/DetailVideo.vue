@@ -91,6 +91,15 @@ export default {
   },
 
   mounted () {
+    const { id } = this.$route.query
+
+    if (!id) {
+      return this.setError({
+        status: true,
+        msg: '页面参数错误，无法访问'
+      })
+    }
+
     // 设置加载状态
     this.setLoading(true)
 
@@ -115,8 +124,6 @@ export default {
       //   lastPlayTime: 20, // 视频起播时间（单位：秒）
       //   lastPlayTimeHideDelay: 5 // 提示文字展示时长（单位：秒）
     })
-
-    const { id } = this.$route.query
 
     // 获取相关MV推荐
     this.getMvSimi(id).then((res) => {
@@ -164,7 +171,7 @@ export default {
       'getMvSimi',
       'getMvUrl'
     ]),
-    ...mapMutations(['setAudioDisplay', 'setLoading'])
+    ...mapMutations(['setAudioDisplay', 'setLoading', 'setError'])
   },
 
   computed: {

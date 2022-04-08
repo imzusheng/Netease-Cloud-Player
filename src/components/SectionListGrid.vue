@@ -63,8 +63,7 @@ export default {
     toDetail (data) {
       const { query: name, payload: id } = data
       if (!name) {
-        console.log(data)
-        console.warn('query 为空，停止跳转')
+        console.warn('query 为空，停止跳转', JSON.parse(JSON.stringify(data)))
         return
       }
       this.$router.push({
