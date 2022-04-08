@@ -12,23 +12,23 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 
 1. 主页
 
-![图片](screenshots/01.png)
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/01.png)
 
-![图片](screenshots/02.png)
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/02.png)
 
 2. 自动提取主题色
 
-![图片](screenshots/gif_02.gif)
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/gif_02.gif)
 
-![图片](screenshots/03.png)
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/03.png)
 
 3. 艺人详情
 
-![图片](screenshots/gif_01.gif)
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/gif_01.gif)
 
 4. 播放列表
 
-![图片](screenshots/05.png)
+![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/05.png)
 
 ## 技术栈
 * vue2
@@ -64,6 +64,5 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 * [ ] 歌词
 
 [我的博客](https://zusheng.club)
-
 
 [项目地址](https://demo.zusheng.club/cloud_music/#/)
