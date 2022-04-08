@@ -111,13 +111,18 @@ export default new Vuex.Store({
       localStorage.setItem('playQueue', JSON.stringify(state.playQueue))
     },
     setAudioDisplay (state, status) {
-      state.audioDisplay = status
+      // 在video和mv页面下，不允许显示播放器
+      if (['video', 'mv'].includes(state.curRouter)) {
+        state.audioDisplay = false
+      } else {
+        state.audioDisplay = status
+      }
     },
     // 从localStorage恢复数据
     reset (state) {
       state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []
       state.curSong.id = localStorage.getItem('songid') || null
-      state.audioDisplay = !!localStorage.getItem('songid')
+      this.commit('setAudioDisplay', !!localStorage.getItem('songid'))
     }
   },
   actions: {
@@ -207,9 +212,13 @@ export default new Vuex.Store({
       })
     },
     // 推荐MV
-    getMv ({ state }, limit = 7) {
+    getMv ({ state }, args) {
+      const { limit = 30, pageIndex = 0 } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_NEW_MV}?limit=${limit}`).then((resJson) => {
+        fetchToJson(`${API.GET_NEW_MV}`, {
+          limit,
+          offset: limit * pageIndex
+        }).then((resJson) => {
           const data = resJson.data.map((v) => {
             let playCount
             if (Number(v.playCount) > 10000) {
@@ -288,7 +297,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_SONG_DETAIL}?ids=${ids}`).then((resJson) => {
           const songs = resJson.songs.map(v => {
-            v.al.picUrl = v.al.picUrl + '?param=50y50'
+            v.al.picUrl = v.al.picUrl + '?param=180y180'
             return v
           })
           resolve(songs)
@@ -328,7 +337,7 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
           const data = resJson.hotSongs.splice(0, 50).map(v => {
-            v.al.picUrl = v.al.picUrl + '?param=50y50'
+            v.al.picUrl = v.al.picUrl + '?param=180y180'
             return v
           })
           resolve({
@@ -712,6 +721,53 @@ export default new Vuex.Store({
             count: resJson.data.totalCount,
             title: '所有搜索结果：播客'
           })
+        })
+      })
+    },
+    // MV详情
+    getMvDetail ({ state }, mvid) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.MV.GET_MV_DETAIL}?mvid=${mvid}`).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // MV评论
+    getMvComment ({ state }, id) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.MV.GET_MV_COMMENT}?id=${id}`).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // MV URL
+    getMvUrl ({ state }, { id, br = 720 }) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.MV.GET_MV_URL}`, {
+          id,
+          r: br
+        }).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // MV 相关推荐
+    getMvSimi ({ state }, mvid) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.MV.GET_MV_SIMI}`, {
+          mvid
+        }).then((resJson) => {
+          resolve(resJson)
+        })
+      })
+    },
+    // 获取用户信息
+    getUserDetail ({ state }, uid) {
+      return new Promise(resolve => {
+        fetchToJson(`${API.USER.GET_USER_DETAIL}`, {
+          uid
+        }).then((resJson) => {
+          resolve(resJson)
         })
       })
     }

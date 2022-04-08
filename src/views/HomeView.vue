@@ -167,8 +167,8 @@ export default {
       this.getRecommendDj(),
       this.getCommunity(),
       this.getRecommend(args),
+      this.getMv(args),
       this.getNewsong(),
-      this.getMv(),
       this.getHotArtists(args)
     ]).then((resArr) => {
       resArr.forEach(({ status, value: res }) => {

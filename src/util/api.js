@@ -45,6 +45,12 @@ export default {
   // 获取专辑所有歌曲
   GET_ALBUM_All: `${API_ROOT}/album/track/all`,
 
+  // 用户相关
+  USER: {
+    // 用户信息
+    GET_USER_DETAIL: `${API_ROOT}/user/detail`
+  },
+
   // 搜索相关
   SEARCH: {
     // type: 搜索类型；默认为 1 即单曲
@@ -68,6 +74,20 @@ export default {
     // 最佳结果
     GET_SEARCH_MATCH: `${API_ROOT}/search/multimatch`
 
+  },
+
+  // MV相关
+  MV: {
+    // MV详情
+    GET_MV_DETAIL: `${API_ROOT}/mv/detail`,
+    // MV详情
+    GET_MV_URL: `${API_ROOT}/mv/url`,
+    // MV 点赞评论数量
+    GET_MV_INFO: `${API_ROOT}/mv/detail/info`,
+    // MV 评论列表
+    GET_MV_COMMENT: `${API_ROOT}/comment/mv`,
+    // MV 相似推荐
+    GET_MV_SIMI: `${API_ROOT}/simi/mv`
   },
 
   // 需要登录

@@ -79,8 +79,14 @@ export default {
             })
             this.title = res.title
             this.setLoading(false)
+
             console.log('\n\n\n', res.data, '\n\n\n')
-            if (res.data.length === 0) {
+
+            // 当获取的数据为空 或 获取的数据都是重复的
+            if (
+              res.data.length === 0 ||
+              listDataIds.length === this.listData.length
+            ) {
               this.more = false
             }
           })

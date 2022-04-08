@@ -28,6 +28,10 @@
 export default {
   name: 'TheError',
 
+  mounted () {
+    this.$store.commit('setLoading', false)
+  },
+
   methods: {
     goBack () {
       this.$router.go(-1)

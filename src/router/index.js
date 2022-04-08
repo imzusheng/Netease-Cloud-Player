@@ -41,6 +41,14 @@ const routes = [
       path: 'library',
       name: 'library',
       component: () => import('@/views/HomeLibrary.vue')
+    }, {
+      path: 'video',
+      name: 'video',
+      component: () => import('@/views/DetailVideo.vue')
+    }, {
+      path: 'mv',
+      name: 'mv',
+      component: () => import('@/views/DetailVideo.vue')
     }]
   },
   {
