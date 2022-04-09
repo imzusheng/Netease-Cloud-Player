@@ -76,7 +76,7 @@ export default {
     toMore () {
       const query = {}
       if (this.$props.action) query.action = this.$props.action
-      else return console.warn('路由参数错误，停止跳转')
+      else return console.error('\n\n', '路由参数错误，停止跳转: 缺少action', '\n\n')
 
       if (this.$props.id) query.id = this.$props.id
       // 跳转到查看更多页面 query是获取数据调用的函数名

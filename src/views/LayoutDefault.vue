@@ -356,7 +356,7 @@ export default {
           position: relative;
 
           .sub-tabs-title {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.8);
             line-height: 2;
             font-size: 22px;
             font-weight: 400;

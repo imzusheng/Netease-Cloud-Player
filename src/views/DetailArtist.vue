@@ -128,16 +128,34 @@
           ></span>
         </section>
 
-        <SectionListGrid :title="'专辑'" :listData="tableData.hotAlbums" />
+        <SectionListGrid
+          :title="'专辑'"
+          :listData="tableData.hotAlbums"
+          action="getArtistALBUM"
+          :args="args"
+        />
 
-        <SectionListGrid :title="'MV'" :listData="tableData.mvs" />
+        <SectionListGrid
+          :title="'MV'"
+          :listData="tableData.mvs"
+          action="getArtistMV"
+          :args="args"
+        />
 
-        <SectionListGrid :title="'视频'" :listData="tableData.video" />
+        <SectionListGrid
+          :title="'视频'"
+          :listData="tableData.video"
+          :round="false"
+          action="getArtistVideo"
+          :args="args"
+        />
 
         <SectionListGrid
           :title="'粉丝也喜欢'"
           :listData="tableData.simi"
           :round="true"
+          action="getArtistALBUM"
+          :args="args"
         />
       </div>
     </div>
@@ -157,6 +175,7 @@ const refs = {
   MaskTransRef: undefined,
   underPosterRef: undefined
 }
+
 // 监听滚动条
 const scrollHandle = () => {
   const curScrollTop = document.documentElement.scrollTop
@@ -171,6 +190,7 @@ const scrollHandle = () => {
   refs.MaskTransRef.style.opacity = curValue * 1.7 > 1 ? 1 : curValue * 1.7
   refs.headerMaskRef.style.opacity = curValue
 }
+
 // 防抖
 const throttleScrollHandle = throttle(scrollHandle, 1000 / 60)
 
@@ -183,6 +203,12 @@ export default {
 
   data () {
     return {
+      // 参数
+      args: {
+        id: '',
+        more: 1
+      },
+
       tableData: {
         mvs: [],
         simi: [],
@@ -250,6 +276,7 @@ export default {
     this.setLoading(true)
     // 获取id
     const { id } = this.$route.query
+    this.args.id = id
     // 获取歌手信息
     this.getArtistDetail(id).then(async (res) => {
       // 获取主题颜色
@@ -259,12 +286,12 @@ export default {
       this.$nextTick(() => {
         // 获取专辑、MV等其余所有数据
         Promise.allSettled([
-          this.getArtistSimi(id),
           this.getArtistSong(id),
-          this.getArtistALBUM(id),
-          this.getArtistMV(id),
           this.getArtistFans(id),
-          this.getArtistVideo(id)
+          this.getArtistMV(this.args),
+          this.getArtistSimi(this.args),
+          this.getArtistALBUM(this.args),
+          this.getArtistVideo(this.args)
         ]).then((resArr) => {
           this.artistInfo = res.data
           resArr.forEach(({ status, value: res }) => {

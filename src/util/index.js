@@ -3,11 +3,13 @@ import axios from '@/util/axios'
 import moment from 'moment'
 
 /**
+ *
  * fetch数据转json
  * @param {String} url 传入url
- * @returns Promise resJSON
+ * @param {Object|null} params
+ * @returns {Promise<Object>} resJSON
  */
-export const fetchToJson = (url, params) => {
+export const fetchToJson = (url, params = {}) => {
   return new Promise((resolve, reject) => {
     axios
       .get(url, {
@@ -68,8 +70,8 @@ export const getRandomIndex = (min, max) => {
 
 /**
  * 提取图片占比最大的颜色
- * @param {ImageData} data
- * @returns {String} rgba 255, 255, 255, 1
+ * @param imgSrc
+ * @returns {Promise<String>}
  */
 export const getMainColor = (imgSrc) => {
   function getRgba (data) {

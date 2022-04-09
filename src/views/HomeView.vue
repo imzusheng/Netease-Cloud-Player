@@ -162,14 +162,16 @@ export default {
     // 监听滚动条事件 目的为了驱动header遮罩透明度变化
     document.addEventListener('scroll', scrollHandle)
 
-    const args = { limit: 7 }
+    const args = {
+      limit: 7
+    }
     Promise.allSettled([
-      this.getRecommendDj(),
-      this.getCommunity(),
+      this.getRecommendDj(args),
+      this.getHotArtists(args),
+      this.getCommunity(args),
       this.getRecommend(args),
       this.getMv(args),
-      this.getNewsong(),
-      this.getHotArtists(args)
+      this.getNewsong()
     ]).then((resArr) => {
       resArr.forEach(({ status, value: res }) => {
         if (status === 'fulfilled') {

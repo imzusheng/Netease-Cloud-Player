@@ -64,11 +64,10 @@ export default {
         Object.keys(this.$store._actions).includes(this.$route.query.action)
       ) {
         // 调用store函数并传入参数
-        this.$store
-          .dispatch(this.$route.query.action, {
-            ...this.$route.query,
-            pageIndex: this.pageIndex
-          })
+        this.$store.dispatch(this.$route.query.action, {
+          ...this.$route.query,
+          pageIndex: this.pageIndex
+        })
           .then((res) => {
             const listDataIds = this.listData.map((v) => v.payload)
             // 用id来排除重复值

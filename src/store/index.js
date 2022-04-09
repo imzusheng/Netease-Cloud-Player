@@ -129,10 +129,17 @@ export default new Vuex.Store({
         state.curSongurlInfo.redirect = await res.text()
       })
     },
-    // 社区精选
-    getCommunity ({ state }, limit = 7) {
+    // 社区精选 歌单
+    getCommunity ({ state }, args) {
+      const {
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_COMMUNITY}?limit=${limit}`).then((resJson) => {
+        fetchToJson(API.PLAYLIST.GET_COMMUNITY, {
+          limit,
+          offset: pageIndex * limit
+        }).then((resJson) => {
           const data = resJson.playlists.map((v) => {
             const days = moment.duration(v.trackUpdateTime).days()
             const updateTime = v.trackUpdateTime && days !== '0' ? `${days}天前 • ` : ''
@@ -151,14 +158,14 @@ export default new Vuex.Store({
         })
       })
     },
-    // 今日推荐
+    // 今日推荐 歌单
     getRecommend ({ state }, args) {
       const {
         limit = 30,
         pageIndex = 0
       } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_RECOMMENDS}`, {
+        fetchToJson(API.PLAYLIST.GET_RECOMMENDS, {
           limit,
           offset: limit * pageIndex
         }).then((resJson) => {
@@ -194,7 +201,7 @@ export default new Vuex.Store({
     // 新歌
     getNewsong ({ state }, limit = 9) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_PERSON_NEWSONG}?limit=${limit}`).then((resJson) => {
+        fetchToJson(`${API.SONG.GET_PERSON_NEWSONG}?limit=${limit}`).then((resJson) => {
           const data = resJson.result.map((v) => {
             v.picUrl = v.picUrl + '?param=180y180'
             v.desc1 = v.song.album.type
@@ -218,7 +225,7 @@ export default new Vuex.Store({
         pageIndex = 0
       } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_NEW_MV}`, {
+        fetchToJson(API.MV.GET_NEW_MV, {
           limit,
           offset: limit * pageIndex
         }).then((resJson) => {
@@ -244,9 +251,16 @@ export default new Vuex.Store({
       })
     },
     // 推荐电台
-    getRecommendDj ({ state }, limit = 7) {
+    getRecommendDj ({ state }, args) {
+      const {
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
-        fetchToJson(API.GET_RECOMMENDS_DJ).then((resJson) => {
+        fetchToJson(API.GET_RECOMMENDS_DJ, {
+          limit,
+          offset: limit * pageIndex
+        }).then((resJson) => {
           const data = resJson.result.map((v) => {
             v.picUrl = v.picUrl + '?param=180y180'
             v.desc = v.program.description
@@ -269,7 +283,7 @@ export default new Vuex.Store({
         pageIndex = 0
       } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_HOT_ARTISTS}`, {
+        fetchToJson(`${API.ART.GET_HOT_ARTISTS}`, {
           limit,
           offset: pageIndex * limit
         }).then((resJson) => {
@@ -291,7 +305,7 @@ export default new Vuex.Store({
     // 获取歌单详情
     getPlaylistDetail ({ state }, id) {
       return new Promise((resolve, reject) => {
-        fetchToJson(`${API.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.PLAYLIST.GET_PLAYLIST_DETAIL}?id=${id}`).then((resJson) => {
           resolve(resJson.playlist)
         }).catch(err => {
           reject(err)
@@ -301,7 +315,7 @@ export default new Vuex.Store({
     // 获取单曲详情
     getSongDetail ({ state }, ids) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_SONG_DETAIL}?ids=${ids}`).then((resJson) => {
+        fetchToJson(`${API.SONG.GET_SONG_DETAIL}?ids=${ids}`).then((resJson) => {
           const songs = resJson.songs.map(v => {
             v.al.picUrl = v.al.picUrl + '?param=180y180'
             return v
@@ -313,7 +327,7 @@ export default new Vuex.Store({
     // 获取单曲url
     getSongUrl ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_SONG_URL}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.SONG.GET_SONG_URL}?id=${id}`).then((resJson) => {
           resolve(resJson)
         })
       })
@@ -321,7 +335,7 @@ export default new Vuex.Store({
     // 获取歌手信息
     getArtistDetail ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_DETAIL}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.ART.GET_ARTIST_DETAIL}?id=${id}`).then((resJson) => {
           resolve(resJson)
           //  + '?param=200y150'
         })
@@ -330,7 +344,7 @@ export default new Vuex.Store({
     // 获取歌手粉丝
     getArtistFans ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_FANS}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.ART.GET_ARTIST_FANS}?id=${id}`).then((resJson) => {
           resolve({
             data: resJson.data,
             type: 'fans'
@@ -341,7 +355,7 @@ export default new Vuex.Store({
     // 获取歌手单曲
     getArtistSong ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.ART.GET_ARTIST_SONG}?id=${id}`).then((resJson) => {
           const data = resJson.hotSongs.splice(0, 50).map(v => {
             v.al.picUrl = v.al.picUrl + '?param=180y180'
             return v
@@ -354,10 +368,12 @@ export default new Vuex.Store({
       })
     },
     // 获取歌手专辑
-    getArtistALBUM ({ state }, id) {
+    getArtistALBUM ({ state }, args) {
+      const { id, more = null } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_ALBUM}?id=${id}`).then((resJson) => {
-          const data = resJson.hotAlbums.splice(0, 7).map(v => {
+        fetchToJson(API.ART.GET_ARTIST_ALBUM, { id }).then((resJson) => {
+          const cuttingArr = more ? resJson.hotAlbums : resJson.hotAlbums.splice(0, 7)
+          const data = cuttingArr.map(v => {
             v.desc = `${moment(v.publishTime).year()} • ${v.type === 'Single' ? v.type = '单曲' : v.type}`
             v.query = 'album'
             v.picUrl = v.picUrl + '?param=200y200'
@@ -372,10 +388,12 @@ export default new Vuex.Store({
       })
     },
     // 获取歌手MV
-    getArtistMV ({ state }, id) {
+    getArtistMV ({ state }, args) {
+      const { id, more = null } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_MV}?id=${id}`).then((resJson) => {
-          const data = resJson.mvs.splice(0, 7).map(v => {
+        fetchToJson(API.ART.GET_ARTIST_MV, { id }).then((resJson) => {
+          const cuttingArr = more ? resJson.mvs : resJson.mvs.splice(0, 7)
+          const data = cuttingArr.map(v => {
             v.picUrl = v.imgurl + '?param=200y150'
             let playCount = v.playCount
             if (playCount > 10000) {
@@ -394,10 +412,12 @@ export default new Vuex.Store({
       })
     },
     // 获取歌手视频
-    getArtistVideo ({ state }, id) {
+    getArtistVideo ({ state }, args) {
+      const { id, more = null } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_VIDEO}?id=${id}&order=${1}`).then((resJson) => {
-          const data = resJson.data.records.splice(0, 7).map(v => {
+        fetchToJson(API.ART.GET_ARTIST_VIDEO, { id }).then((resJson) => {
+          const cuttingArr = more ? resJson.data.records : resJson.data.records.splice(0, 7)
+          const data = cuttingArr.map(v => {
             if (v.picUrl) {
               v.picUrl = v.imgurl + '?param=200y150'
               v.desc = v.name
@@ -406,8 +426,11 @@ export default new Vuex.Store({
               v.desc = v.resource.mlogBaseData.desc
               v.picUrl = v.resource.mlogBaseData.coverUrl + '?param=200y150'
             }
+            v.payload = v.id
+            v.query = 'video'
             return v
           })
+          console.log('\n\n\n', resJson, '\n\n\n')
           resolve({
             data,
             type: 'video'
@@ -416,10 +439,12 @@ export default new Vuex.Store({
       })
     },
     // 相似歌手
-    getArtistSimi ({ state }, id) {
+    getArtistSimi ({ state }, args) {
+      const { id, more = null } = args
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ARTIST_SIMI}?id=${id}`).then((resJson) => {
-          const data = resJson.artists.splice(0, 7).map(v => {
+        fetchToJson(API.ART.GET_ARTIST_SIMI, { id }).then((resJson) => {
+          const cuttingArr = more ? resJson.artists : resJson.artists.splice(0, 7)
+          const data = cuttingArr.map(v => {
             v.picUrl = v.img1v1Url + '?param=180y180'
             v.desc = '艺人'
             v.query = 'artist'
@@ -444,7 +469,7 @@ export default new Vuex.Store({
     // 获取专辑
     getAlbum ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ALBUM_DETAIL}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.ALBUM.GET_ALBUM_DETAIL}?id=${id}`).then((resJson) => {
           resolve({
             data: resJson.album,
             type: 'album'
@@ -455,7 +480,7 @@ export default new Vuex.Store({
     // 获取专辑所有歌曲
     getAlbumAll ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.GET_ALBUM_All}?id=${id}`).then((resJson) => {
+        fetchToJson(`${API.ALBUM.GET_ALBUM_All}?id=${id}`).then((resJson) => {
           resolve(resJson)
         })
       })
@@ -607,7 +632,6 @@ export default new Vuex.Store({
         })
       })
     },
-    // 搜索用户 TODO MV详情页还没做
     getSearchMV ({ state }, args) {
       const {
         keywords,
