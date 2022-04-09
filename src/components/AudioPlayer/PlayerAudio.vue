@@ -10,7 +10,7 @@
 <template>
   <div
     id="audioPlayerWrap"
-    :class="{ 'audio-player-hidden': !$store.state.audioDisplay }"
+    :class="{ 'audio-player-show': $store.state.audioDisplay }"
   >
     <div class="player-main">
       <!-- 进度条 -->
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import PlayerAudioVolume from '@/components/PlayerAudioVolume'
+import PlayerAudioVolume from '@/components/AudioPlayer/PlayerAudioVolume'
 import PlayerProgress from '@/components/AudioPlayer/PlayerProgress'
 import PlayerControls from '@/components/AudioPlayer/PlayerControls'
 import PlayerInfo from '@/components/AudioPlayer/PlayerInfo'
@@ -235,12 +235,24 @@ export default {
     this.audioRef.addEventListener('waiting', (e) => {
       console.log('\n\n\n', 'waiting', e, '\n\n\n')
     })
+    this.matchRouteName(this.$route.name)
   },
 
   methods: {
     ...mapGetters(['playQueue', 'playQueueIndex']),
     ...mapActions(['getSongDetail', 'getSongUrl']),
     ...mapMutations(['setCurSongid', 'setTips', 'setAudioDisplay']),
+
+    // 匹配路由名字， 在视频页面时隐藏播放器
+    matchRouteName (name) {
+      if (['mv', 'video'].includes(name)) {
+        this.setAudioDisplay(false)
+        // 人家要放视频了，赶紧停了音乐
+        this.audioRef.pause()
+      } else if (name && localStorage.getItem('songid')) {
+        this.setAudioDisplay(true)
+      }
+    },
 
     // 获取到歌曲url，开始切歌
     InitPlayer (url, autoplay) {
@@ -371,10 +383,6 @@ export default {
     '$store.getters.curSongid': {
       handler (songid) {
         if (songid) {
-          // 显示播放器
-          if (!this.$store.state.audioDisplay) {
-            this.setAudioDisplay(true)
-          }
           // 播放器显示成功才加载音乐
           const localSongid = localStorage.getItem('songid')
           if (localSongid !== songid.toString()) {
@@ -388,15 +396,7 @@ export default {
     },
     '$route.name': {
       handler (routeName) {
-        if (['mv', 'video'].includes(routeName)) {
-          this.setAudioDisplay(false)
-          // 人家要放视频了，赶紧停了音乐
-          this.audioRef.pause()
-        } else {
-          if (localStorage.getItem('songid')) {
-            this.setAudioDisplay(true)
-          }
-        }
+        this.matchRouteName(routeName)
       }
     }
   }
@@ -404,9 +404,8 @@ export default {
 </script>
 
 <style lang="less">
-.audio-player-hidden {
-  //display: none;
-  transform: translate(0, 70px);
+.audio-player-show {
+  transform: translate(0, 0)!important;
 }
 
 #audioPlayerWrap {
@@ -417,6 +416,7 @@ export default {
   height: 72px;
   background: rgba(24, 24, 24, 1);
   box-shadow: 0 0 1px rgba(255, 255, 255, 1);
+  transform: translate(0, 100px);
   transition: transform .4s;
 
   * {

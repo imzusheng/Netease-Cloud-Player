@@ -120,7 +120,6 @@ export default new Vuex.Store({
     reset (state) {
       state.playQueue = localStorage.getItem('playQueue') ? JSON.parse(localStorage.getItem('playQueue')) : []
       state.curSong.id = localStorage.getItem('songid') || null
-      this.commit('setAudioDisplay', !!localStorage.getItem('songid'))
     }
   },
   actions: {

@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import PlayerAudio from '@/components/PlayerAudio'
+import PlayerAudio from '@/components/AudioPlayer/PlayerAudio'
 import { mapMutations } from 'vuex'
 export default {
   name: 'App',

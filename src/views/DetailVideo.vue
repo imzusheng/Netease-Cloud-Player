@@ -90,6 +90,17 @@ export default {
     }
   },
 
+  methods: {
+    ...mapActions([
+      'getArtistDetail',
+      'getMvComment',
+      'getMvDetail',
+      'getMvSimi',
+      'getMvUrl'
+    ]),
+    ...mapMutations(['setLoading', 'setError'])
+  },
+
   mounted () {
     const { id } = this.$route.query
 
@@ -109,7 +120,8 @@ export default {
     const player = new Player({
       id: 'xgplayer',
       fluid: true,
-      videoInit: true
+      videoInit: true,
+      autoplay: true
       //   playbackRate: [0.5, 0.75, 1, 1.5, 2], // 可调整倍数
       //   defaultPlaybackRate: 1, // 默认倍数
       //   download: true, // 设置download控件显示
@@ -161,18 +173,6 @@ export default {
       this.comment.comments = res.comments
     })
   },
-
-  methods: {
-    ...mapActions([
-      'getArtistDetail',
-      'getMvComment',
-      'getMvDetail',
-      'getMvSimi',
-      'getMvUrl'
-    ]),
-    ...mapMutations(['setLoading', 'setError'])
-  },
-
   computed: {
     // 播放次数改成单位：万
     countConvert () {

@@ -8,19 +8,19 @@
         :class="{ 'play-queue-open': $store.state.playQueueStatus }"
         @click="toPlayQueue"
       >
-        <img v-if="!$store.state.playQueueStatus" src="../assets/player-controls-queue.svg" alt="">
-        <img v-else src="../assets/player-controls-queue-action.svg" alt="">
+        <img v-if="!$store.state.playQueueStatus" src="../../assets/player-controls-queue.svg" alt="">
+        <img v-else src="../../assets/player-controls-queue-action.svg" alt="">
       </button>
       <!-- 单击切换静音 -->
       <button title="静音" class="switch-volume" @click="switchVolume">
         <!-- 静音icon -->
-        <img v-if="volumeProgress === 0" src="../assets/player-controls-volume-muted.svg" alt="">
+        <img v-if="volumeProgress === 0" src="../../assets/player-controls-volume-muted.svg" alt="">
         <!-- 低音量icon -->
-        <img v-else-if="volumeProgress <= 25" src="../assets/player-controls-volume-low.svg" alt="">
+        <img v-else-if="volumeProgress <= 25" src="../../assets/player-controls-volume-low.svg" alt="">
         <!-- 中音量icon -->
-        <img v-else-if="volumeProgress <= 75" src="../assets/player-controls-volume-medium.svg" alt="">
+        <img v-else-if="volumeProgress <= 75" src="../../assets/player-controls-volume-medium.svg" alt="">
         <!-- 高音量icon -->
-        <img v-else src="../assets/player-controls-volume-high.svg" alt="">
+        <img v-else src="../../assets/player-controls-volume-high.svg" alt="">
       </button>
     </div>
 
