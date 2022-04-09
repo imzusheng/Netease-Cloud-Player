@@ -46,6 +46,7 @@
     <!-- 模板 -->
     <SectionListGrid
       :title="listTitle.recommends"
+      :sub-title="'精选歌单'"
       :listData="listData.recommends"
       :round="false"
       action="getRecommend"
@@ -64,6 +65,7 @@
     />
     <SectionListGrid
       :title="listTitle.community"
+      :sub-title="'精选歌单'"
       :listData="listData.community"
       :round="false"
       action="getCommunity"
