@@ -1,131 +1,114 @@
+<!--
+  单曲显示表格组件
+  单击切歌，有L/M/S三种尺寸
+  L: 序号，封面，歌名，专辑，时长
+  M: 序号，封面，歌名，时长
+  S: 封面，歌名，时长
+-->
+
 <template>
-  <ul class="table-songs">
+  <ul class="song-table">
     <li
+      v-for="(listItem, listIndex) in songs"
+      :key="`songs-${listIndex}`"
+      :class="`table-row-size-${size.toLowerCase()}`"
       class="table-row"
-      @click="playSong(listItem.id)"
-      v-for="(listItem, listIndex) in getListData"
-      :key="`detailArtist-${listIndex}`"
+      @click="setCurSongid(listItem.id)"
     >
       <!-- 序号 -->
-      <div class="table-cell-index" v-if="indexDisplay">
+      <div v-if="['L', 'M'].includes(size.toUpperCase())"  class="table-cell-index">
         <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
         <span class="playlist-table-icon">
-          <svg
-            class="icon-play"
-            height="32"
-            role="img"
-            width="32"
-            viewBox="0 0 24 24"
-          >
-            <polygon
-              points="21.57 12 5.98 3 5.98 21 21.57 12"
-              fill="currentColor"
-            ></polygon>
-          </svg>
-        </span>
+            <img alt="" src="../assets/icon-song-play.svg">
+          </span>
       </div>
+
       <!-- 歌曲名字和作者 -->
       <div class="table-cell-desc">
         <img
           ref="lazyload-img"
-          class="table-cell-desc-pic"
-          :data-pic-src="listItem.picUrl"
+          :src="listItem.al.picUrl + '?param=50y50'"
           alt=""
+          class="table-cell-desc-pic"
         />
         <div class="table-cell-desc-info">
           <!-- 歌名 -->
           <div class="table-desc-name">
-            <span :title="listItem.name" class="table-cell-ellipsis">
-              {{ listItem.name }}</span
-            >
+                    <span :title="listItem.name" class="table-cell-ellipsis">
+                      {{ listItem.name }}</span
+                    >
             <!-- vip图标 -->
             <img
               v-if="![0, 8].includes(listItem.fee)"
-              class="table-cell-desc-vip"
               ref=""
-              src="../assets/vip.svg"
               alt=""
+              class="table-cell-desc-vip"
+              src="../assets/vip.svg"
             />
           </div>
         </div>
       </div>
+
       <!-- 专辑名 -->
-      <div class="table-cell-ellipsis" v-if="albumDisplay">
+      <div v-if="['L'].includes(size.toUpperCase())" class="table-cell-ellipsis table-cell-album">
         <div
           :title="listItem.al.name"
+          class="table-cell-ellipsis table-cell-album"
           style="display: block"
-          class="table-cell-ellipsis"
         >
           {{ listItem.al.name }}
         </div>
       </div>
+
       <!-- 时长 -->
-      <div>{{ getSongDt(listItem.dt) }}</div>
+      <div class="table-cell-dt">{{ getSongDt(listItem.dt) }}</div>
+
     </li>
   </ul>
 </template>
 
 <script>
-import moment from 'moment'
-import { lazyLoadImg } from '@/util'
 import { mapMutations } from 'vuex'
+import { durationConvert } from '@/util'
 
 export default {
-  name: 'TableListSongs',
+  name: 'TableSongs',
 
   props: {
-    // 列表数据
-    listData: Array,
+    // 数据
+    songs: Array,
 
-    // 是否显示序号
-    indexDisplay: Boolean,
-
-    // 是否显示专辑
-    albumDisplay: Boolean
+    // 表格尺寸 L/M/S
+    size: String
   },
 
   methods: {
-    ...mapMutations(['setCurSongid']),
-    // 播放歌曲
-    playSong (id) {
-      this.setCurSongid(id)
-    },
-    // 实现图片懒加载
-    lazyLoadimg () {
-      this.$nextTick(() => {
-        lazyLoadImg(this.$refs['lazyload-img'])
-      })
-    }
+    ...mapMutations(['setCurSongid'])
   },
 
   computed: {
     getSongDt () {
       return function (time) {
-        const _moment = moment.duration(time)
-        return `${
-          _moment.minutes() < 10 ? `0${_moment.minutes()}` : _moment.minutes()
-        }:${
-          _moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
-        }`
+        return durationConvert(time / 1000)
       }
-    },
-    getListData () {
-      this.lazyLoadimg()
-      return this.$props.listData || []
     }
   }
 }
 </script>
 
-<style lang="less" scoped>
-.table-songs {
+<style lang="less">
+// ul
+.song-table {
   // li
   .table-row {
     display: grid;
     grid-gap: 16px;
     grid-template-columns:
-      [name] 6fr
-      [last] minmax(120px, 1fr);
+              [index] 16px
+              [name] 6fr
+              [al] 4fr
+              [last] minmax(120px, 1fr);
+    padding: 0 16px;
     border-radius: 6px;
     cursor: pointer;
     // li > div
@@ -147,10 +130,6 @@ export default {
       }
       .playlist-table-icon {
         display: none;
-        > svg {
-          width: 16px;
-          height: 16px;
-        }
       }
     }
     // 歌曲信息
@@ -184,6 +163,12 @@ export default {
         }
       }
     }
+    // 专辑
+    .table-cell-album,
+    .table-cell-dt{
+      color: #b3b3b3;
+      font-size: 14px;
+    }
     // hover样式
     &:hover {
       background: rgba(255, 255, 255, 0.1);
@@ -205,6 +190,22 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+  }
+
+  // 中等尺寸,去掉专辑
+  .table-row-size-m{
+    grid-template-columns:
+              [index] 16px
+              [name] auto
+              [last] minmax(120px, 1fr);
+  }
+
+  // 小尺寸,只保留封面、歌名、时长
+  .table-row-size-s{
+    padding: 0;
+    grid-template-columns:
+              [name] auto
+              [last] minmax(120px, 1fr);
   }
 
   // 正在播放的歌曲样式

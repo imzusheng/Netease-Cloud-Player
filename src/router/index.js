@@ -49,6 +49,10 @@ const routes = [
       path: 'mv',
       name: 'mv',
       component: () => import('@/views/DetailVideo.vue')
+    }, {
+      path: 'song',
+      name: 'song',
+      component: () => import('@/views/DetailSongs.vue')
     }]
   },
   {

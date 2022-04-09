@@ -1,6 +1,6 @@
 <template>
   <div id="search-view" class="view-spacing">
-    <section class="search-section" v-if="matchSearch.artist.id">
+    <section v-if="matchSearch.artist.id" class="search-section">
       <div class="search-section-content">
         <div
           class="search-section-left"
@@ -10,9 +10,9 @@
           <div class="search-section-left-main">
             <img
               v-if="matchSearch.artist.picUrl"
-              class="match-poster"
               :src="matchSearch.artist.picUrl + '?param=100y100'"
               alt=""
+              class="match-poster"
             />
             <div class="match-title">
               <h3 class="match-title-h">{{ matchSearch.artist.name }}</h3>
@@ -23,83 +23,84 @@
           </div>
         </div>
         <!-- 歌曲列表 -->
-        <div class="search-section-right" v-if="listData.songs.data.length > 0">
+        <div v-if="listData.songs.data.length > 0" class="search-section-right">
           <h2>歌曲</h2>
-          <TableListSongs
+          <table-songs
+            :songs="listData.songs.data.slice(0, 4)"
             class="search-table-songs"
-            :listData="listData.songs.data.slice(0, 4)"
+            size="S"
           />
         </div>
       </div>
     </section>
     <SectionListGrid
-      :title="'专辑'"
+      :args="{ keywords }"
       :listData="listData.albums.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'专辑'"
       action="getSearchAlbums"
     />
     <SectionListGrid
-      :title="'艺人'"
+      :args="{ keywords }"
       :listData="listData.artists.data"
       :round="true"
-      :args="{ keywords }"
+      :title="'艺人'"
       action="getSearchArtists"
     />
     <SectionListGrid
-      :title="'歌曲'"
+      :args="{ keywords }"
       :listData="listData.songs.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'歌曲'"
       action="getSearchSongs"
     />
     <SectionListGrid
-      :title="'歌单'"
+      :args="{ keywords }"
       :listData="listData.playlists.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'歌单'"
       action="getSearchPlaylist"
     />
     <SectionListGrid
-      :title="'单曲'"
+      :args="{ keywords }"
       :listData="listData.songs.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'单曲'"
       action="getSearchSongs"
     />
     <SectionListGrid
-      :title="'用户'"
+      :args="{ keywords }"
       :listData="listData.users.data"
       :round="true"
-      :args="{ keywords }"
+      :title="'用户'"
       action="getSearchUsers"
     />
     <SectionListGrid
-      :title="'MV'"
+      :args="{ keywords }"
       :listData="listData.mvs.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'MV'"
       action="getSearchMV"
     />
     <SectionListGrid
-      :title="'电台'"
+      :args="{ keywords }"
       :listData="listData.djs.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'电台'"
       action="getSearchDj"
     />
     <SectionListGrid
-      :title="'视频'"
+      :args="{ keywords }"
       :listData="listData.videos.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'视频'"
       action="getSearchVideos"
     />
     <SectionListGrid
-      :title="'播客'"
+      :args="{ keywords }"
       :listData="listData.voices.data"
       :round="false"
-      :args="{ keywords }"
+      :title="'播客'"
       action="getSearchVoices"
     />
   </div>
@@ -107,15 +108,15 @@
 
 <script>
 import SectionListGrid from '@/components/SectionListGrid.vue'
-import TableListSongs from '@/components/TableListSongs.vue'
 import { mapActions, mapMutations } from 'vuex'
+import tableSongs from '@/components/TableSongs'
 
 export default {
   name: 'DetailSearch',
 
   components: {
     SectionListGrid,
-    TableListSongs
+    tableSongs
   },
 
   data () {

@@ -749,6 +749,8 @@ export default new Vuex.Store({
             data: res.map(v => {
               v.picUrl = v.al.picUrl + '?param=180y180'
               v.desc = `${v.al.name}}`
+              v.payload = v.id
+              v.query = 'song'
               return v
             }),
             key: 'songs',

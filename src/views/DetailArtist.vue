@@ -5,16 +5,16 @@
   >
     <!-- 海报 -->
     <div
-      class="under-poster"
       ref="under-poster"
       :style="{ '--poster-url': artistnPoster }"
+      class="under-poster"
     ></div>
 
     <!-- 海报褪色滤镜 -->
     <div class="under-poster-mask"></div>
 
     <!-- 海报遮罩 -->
-    <div class="under-poster-mask-trans" ref="under-poster-mask-trans"></div>
+    <div ref="under-poster-mask-trans" class="under-poster-mask-trans"></div>
 
     <!-- 歌手信息 -->
     <div class="artist-info">
@@ -23,7 +23,7 @@
         <!-- 信息容器 -->
         <div class="artist-info-main">
           <span class="artist-info-name">{{ artistName }}</span>
-          <span class="artist-info-type" :title="artistTags">{{
+          <span :title="artistTags" class="artist-info-type">{{
             artistTags
           }}</span>
         </div>
@@ -41,7 +41,7 @@
               class="action-btn-play"
               @click="actionPlayAll"
             >
-              <svg role="img" height="28" width="28" viewBox="0 0 24 24">
+              <svg height="28" role="img" viewBox="0 0 24 24" width="28">
                 <path
                   d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"
                 ></path>
@@ -56,106 +56,43 @@
         <!-- 热门歌曲 -->
         <section class="section-hot-song">
           <h2>热门</h2>
-          <ul class="hot-song-table">
-            <li
-              class="table-row"
-              @click="playSong(listItem.id)"
-              v-for="(listItem, listIndex) in getHotSongs"
-              :key="`detailArtist-${listIndex}`"
-            >
-              <!-- 序号 -->
-              <div class="table-cell-index">
-                <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
-                <span class="playlist-table-icon">
-                  <svg
-                    class="icon-play"
-                    height="32"
-                    role="img"
-                    width="32"
-                    viewBox="0 0 24 24"
-                  >
-                    <polygon
-                      points="21.57 12 5.98 3 5.98 21 21.57 12"
-                      fill="currentColor"
-                    ></polygon>
-                  </svg>
-                </span>
-              </div>
-              <!-- 歌曲名字和作者 -->
-              <div class="table-cell-desc">
-                <img
-                  ref="lazyload-img"
-                  class="table-cell-desc-pic"
-                  :data-pic-src="listItem.al.picUrl"
-                  alt=""
-                />
-                <div class="table-cell-desc-info">
-                  <!-- 歌名 -->
-                  <div class="table-desc-name">
-                    <span :title="listItem.name" class="table-cell-ellipsis">
-                      {{ listItem.name }}</span
-                    >
-                    <!-- vip图标 -->
-                    <img
-                      v-if="![0, 8].includes(listItem.fee)"
-                      class="table-cell-desc-vip"
-                      ref=""
-                      src="../assets/vip.svg"
-                      alt=""
-                    />
-                  </div>
-                </div>
-              </div>
-              <!-- 专辑名 -->
-              <div class="table-cell-ellipsis">
-                <div
-                  :title="listItem.al.name"
-                  style="display: block"
-                  class="table-cell-ellipsis"
-                >
-                  {{ listItem.al.name }}
-                </div>
-              </div>
-              <!-- 时长 -->
-              <div>{{ getSongDt(listItem.dt) }}</div>
-            </li>
-          </ul>
+          <table-songs :songs="getHotSongs" size="L"/>
           <span
-            href="#"
             class="more-hotSongs"
+            href="#"
             @click="hotSongsDisplay = !hotSongsDisplay"
             v-html="hotSongsDisplay ? '收起' : '查看更多'"
           ></span>
         </section>
 
         <SectionListGrid
-          :title="'专辑'"
+          :args="args"
           :listData="tableData.hotAlbums"
+          :title="'专辑'"
           action="getArtistALBUM"
-          :args="args"
         />
 
         <SectionListGrid
-          :title="'MV'"
+          :args="args"
           :listData="tableData.mvs"
+          :title="'MV'"
           action="getArtistMV"
-          :args="args"
         />
 
         <SectionListGrid
-          :title="'视频'"
+          :args="args"
           :listData="tableData.video"
           :round="false"
+          :title="'视频'"
           action="getArtistVideo"
-          :args="args"
         />
 
         <SectionListGrid
-          :title="'粉丝也喜欢'"
+          :args="args"
           :listData="tableData.simi"
           :round="true"
+          :title="'粉丝也喜欢'"
           action="getArtistALBUM"
-          :args="args"
         />
       </div>
     </div>
@@ -166,6 +103,7 @@
 import moment from 'moment'
 import { getMainColor, throttle, lazyLoadImg } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
+import TableSongs from '@/components/TableSongs'
 import SectionListGrid from '@/components/SectionListGrid.vue'
 
 // 滚动条参数
@@ -198,7 +136,8 @@ export default {
   name: 'DetailArtist',
 
   components: {
-    SectionListGrid
+    SectionListGrid,
+    TableSongs
   },
 
   data () {
