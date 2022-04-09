@@ -2,7 +2,7 @@
 
 ## 前言
 
-API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCloudMusicApi)，非常感谢API提供者。
+API源自[网易云音乐 NodeJS 版 API](http://github.com/Binaryify/NeteaseCloudMusicApi)，非常感谢API提供者。
 
 最近一项考试需要用到vue2所有没有选择3，本身也很少接触Audio API。发现如此全面的网易云音乐API后来踩踩坑，交互界面参考Spotify、YouTuBe Music，后续考虑用vue3、vite、typescript练手。
 
@@ -12,27 +12,27 @@ API源自[网易云音乐 NodeJS 版 API](https://github.com/Binaryify/NeteaseCl
 
 1. 主页
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/01.png)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/01.png)
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/02.png)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/02.png)
 
 2. 自动提取主题色
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/gif_02.gif)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/gif_02.gif)
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/03.png)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/03.png)
 
 3. 播放mv
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/07.png)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/07.png)
 
 4. 艺人详情
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/gif_01.gif)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/gif_01.gif)
 
 5. 播放列表
 
-![图片](https://gitee.com/imzusheng/vue-netease-cloud-music/raw/master/screenshots/05.png)
+![图片](http://cdn.zusheng.club/screenshots/cloud-music/05.png)
 
 ## 技术栈
 * vue2
