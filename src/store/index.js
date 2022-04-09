@@ -79,7 +79,10 @@ export default new Vuex.Store({
     setSearchDisplay (state, display) {
       state.searchDisplay = display
     },
-    setError (state, { status = false, msg = '' }) {
+    setError (state, {
+      status = false,
+      msg = ''
+    }) {
       state.error.status = status
       state.error.msg = msg
     },
@@ -112,12 +115,6 @@ export default new Vuex.Store({
     },
     setAudioDisplay (state, status) {
       state.audioDisplay = status
-      // 在video和mv页面下，不允许显示播放器
-      // if (['video', 'mv'].includes(state.curRouter)) {
-      //   state.audioDisplay = false
-      // } else {
-      //   state.audioDisplay = status
-      // }
     },
     // 从localStorage恢复数据
     reset (state) {
@@ -157,7 +154,10 @@ export default new Vuex.Store({
     },
     // 今日推荐
     getRecommend ({ state }, args) {
-      const { limit = 30, pageIndex = 0 } = args
+      const {
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.GET_RECOMMENDS}`, {
           limit,
@@ -214,7 +214,10 @@ export default new Vuex.Store({
     },
     // 推荐MV
     getMv ({ state }, args) {
-      const { limit = 30, pageIndex = 0 } = args
+      const {
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.GET_NEW_MV}`, {
           limit,
@@ -262,7 +265,10 @@ export default new Vuex.Store({
     },
     // 获取热门歌手
     getHotArtists ({ state }, args) {
-      const { limit = 30, pageIndex = 0 } = args
+      const {
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.GET_HOT_ARTISTS}`, {
           limit,
@@ -478,7 +484,11 @@ export default new Vuex.Store({
     // }
     // 搜索专辑
     getSearchAlbums ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['专辑'],
@@ -504,7 +514,11 @@ export default new Vuex.Store({
     },
     // 搜索歌手
     getSearchArtists ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌手'],
@@ -535,7 +549,11 @@ export default new Vuex.Store({
     },
     // 搜索歌单
     getSearchPlaylist ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌单'],
@@ -561,7 +579,11 @@ export default new Vuex.Store({
     },
     // 搜索用户 TODO 用户详情页还没做
     getSearchUsers ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['用户'],
@@ -588,7 +610,11 @@ export default new Vuex.Store({
     },
     // 搜索用户 TODO MV详情页还没做
     getSearchMV ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE.MV,
@@ -614,7 +640,11 @@ export default new Vuex.Store({
     },
     // 搜索电台 TODO 电台详情页还没做
     getSearchDj ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['电台'],
@@ -643,7 +673,11 @@ export default new Vuex.Store({
     },
     // 搜索视频 TODO 视频详情页还没做
     getSearchVideos ({ state }, args) {
-      const { keywords, limit = 30, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 30,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['视频'],
@@ -673,7 +707,11 @@ export default new Vuex.Store({
     },
     // 搜索歌曲 TODO 不知道跳转到哪里
     getSearchSongs ({ state }, args) {
-      const { keywords, limit = 7, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 7,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['歌曲'],
@@ -699,7 +737,11 @@ export default new Vuex.Store({
     },
     // 搜索播客（声音） TODO 不知道跳转到哪里
     getSearchVoices ({ state }, args) {
-      const { keywords, limit = 7, pageIndex = 0 } = args
+      const {
+        keywords,
+        limit = 7,
+        pageIndex = 0
+      } = args
       return new Promise(resolve => {
         fetchToJson(`${API.SEARCH.GET_SEARCH}`, {
           type: API.SEARCH.MATCH_TYPE['声音'],
@@ -744,7 +786,10 @@ export default new Vuex.Store({
       })
     },
     // MV URL
-    getMvUrl ({ state }, { id, br = 720 }) {
+    getMvUrl ({ state }, {
+      id,
+      br = 720
+    }) {
       return new Promise(resolve => {
         fetchToJson(`${API.MV.GET_MV_URL}`, {
           id,

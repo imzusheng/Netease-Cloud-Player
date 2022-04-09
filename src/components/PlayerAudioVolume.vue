@@ -8,78 +8,22 @@
         :class="{ 'play-queue-open': $store.state.playQueueStatus }"
         @click="toPlayQueue"
       >
-        <svg role="img" height="16" width="16" viewBox="0 0 16 16">
-          <path
-            d="M15 15H1v-1.5h14V15zm0-4.5H1V9h14v1.5zm-14-7A2.5 2.5 0 013.5 1h9a2.5 2.5 0 010 5h-9A2.5 2.5 0 011 3.5zm2.5-1a1 1 0 000 2h9a1 1 0 100-2h-9z"
-          ></path>
-        </svg>
+        <img v-if="!$store.state.playQueueStatus" src="../assets/player-controls-queue.svg" alt="">
+        <img v-else src="../assets/player-controls-queue-action.svg" alt="">
       </button>
       <!-- 单击切换静音 -->
       <button title="静音" class="switch-volume" @click="switchVolume">
         <!-- 静音icon -->
-        <svg
-          v-if="volumeProgress === 0"
-          role="presentation"
-          height="16"
-          width="16"
-          aria-label="Volume off"
-          id="volume-icon"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M13.86 5.47a.75.75 0 00-1.061 0l-1.47 1.47-1.47-1.47A.75.75 0 008.8 6.53L10.269 8l-1.47 1.47a.75.75 0 101.06 1.06l1.47-1.47 1.47 1.47a.75.75 0 001.06-1.06L12.39 8l1.47-1.47a.75.75 0 000-1.06z"
-          ></path>
-          <path
-            d="M10.116 1.5A.75.75 0 008.991.85l-6.925 4a3.642 3.642 0 00-1.33 4.967 3.639 3.639 0 001.33 1.332l6.925 4a.75.75 0 001.125-.649v-1.906a4.73 4.73 0 01-1.5-.694v1.3L2.817 9.852a2.141 2.141 0 01-.781-2.92c.187-.324.456-.594.78-.782l5.8-3.35v1.3c.45-.313.956-.55 1.5-.694V1.5z"
-          ></path>
-        </svg>
+        <img v-if="volumeProgress === 0" src="../assets/player-controls-volume-muted.svg" alt="">
         <!-- 低音量icon -->
-        <svg
-          v-else-if="volumeProgress <= 25"
-          role="presentation"
-          height="16"
-          width="16"
-          aria-label="Volume low"
-          id="volume-icon"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"
-          ></path>
-        </svg>
+        <img v-else-if="volumeProgress <= 25" src="../assets/player-controls-volume-low.svg" alt="">
         <!-- 中音量icon -->
-        <svg
-          v-else-if="volumeProgress <= 75"
-          role="presentation"
-          height="16"
-          width="16"
-          aria-label="Volume medium"
-          id="volume-icon"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 6.087a4.502 4.502 0 000-8.474v1.65a2.999 2.999 0 010 5.175v1.649z"
-          ></path>
-        </svg>
+        <img v-else-if="volumeProgress <= 75" src="../assets/player-controls-volume-medium.svg" alt="">
         <!-- 高音量icon -->
-        <svg
-          v-else
-          role="presentation"
-          height="16"
-          width="16"
-          aria-label="Volume high"
-          id="volume-icon"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"
-          ></path>
-          <path
-            d="M11.5 13.614a5.752 5.752 0 000-11.228v1.55a4.252 4.252 0 010 8.127v1.55z"
-          ></path>
-        </svg>
+        <img v-else src="../assets/player-controls-volume-high.svg" alt="">
       </button>
     </div>
+
     <!-- 音量调整滑轨 -->
     <div class="player-volume-progress" ref="player-volume-progress">
       <!-- 滑轨小圆点 -->
@@ -105,7 +49,7 @@ export default {
 
   data () {
     return {
-      // 0~100区间的音量值
+      // 0~100 区间的音量值
       volumeProgress: localStorage.getItem('volumeProgress') || 50
     }
   },
@@ -144,6 +88,7 @@ export default {
       } else {
         this.volumeProgress = localStorage.getItem('volumeProgress') || 50
       }
+      this.$emit('volume-change', this.volumeProgress / 100)
     },
     updateVolume (x) {
       if (this.volumeProgress !== x) {
@@ -172,7 +117,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .player-volume {
   flex: 1;
   display: flex;
@@ -180,10 +125,21 @@ export default {
   justify-content: flex-end;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 6px;
+    cursor: pointer;
+  }
+
   .btn-row {
     display: flex;
     .play-queue,
@@ -192,9 +148,6 @@ export default {
       margin: 0 4px 0 0 !important;
     }
     .play-queue-open {
-      * {
-        color: rgba(240, 0, 0, 0.8) !important;
-      }
       &::after {
         content: "";
         background-color: rgba(240, 0, 0, 0.8);

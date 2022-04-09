@@ -46,12 +46,24 @@ export const countConvert = (count) => {
   return count > 10000 ? `${(count / 10000).toFixed(1)}万` : count
 }
 
-// 时间转换为格式04:31
+/**
+ * 时间转换为格式 04:31
+ * @param {Number|String} time timeStamp时间戳
+ * @returns {string}
+ */
 export const durationConvert = (time) => {
-  const _moment = moment.duration(time)
+  const _moment = moment.duration(time, 'second')
   return `${_moment.minutes() < 10 ? `0${_moment.minutes()}` : _moment.minutes()
-    }:${_moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
-    }`
+  }:${_moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
+  }`
+}
+
+/**
+ * 获取 [min,max]的随机数
+ * Math.floor(Math.random()*10) 可均衡获取 0 到 9 的随机整数
+ */
+export const getRandomIndex = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 /**
@@ -91,6 +103,7 @@ export const getMainColor = (imgSrc) => {
     }
     return color
   }
+
   return new Promise(resolve => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')

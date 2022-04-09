@@ -106,7 +106,6 @@ export default {
     const headerMaskRef = this.$parent.$refs['main-header-mask']
     headerMaskRef.style.opacity = 1
 
-    this.setAudioDisplay(false)
     const player = new Player({
       id: 'xgplayer',
       fluid: true,
@@ -171,7 +170,7 @@ export default {
       'getMvSimi',
       'getMvUrl'
     ]),
-    ...mapMutations(['setAudioDisplay', 'setLoading', 'setError'])
+    ...mapMutations(['setLoading', 'setError'])
   },
 
   computed: {
