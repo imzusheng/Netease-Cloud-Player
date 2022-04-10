@@ -101,7 +101,7 @@
 
 <script>
 import moment from 'moment'
-import { getMainColor, throttle, lazyLoadImg } from '@/util'
+import { getMainColor, throttle } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
 import TableSongs from '@/components/TableSongs'
 import SectionListGrid from '@/components/SectionListGrid.vue'
@@ -181,13 +181,6 @@ export default {
       'getArtistSimi',
       'getArtistMV'
     ]),
-    // 实现图片懒加载
-    lazyLoadimg () {
-      // dom更新完成
-      this.$nextTick(() => {
-        lazyLoadImg(this.$refs['lazyload-img'])
-      })
-    },
     playSong (id) {
       this.setCurSongid(id)
     },
@@ -238,7 +231,6 @@ export default {
               this.tableData[res.type] = res.data
             }
           })
-          this.lazyLoadimg()
           this.setLoading(false)
         })
       })

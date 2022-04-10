@@ -128,6 +128,30 @@ export default new Vuex.Store({
       state.curSong.id = localStorage.getItem('songid') || null
     }
   },
+  /**
+   * 所有异步请求，数据返回格式统一为：
+   *
+   * {
+   *     picUrl 图片链接，后缀加上?param=宽度y高度
+   *
+   *     payload 参数，一般为id
+   *
+   *     name 名字
+   *
+   *     desc 描述、副标题
+   *
+   *     query 点击后跳转的模板name（url）
+   *
+   *     以下可选：
+   *
+   *     album 专辑
+   *
+   *     duration 时长
+   *
+   *     publishTime 发布时间
+   * }
+   *
+   */
   actions: {
     // 获取重定向url(MP3url)
     getRedirect ({ state }, url) {
@@ -151,8 +175,8 @@ export default new Vuex.Store({
             const updateTime = v.trackUpdateTime && days !== '0' ? `${days}天前 • ` : ''
             const trackCount = v.trackCount + '首音乐'
             v.desc = updateTime + trackCount
-            v.payload = v.id
             v.picUrl = v.coverImgUrl + '?param=180y180'
+            v.payload = v.id
             v.query = 'playlist'
             return v
           })
@@ -192,18 +216,18 @@ export default new Vuex.Store({
       })
     },
     // 播放记录/最近播放
-    getRecords () {
-      return new Promise(resolve => {
-        fetchToJson(API.AUTH.GET_RECORDS).then((resJson) => {
-          resolve(resJson.weekData.map((v) => {
-            v.desc1 = pickUpName(v.song.ar)
-            v.desc2 = v.song.al.name
-            v.picUrl = v.song.al.picUrl + '?param=180y180'
-            return v
-          }))
-        })
-      })
-    },
+    // getRecords () {
+    //   return new Promise(resolve => {
+    //     fetchToJson(API.AUTH.GET_RECORDS).then((resJson) => {
+    //       resolve(resJson.weekData.map((v) => {
+    //         v.desc1 = pickUpName(v.song.ar)
+    //         v.desc2 = v.song.al.name
+    //         v.picUrl = v.song.al.picUrl + '?param=180y180'
+    //         return v
+    //       }))
+    //     })
+    //   })
+    // },
     // 新歌
     getNewsong ({ state }, limit = 9) {
       return new Promise(resolve => {
@@ -331,7 +355,15 @@ export default new Vuex.Store({
     getDjP ({ state }, rid) {
       return new Promise((resolve, reject) => {
         fetchToJson(API.DJ.GET_DJP, { rid }).then((resJson) => {
-          resolve(resJson.programs)
+          const data = resJson.programs.map(v => {
+            v.album = v.radio.name
+            v.picUrl = v.coverUrl + '?param=50y50'
+            v.publishTime = v.scheduledPublishTime
+            v.id = v.mainTrackId
+            console.log(JSON.parse(JSON.stringify(v)))
+            return v
+          })
+          resolve({ data })
         })
       })
     },
@@ -348,7 +380,9 @@ export default new Vuex.Store({
       return new Promise(resolve => {
         fetchToJson(`${API.SONG.GET_SONG_DETAIL}?ids=${ids}`).then((resJson) => {
           const songs = resJson.songs.map(v => {
-            v.al.picUrl = v.al.picUrl + '?param=180y180'
+            v.duration = v.dt
+            v.album = v.al.name
+            v.picUrl = v.al.picUrl + '?param=180y180'
             return v
           })
           resolve(songs)

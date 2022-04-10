@@ -185,28 +185,15 @@ export default {
           this.curPlaylist = res
           // 设置加载状态false
           this.setLoading(false)
-          // 实现图片懒加载
-          this.lazyLoadimg()
         })
       })
     } else if (name === 'djp') {
       console.log('电台节目')
-      this.getDjP(id).then(res => {
-        this.curPlaylistInfo = res[0].radio
-        this.curPlaylist = res.map(v => {
-          v.al = {
-            picUrl: v.coverUrl,
-            name: v.radio.name
-          }
-          v.publishTime = v.scheduledPublishTime
-          v.dt = v.duration
-          v.id = v.mainTrackId
-          return v
-        })
+      this.getDjP(id).then(({ data }) => {
+        this.curPlaylistInfo = data[0].radio
+        this.curPlaylist = data
         // 设置加载状态false
         this.setLoading(false)
-        //  实现图片懒加载
-        this.lazyLoadimg()
       })
     } else {
       console.log('歌单')
@@ -219,8 +206,6 @@ export default {
           this.curPlaylist = res
           // 设置加载状态false
           this.setLoading(false)
-          // 实现图片懒加载
-          this.lazyLoadimg()
         })
       })
     }
@@ -259,8 +244,7 @@ export default {
     },
     playlistPicUrl () {
       // 获取到歌单的封面之后，开始提取主题色
-      const url =
-        this.curPlaylistInfo.coverImgUrl || this.curPlaylistInfo.picUrl
+      const url = `${this.curPlaylistInfo.coverImgUrl || this.curPlaylistInfo.picUrl}?param=250y250`
       if (url) this.getPicMainColor(url)
       return url
     },

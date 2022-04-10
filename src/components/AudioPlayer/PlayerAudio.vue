@@ -227,7 +227,7 @@ export default {
 
   methods: {
     ...mapGetters(['playQueue', 'playQueueIndex']),
-    ...mapActions(['getSongDetail', 'getSongUrl']),
+    ...mapActions(['getSongUrl']),
     ...mapMutations(['setCurSongid', 'setTips', 'setAudioDisplay']),
 
     // 匹配路由名字， 在视频页面时隐藏播放器
