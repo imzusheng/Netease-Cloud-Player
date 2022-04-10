@@ -26,6 +26,9 @@ export default new Vuex.Store({
     // 当前主题颜色
     curPlaylistColor: '12, 12, 12, 1',
 
+    // 当前播放的歌曲信息
+    curSongInfo: localStorage.getItem('curSongInfo') ? JSON.parse(localStorage.getItem('curSongInfo')) : {},
+
     // 当前播放的歌曲
     curSong: {
       id: 0 // 当前播放的歌曲id
@@ -70,6 +73,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setCurSongInfo (state, info) {
+      state.curSongInfo = info
+    },
     setColumnCount (state, num) {
       state.columnCount = num
     },
@@ -257,15 +263,15 @@ export default new Vuex.Store({
         pageIndex = 0
       } = args
       return new Promise(resolve => {
-        fetchToJson(API.GET_RECOMMENDS_DJ, {
+        fetchToJson(API.DJ.GET_RECOMMENDS_DJ, {
           limit,
           offset: limit * pageIndex
         }).then((resJson) => {
           const data = resJson.result.map((v) => {
             v.picUrl = v.picUrl + '?param=180y180'
             v.desc = v.program.description
-            v.payload = v.id
-            v.query = 'playlist'
+            v.payload = v.program.radio.id
+            v.query = 'djp'
             return v
           })
           resolve({
@@ -312,6 +318,31 @@ export default new Vuex.Store({
         })
       })
     },
+    // 获取DJ电台详情
+    getDjDetail ({ state }, rid) {
+      return new Promise((resolve, reject) => {
+        fetchToJson(API.DJ.GET_DJ_DETAIL, { rid }).then((resJson) => {
+          console.log(resolve)
+          resolve(resJson.dj)
+        })
+      })
+    },
+    // 获取DJ电台节目清单
+    getDjP ({ state }, rid) {
+      return new Promise((resolve, reject) => {
+        fetchToJson(API.DJ.GET_DJP, { rid }).then((resJson) => {
+          resolve(resJson.programs)
+        })
+      })
+    },
+    // 获取DJ电台节目详情
+    getDjPDetail ({ state }, id) {
+      return new Promise((resolve, reject) => {
+        fetchToJson(API.DJ.GET_DJP_DETAIL, { id }).then((resJson) => {
+          resolve(resJson.program)
+        })
+      })
+    },
     // 获取单曲详情
     getSongDetail ({ state }, ids) {
       return new Promise(resolve => {
@@ -327,7 +358,7 @@ export default new Vuex.Store({
     // 获取单曲url
     getSongUrl ({ state }, id) {
       return new Promise(resolve => {
-        fetchToJson(`${API.SONG.GET_SONG_URL}?id=${id}`).then((resJson) => {
+        fetchToJson(API.SONG.GET_SONG_URL, { id }).then((resJson) => {
           resolve(resJson)
         })
       })

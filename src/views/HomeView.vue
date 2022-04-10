@@ -17,20 +17,20 @@
       </div>
       <ul class="section-newSong-list">
         <li
-          class="section-newSong-item"
           v-for="rmdItem in listData.newsong"
           :key="rmdItem.id"
+          class="section-newSong-item"
           @click="playSong(rmdItem.id)"
         >
           <figure class="item-figure">
-            <img class="item-poster" :src="rmdItem.picUrl" alt="" />
+            <img :src="rmdItem.picUrl" alt="" class="item-poster" />
             <span class="icon-play">
               <svg
+                class="icon-play-svg"
                 height="32"
                 role="img"
-                width="32"
                 viewBox="0 0 24 24"
-                class="icon-play-svg"
+                width="32"
               >
                 <polygon points="21.57 12 5.98 3 5.98 21 21.57 12"></polygon>
               </svg>
@@ -45,35 +45,36 @@
     </section>
     <!-- 模板 -->
     <SectionListGrid
-      :title="listTitle.recommends"
-      :sub-title="'精选歌单'"
       :listData="listData.recommends"
       :round="false"
+      :sub-title="'精选歌单'"
+      :title="listTitle.recommends"
       action="getRecommend"
     />
     <SectionListGrid
-      :title="listTitle.hotArtists"
       :listData="listData.hotArtists"
       :round="true"
+      :title="listTitle.hotArtists"
       action="getHotArtists"
     />
     <SectionListGrid
-      :title="listTitle.recommendMv"
       :listData="listData.recommendMv"
       :round="false"
+      :title="listTitle.recommendMv"
       action="getMv"
     />
     <SectionListGrid
-      :title="listTitle.community"
-      :sub-title="'精选歌单'"
       :listData="listData.community"
       :round="false"
+      :sub-title="'精选歌单'"
+      :title="listTitle.community"
       action="getCommunity"
     />
     <SectionListGrid
-      :title="listTitle.dj"
       :listData="listData.dj"
       :round="false"
+      :sub-title="'电台节目'"
+      :title="listTitle.dj"
       action="getRecommendDj"
     />
   </main>

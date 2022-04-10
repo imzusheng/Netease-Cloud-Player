@@ -13,15 +13,12 @@
     <div class="player-song-desc">
       <p :title="curSongName">
         {{ curSongName }}
-<!--        {{ loading ? '正在加载...' : curSongName }}-->
       </p>
-<!--      v-if="!loading"-->
       <p>
         {{ curSongArtists }}
-        <span v-if="curSongPubtime">&nbsp;•&nbsp;</span>
+        <span v-if="curSongArtists && curSongPubtime">&nbsp;•&nbsp;</span>
         {{ curSongPubtime }}
       </p>
-<!--      <p v-else>&nbsp;</p>-->
     </div>
   </div>
 </template>

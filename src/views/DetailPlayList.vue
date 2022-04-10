@@ -5,7 +5,7 @@
 <template>
   <div id="playlist">
     <!-- 歌曲信息 banner -->
-    <div class="playlist-banner" ref="playlist-banner">
+    <div ref="playlist-banner" class="playlist-banner">
       <div class="playlist-banner-content">
         <div class="playlist-banner-poster">
           <img :src="playlistPicUrl" alt="" />
@@ -25,18 +25,18 @@
     <!-- 列表 -->
     <div class="playlist-content">
       <!-- 颜色过渡遮罩 -->
-      <div class="playlist-content-mask" ref="playlist-content-mask"></div>
+      <div ref="playlist-content-mask" class="playlist-content-mask"></div>
       <!-- 歌单列表 -->
       <div class="playlist-content-main">
         <div class="playlist-content-action">
           <div class="playlist-content-action-content">
-            <button aria-label="播放全部" @click="actionPlayAll" data-btn-play>
+            <button aria-label="播放全部" data-btn-play @click="actionPlayAll">
               <svg
-                role="img"
-                height="28"
-                width="28"
-                viewBox="0 0 24 24"
                 class="Svg-sc-1bi12j5-0 jgfuCe"
+                height="28"
+                role="img"
+                viewBox="0 0 24 24"
+                width="28"
               >
                 <path
                   d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"
@@ -45,12 +45,12 @@
             </button>
             <button aria-label="添加至播放队列" data-btn-add>
               <svg
-                role="img"
-                height="12"
-                width="12"
                 aria-hidden="true"
-                viewBox="0 0 16 16"
                 class="Svg-sc-1bi12j5-0 jgfuCe"
+                height="12"
+                role="img"
+                viewBox="0 0 16 16"
+                width="12"
               >
                 <path
                   d="M15.25 8a.75.75 0 01-.75.75H8.75v5.75a.75.75 0 01-1.5 0V8.75H1.5a.75.75 0 010-1.5h5.75V1.5a.75.75 0 011.5 0v5.75h5.75a.75.75 0 01.75.75z"
@@ -60,7 +60,7 @@
           </div>
         </div>
         <!-- 列表标题 -->
-        <div class="playlist-table-title" ref="playlist-table-title">
+        <div ref="playlist-table-title" class="playlist-table-title">
           <div>#</div>
           <div>标题</div>
           <div>专辑</div>
@@ -68,81 +68,16 @@
           <div>时长</div>
         </div>
         <!-- 表格 -->
-        <ul class="playlist-table-content">
-          <li
-            class="playlist-table-row"
-            v-for="(listItem, listIndex) in curPlaylist"
-            :key="`playlist${listIndex}`"
-            @click="playlistSelect(listItem)"
-          >
-            <!-- <input type="radio" /> -->
-            <!-- 序号 -->
-            <div class="table-cell-index">
-              <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
-              <span class="playlist-table-icon">
-                <svg
-                  height="32"
-                  role="img"
-                  width="32"
-                  viewBox="0 0 24 24"
-                  class="UIBT7E6ZYMcSDl1KL62g"
-                >
-                  <polygon
-                    points="21.57 12 5.98 3 5.98 21 21.57 12"
-                    fill="currentColor"
-                  ></polygon>
-                </svg>
-              </span>
-            </div>
-            <!-- 歌曲名字和作者 -->
-            <div class="table-cell-desc">
-              <img
-                class="table-cell-desc-pic"
-                :data-pic-src="listItem.al.picUrl"
-                alt=""
-              />
-              <div>
-                <div>
-                  <span :title="listItem.name" class="table-cell-ellipsis">
-                    {{ listItem.name }}</span
-                  >
-                  <!-- vip -->
-                  <img
-                    v-if="![0, 8].includes(listItem.fee)"
-                    class="table-cell-desc-vip"
-                    src="../assets/vip.svg"
-                    alt=""
-                  />
-                </div>
-                <div :title="getName(listItem.ar)" class="table-cell-ellipsis">
-                  {{ getName(listItem.ar) }}
-                </div>
-              </div>
-            </div>
-            <!-- 专辑名 -->
-            <div class="table-cell-ellipsis">
-              <div
-                :title="listItem.al.name"
-                style="display: block"
-                class="table-cell-ellipsis"
-              >
-                {{ listItem.al.name }}
-              </div>
-            </div>
-            <!-- 发布时间 -->
-            <div>{{ getPubTime(listItem.publishTime) }}</div>
-            <!-- 时长 -->
-            <div>{{ getSongDt(listItem.dt) }}</div>
-          </li>
-        </ul>
+        <table-songs :songs="curPlaylist" class="playlist-table-content" size="XL"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import TableSongs from '@/components/TableSongs'
 import moment from 'moment'
-import { pickUpName, getMainColor } from '@/util'
+import { pickUpName, getMainColor, durationConvert } from '@/util'
 import { mapActions, mapMutations } from 'vuex'
 
 let playlistMaskRef
@@ -167,6 +102,9 @@ const scrollHandle = () => {
 
 export default {
   name: 'DetailPlayList',
+  components: {
+    TableSongs
+  },
 
   data () {
     return {
@@ -180,7 +118,8 @@ export default {
       'getPlaylistDetail',
       'getSongDetail',
       'getAlbum',
-      'getAlbumAll'
+      'getAlbumAll',
+      'getDjP'
     ]),
     ...mapMutations([
       'setCurPlaylistColor',
@@ -250,9 +189,27 @@ export default {
           this.lazyLoadimg()
         })
       })
+    } else if (name === 'djp') {
+      console.log('电台节目')
+      this.getDjP(id).then(res => {
+        this.curPlaylistInfo = res[0].radio
+        this.curPlaylist = res.map(v => {
+          v.al = {
+            picUrl: v.coverUrl,
+            name: v.radio.name
+          }
+          v.publishTime = v.scheduledPublishTime
+          v.dt = v.duration
+          v.id = v.mainTrackId
+          return v
+        })
+        // 设置加载状态false
+        this.setLoading(false)
+        //  实现图片懒加载
+        this.lazyLoadimg()
+      })
     } else {
       console.log('歌单')
-      // 歌单
       // 获取歌单详情，得到所有歌曲的id集合ids
       this.getPlaylistDetail(id).then((playlist) => {
         this.curPlaylistInfo = playlist
@@ -294,12 +251,7 @@ export default {
     },
     getSongDt () {
       return function (time) {
-        const _moment = moment.duration(time)
-        return `${
-          _moment.minutes() < 10 ? `0${_moment.minutes()}` : _moment.minutes()
-        }:${
-          _moment.seconds() < 10 ? `0${_moment.seconds()}` : _moment.seconds()
-        }`
+        return durationConvert(time)
       }
     },
     playlistName () {
@@ -340,13 +292,13 @@ export default {
 #playlist {
   width: 100%;
   box-sizing: border-box;
+  padding: 68px 0 0;
   .playlist-banner {
     width: 100%;
-    height: 30vh;
+    height: 50vh;
     max-height: 500px;
     min-height: 340px;
     position: relative;
-    margin-top: 68px;
     &::after {
       content: "";
       position: absolute;
@@ -406,7 +358,7 @@ export default {
   }
   .playlist-content {
     width: 100%;
-    padding-bottom: 16px;
+    min-height: calc(50vh - 68px);
     position: relative;
     background: rgb(18, 18, 18);
     .playlist-content-mask {

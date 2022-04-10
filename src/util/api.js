@@ -6,8 +6,6 @@ const API_ROOT =
 // 'https://netease-cloud-music-f4u1p2cjb-imzusheng.vercel.app'
 
 export default {
-  // 推荐电台
-  GET_RECOMMENDS_DJ: `${API_ROOT}/personalized/djprogram`,
 
   // 用户相关
   USER: {
@@ -38,6 +36,18 @@ export default {
     // 最佳结果
     GET_SEARCH_MATCH: `${API_ROOT}/search/multimatch`
 
+  },
+
+  // 电台/播客相关
+  DJ: {
+    // 电台详情
+    GET_DJ_DETAIL: `${API_ROOT}/dj/detail`,
+    // 电台节目-播放清单
+    GET_DJP: `${API_ROOT}/dj/program`,
+    // 电台节目详情-单条
+    GET_DJP_DETAIL: `${API_ROOT}/dj/program/detail`,
+    // 推荐电台
+    GET_RECOMMENDS_DJ: `${API_ROOT}/personalized/djprogram`
   },
 
   // 单曲

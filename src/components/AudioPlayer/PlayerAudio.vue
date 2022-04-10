@@ -15,9 +15,9 @@
     <div class="player-main">
       <!-- 进度条 -->
       <player-progress
-        :progress="progress"
-        :cache-progress="cacheProgress"
         :audioLength="audioLength"
+        :cache-progress="cacheProgress"
+        :progress="progress"
         @set-current-time="setCurTime"
         @seeking-change="seekingChange"
       />
@@ -99,14 +99,6 @@ export default {
       // 刷新时恢复播放进度
       currentTime: '',
 
-      // 当前播放的歌曲信息
-      curSongInfo: {
-        name: '',
-        picUrl: '',
-        artists: '',
-        publishTime: ''
-      },
-
       // 出现错误的次数， 每一首歌有一次重连机会
       errorNum: 0,
 
@@ -138,11 +130,6 @@ export default {
     const songid = localStorage.getItem('songid')
     // id存在且播放器是显示状态时，才加载歌曲
     if (songid) this.idToUrl(songid, false)
-    // 读取上次播放的歌曲信息
-    const curSongInfo = localStorage.getItem('curSongInfo')
-    if (curSongInfo) {
-      this.curSongInfo = JSON.parse(curSongInfo)
-    }
     /**
      * 以下是监听audio
      */
@@ -259,7 +246,6 @@ export default {
       // 重置播放器信息,删除上一首歌播放进度
       localStorage.removeItem('audioLength')
       localStorage.removeItem('currentTime')
-      localStorage.removeItem('curSongInfo')
 
       // 设置是否自动播放
       if (!url) {
@@ -273,24 +259,10 @@ export default {
 
     // 通过歌曲id获取MP3url
     idToUrl (songid, autoplay) {
-      // 获取歌曲详情，返回只有一个元素的songs
-      this.getSongDetail(songid).then((res) => {
-        const data = res[0]
-        const curSongInfo = {
-          name: data.name,
-          picUrl: data.al.picUrl,
-          artists: data.ar,
-          publishTime: data.publishTime
-        }
-        // 赋值到this.curSongInfo
-        this.curSongInfo = JSON.parse(JSON.stringify((curSongInfo)))
-        localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
-        // 修改网页标题
-        document.title = `Music - ${curSongInfo.name}`
-        // 通过歌曲的id获取MP3的url
-        this.getSongUrl(songid).then((res) => {
-          this.InitPlayer(res.data[0].url, autoplay)
-        })
+      this.loading = true
+      // 通过歌曲的id获取MP3的url
+      this.getSongUrl(songid).then((res) => {
+        this.InitPlayer(res.data[0].url, autoplay)
       })
     },
 
@@ -310,6 +282,7 @@ export default {
           const nextIndex = getRandomIndex(0, playQueue.length - 1)
           return nextIndex === playQueueIndex ? getNextIndex() : nextIndex
         }
+
         const nextIndex = getNextIndex()
         this.setCurSongid(playQueue[nextIndex].id)
       } else {
@@ -378,6 +351,12 @@ export default {
     }
   },
 
+  computed: {
+    curSongInfo () {
+      return this.$store.state.curSongInfo
+    }
+  },
+
   watch: {
     // ID改变，相当于切歌
     '$store.getters.curSongid': {
@@ -389,7 +368,7 @@ export default {
             localStorage.setItem('songid', songid)
             this.audioRef.pause()
             this.idToUrl(songid, true)
-            this.loading = true
+            this.matchRouteName(this.$route.name)
           }
         }
       }
@@ -405,7 +384,7 @@ export default {
 
 <style lang="less">
 .audio-player-show {
-  transform: translate(0, 0)!important;
+  transform: translate(0, 0) !important;
 }
 
 #audioPlayerWrap {

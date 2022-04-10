@@ -13,10 +13,10 @@
       :key="`songs-${listIndex}`"
       :class="`table-row-size-${size.toLowerCase()}`"
       class="table-row"
-      @click="setCurSongid(listItem.id)"
+      @click="play(listItem)"
     >
       <!-- 序号 -->
-      <div v-if="['L', 'M'].includes(size.toUpperCase())"  class="table-cell-index">
+      <div v-if="['XL','L', 'M'].includes(size.toUpperCase())"  class="table-cell-index">
         <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
         <span class="playlist-table-icon">
             <img alt="" src="../assets/icon-song-play.svg">
@@ -24,33 +24,44 @@
       </div>
 
       <!-- 歌曲名字和作者 -->
-      <div class="table-cell-desc">
+      <div class="table-cell-desc table-cell-ellipsis">
         <img
           ref="lazyload-img"
-          :src="listItem.al.picUrl + '?param=50y50'"
+          :data-pic-src="listItem.al.picUrl + '?param=50y50'"
           alt=""
           class="table-cell-desc-pic"
+          src="../assets/empty_black.png"
         />
-        <div class="table-cell-desc-info">
+        <div class="table-cell-desc-info table-cell-ellipsis">
           <!-- 歌名 -->
           <div class="table-desc-name">
-                    <span :title="listItem.name" class="table-cell-ellipsis">
+            <span
+              :title="listItem.name"
+              class="table-cell-ellipsis">
                       {{ listItem.name }}</span
                     >
             <!-- vip图标 -->
             <img
-              v-if="![0, 8].includes(listItem.fee)"
+              v-if="[1].includes(listItem.fee)"
               ref=""
               alt=""
               class="table-cell-desc-vip"
               src="../assets/vip.svg"
             />
           </div>
+          <div
+            v-if="['XL','L'].includes(size.toUpperCase())"
+            :title="getName(listItem.ar)"
+            class="table-desc-art table-cell-ellipsis">
+            {{ getName(listItem.ar) }}
+          </div>
         </div>
       </div>
 
       <!-- 专辑名 -->
-      <div v-if="['L'].includes(size.toUpperCase())" class="table-cell-ellipsis table-cell-album">
+      <div
+        v-if="['XL','L'].includes(size.toUpperCase())"
+        class="table-cell-ellipsis table-cell-album">
         <div
           :title="listItem.al.name"
           class="table-cell-ellipsis table-cell-album"
@@ -58,6 +69,13 @@
         >
           {{ listItem.al.name }}
         </div>
+      </div>
+
+      <!-- 发布时间 -->
+      <div
+        v-if="['XL'].includes(size.toUpperCase())"
+        class="table-cell-pub">
+        {{ getPubTime(listItem.publishTime) }}
       </div>
 
       <!-- 时长 -->
@@ -69,7 +87,8 @@
 
 <script>
 import { mapMutations } from 'vuex'
-import { durationConvert } from '@/util'
+import { durationConvert, pickUpName } from '@/util'
+import moment from 'moment'
 
 export default {
   name: 'TableSongs',
@@ -83,13 +102,38 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['setCurSongid'])
+    ...mapMutations(['setCurSongid', 'setCurSongInfo']),
+    play (data) {
+      // 当前播放的歌曲信息
+      const curSongInfo = {
+        name: data.name,
+        picUrl: data.al.picUrl,
+        artists: data.ar || data.dj.nickname,
+        publishTime: data.publishTime
+      }
+      localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
+      this.setCurSongInfo(curSongInfo)
+      this.setCurSongid(data.id)
+      // 修改网页标题
+      document.title = `Music - ${curSongInfo.name}`
+    }
   },
 
   computed: {
     getSongDt () {
       return function (time) {
         return durationConvert(time / 1000)
+      }
+    },
+    getName () {
+      return function (name) {
+        return pickUpName(name)
+      }
+    },
+    getPubTime () {
+      return function (time) {
+        if (!time) return '未知'
+        else return moment(time).format('YYYY')
       }
     }
   }
@@ -165,6 +209,8 @@ export default {
     }
     // 专辑
     .table-cell-album,
+    .table-cell-pub,
+    .table-desc-art,
     .table-cell-dt{
       color: #b3b3b3;
       font-size: 14px;
@@ -190,6 +236,17 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+  }
+
+  // 最大尺寸
+  .table-row-size-xl{
+    padding: 16px;
+    grid-template-columns:
+            [index] 16px
+            [first] 6fr
+            [var1] 4fr
+            [var2] 3fr
+            [last] minmax(120px, 1fr);
   }
 
   // 中等尺寸,去掉专辑
