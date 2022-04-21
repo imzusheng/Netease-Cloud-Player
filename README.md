@@ -1,4 +1,4 @@
-# [高颜值网易云音乐](https://demo.zusheng.club/cloud_music/#/)
+# [Vue2 + xgplayer 仿网易云音乐播放器](https://demo.zusheng.club/cloud_music/#/)
 
 正在用 vue3、vite、typescript 仿 AppleMusic 重新写了一个移动端的播放器
 
