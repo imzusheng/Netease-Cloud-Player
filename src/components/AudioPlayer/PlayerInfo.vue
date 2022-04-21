@@ -6,7 +6,7 @@
   <div class="player-song">
     <!-- 封面 -->
     <div class="player-song-pic">
-      <img v-if="!loading" :src="curSongPic" alt=""/>
+      <img v-if="!loading && curSongPic" :src="curSongPic" alt=""/>
       <the-loading-circle v-else class="pic-loading"/>
     </div>
     <!-- 歌曲信息 -->

@@ -1,5 +1,9 @@
 <!--
-  歌单详情页面
+Author: zusheng
+Date: 2022-03-31 12:05:14
+LastEditTime: 2022-04-12 16:20:24
+Description: 歌单详情
+FilePath: \vue2-netease-cloud-music\src\views\DetailPlayList.vue
 -->
 
 <template>
@@ -22,6 +26,7 @@
         <div></div>
       </div>
     </div>
+
     <!-- 列表 -->
     <div class="playlist-content">
       <!-- 颜色过渡遮罩 -->
@@ -68,7 +73,11 @@
           <div>时长</div>
         </div>
         <!-- 表格 -->
-        <table-songs :songs="curPlaylist" class="playlist-table-content" size="XL"/>
+        <table-songs
+          :songs="curPlaylist"
+          class="playlist-table-content"
+          size="XL"
+        />
       </div>
     </div>
   </div>
@@ -244,7 +253,9 @@ export default {
     },
     playlistPicUrl () {
       // 获取到歌单的封面之后，开始提取主题色
-      const url = `${this.curPlaylistInfo.coverImgUrl || this.curPlaylistInfo.picUrl}?param=250y250`
+      const url = `${
+        this.curPlaylistInfo.coverImgUrl || this.curPlaylistInfo.picUrl
+      }?param=250y250`
       if (url) this.getPicMainColor(url)
       return url
     },
@@ -284,7 +295,7 @@ export default {
     min-height: 340px;
     position: relative;
     &::after {
-      content: "";
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
@@ -493,7 +504,7 @@ export default {
             }
             > div {
               display: grid;
-              grid-template: "title title" "badges subtitle" / auto 1fr;
+              grid-template: 'title title' 'badges subtitle' / auto 1fr;
               > div {
                 &:first-child {
                   grid-area: title;

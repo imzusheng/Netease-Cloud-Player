@@ -1,3 +1,10 @@
+<!--
+Author: zusheng
+Date: 2022-03-28 11:20:43
+LastEditTime: 2022-04-10 21:13:37
+Description:
+FilePath: \vue2-netease-cloud-music\src\App.vue
+-->
 <template>
   <div id="app">
     <router-view />
@@ -163,14 +170,17 @@ img:not([src]) {
   /* WebKit browsers */
   color: rgba(255, 255, 255, 0.35);
 }
+
 :-moz-placeholder {
   /* Mozilla Firefox 4 to 18 */
   color: rgba(255, 255, 255, 0.35);
 }
+
 ::-moz-placeholder {
   /* Mozilla Firefox 19+ */
   color: rgba(255, 255, 255, 0.35);
 }
+
 :-ms-input-placeholder {
   /* Internet Explorer 10+ */
   color: rgba(255, 255, 255, 0.35);

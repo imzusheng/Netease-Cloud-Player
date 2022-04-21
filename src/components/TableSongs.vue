@@ -13,7 +13,7 @@
       :class="`table-title-size-${size.toLowerCase()}`"
       class="song-table-title"
     >
-      <div v-if="['XL','L', 'M'].includes(size.toUpperCase())" >#</div>
+      <div v-if="['XL','L', 'M'].includes(size.toUpperCase())">#</div>
       <div>标题</div>
       <div v-if="['XL','L'].includes(size.toUpperCase())">专辑</div>
       <div v-if="['XL'].includes(size.toUpperCase())">发布时间</div>
@@ -28,7 +28,7 @@
         @click="play(listItem)"
       >
         <!-- 序号 -->
-        <div v-if="['XL','L', 'M'].includes(size.toUpperCase())"  class="table-cell-index">
+        <div v-if="['XL','L', 'M'].includes(size.toUpperCase())" class="table-cell-index">
           <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
           <span class="playlist-table-icon">
             <img alt="" src="../assets/icon-song-play.svg">
@@ -125,7 +125,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['setCurSongid', 'setCurSongInfo']),
+    ...mapMutations(['setCurSongid']),
     play (data) {
       // 当前播放的歌曲信息
       const curSongInfo = {
@@ -134,7 +134,6 @@ export default {
         artists: data.ar || data.dj.nickname,
         publishTime: data.publishTime
       }
-      localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
       this.setCurSongInfo(curSongInfo)
       this.setCurSongid(data.id)
       // 修改网页标题
@@ -142,9 +141,9 @@ export default {
     },
     loadImg (data) {
       if (data.length > 0) {
-      // dom更新完成
+        // dom更新完成
         this.$nextTick(() => {
-        // 实现图片懒加载
+          // 实现图片懒加载
           lazyLoadImg(this.$refs['lazyload-img'])
         })
       }
@@ -179,9 +178,9 @@ export default {
 </script>
 
 <style lang="less">
-.song-table-wrap{
+.song-table-wrap {
   // 表格标题
-  .song-table-title{
+  .song-table-title {
     display: grid;
     grid-gap: 16px;
     grid-template-columns:
@@ -193,10 +192,12 @@ export default {
     padding: 0 16px;
     cursor: pointer;
     border-bottom: 1px solid rgba(200, 200, 200, 0.2);
+
     > div {
       padding: 12px 0;
       color: #b3b3b3;
       font-size: 16px;
+
       &:last-child {
         text-align: right;
         margin-right: 32px;
@@ -205,7 +206,7 @@ export default {
   }
 
   // 最大尺寸
-  .table-title-size-xl{
+  .table-title-size-xl {
     padding: 16px;
     grid-template-columns:
             [index] 16px
@@ -216,7 +217,7 @@ export default {
   }
 
   // 中等尺寸,去掉专辑
-  .table-title-size-m{
+  .table-title-size-m {
     grid-template-columns:
               [index] 16px
               [name] auto
@@ -224,12 +225,13 @@ export default {
   }
 
   // 小尺寸,只保留封面、歌名、时长
-  .table-title-size-s{
+  .table-title-size-s {
     padding: 0;
     grid-template-columns:
               [name] auto
               [last] minmax(120px, 1fr);
   }
+
   // ul
   .song-table {
     // li
@@ -249,22 +251,27 @@ export default {
         display: flex;
         align-items: center;
         padding: 4px 0;
+
         &:last-child {
           justify-content: flex-end;
           margin-right: 32px;
         }
       }
+
       // index单元格
       .table-cell-index {
         justify-content: center;
         align-items: center;
+
         .playlist-table-index {
           display: block;
         }
+
         .playlist-table-icon {
           display: none;
         }
       }
+
       // 歌曲信息
       .table-cell-desc {
         // 歌曲封面
@@ -276,6 +283,7 @@ export default {
           padding: 5px;
           box-sizing: border-box;
         }
+
         // 歌曲名 和 歌手
         .table-cell-desc-info {
           .table-desc-name {
@@ -283,11 +291,13 @@ export default {
             color: #fff;
             display: flex;
             align-items: center;
+
             > span {
               font-size: 15px;
               color: #fff;
               font-weight: 600;
             }
+
             .table-cell-desc-vip {
               height: 32px;
               width: 32px;
@@ -296,29 +306,35 @@ export default {
           }
         }
       }
+
       // 专辑
       .table-cell-album,
       .table-cell-pub,
       .table-desc-art,
-      .table-cell-dt{
+      .table-cell-dt {
         color: #b3b3b3;
         font-size: 14px;
       }
+
       // hover样式
       &:hover {
         background: rgba(255, 255, 255, 0.1);
+
         .playlist-table-index {
           display: none;
         }
+
         .playlist-table-icon {
           display: flex;
           align-items: center;
           justify-content: center;
         }
+
         .table-desc-name {
           text-decoration: underline;
         }
       }
+
       // 需要省略的格子
       .table-cell-ellipsis {
         white-space: nowrap;
@@ -328,7 +344,7 @@ export default {
     }
 
     // 最大尺寸
-    .table-row-size-xl{
+    .table-row-size-xl {
       padding: 16px;
       grid-template-columns:
             [index] 16px
@@ -339,7 +355,7 @@ export default {
     }
 
     // 中等尺寸,去掉专辑
-    .table-row-size-m{
+    .table-row-size-m {
       grid-template-columns:
               [index] 16px
               [name] auto
@@ -347,7 +363,7 @@ export default {
     }
 
     // 小尺寸,只保留封面、歌名、时长
-    .table-row-size-s{
+    .table-row-size-s {
       padding: 0;
       grid-template-columns:
               [name] auto
@@ -357,25 +373,31 @@ export default {
     // 正在播放的歌曲样式
     .playing {
       background: rgb(60, 60, 60);
+
       .playlist-table-index {
         display: none !important;
       }
+
       .playlist-table-icon {
         display: flex !important;
         align-items: center;
         justify-content: center;
+
         .icon-pause {
           display: none;
         }
+
         .icon-equaliser {
           display: block;
         }
       }
+
       &:hover {
         .playlist-table-icon {
           .icon-pause {
             display: block;
           }
+
           .icon-equaliser {
             display: none;
           }

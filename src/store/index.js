@@ -1,3 +1,10 @@
+/*
+ * @Author: zusheng
+ * @Date: 2022-03-28 11:20:43
+ * @LastEditTime: 2022-04-11 23:47:09
+ * @Description:
+ * @FilePath: \vue2-netease-cloud-music\src\store\index.js
+ */
 import Vue from 'vue'
 import Vuex from 'vuex'
 import API from '@/util/api'
@@ -79,6 +86,7 @@ export default new Vuex.Store({
     setColumnCount (state, num) {
       state.columnCount = num
     },
+
     setCurRouter (state, name) {
       state.curRouter = name
     },
@@ -466,7 +474,7 @@ export default new Vuex.Store({
             }
             v.query = 'mv'
             v.payload = v.id
-            v.desc = ` ${playCount}次观看`
+            v.desc = `${playCount}次观看`
             return v
           })
           resolve({

@@ -84,6 +84,9 @@ export default {
       // 已经缓存的进度
       cacheProgress: '',
 
+      // 歌曲信息
+      curSongInfo: {},
+
       // 音频总长度
       audioLength: '',
 
@@ -227,7 +230,7 @@ export default {
 
   methods: {
     ...mapGetters(['playQueue', 'playQueueIndex']),
-    ...mapActions(['getSongUrl']),
+    ...mapActions(['getSongUrl', 'getSongDetail']),
     ...mapMutations(['setCurSongid', 'setTips', 'setAudioDisplay']),
 
     // 匹配路由名字， 在视频页面时隐藏播放器
@@ -259,10 +262,23 @@ export default {
 
     // 通过歌曲id获取MP3url
     idToUrl (songid, autoplay) {
-      this.loading = true
-      // 通过歌曲的id获取MP3的url
-      this.getSongUrl(songid).then((res) => {
-        this.InitPlayer(res.data[0].url, autoplay)
+      // 获取歌曲详情，返回只有一个元素的songs
+      this.getSongDetail(songid).then((res) => {
+        const data = res[0]
+        const curSongInfo = {
+          name: data.name,
+          picUrl: data.al.picUrl,
+          artists: data.ar,
+          publishTime: data.publishTime
+        }
+        localStorage.setItem('curSongInfo', JSON.stringify(curSongInfo))
+        // 通过歌曲的id获取MP3的url
+        this.getSongUrl(songid).then((res) => {
+          this.InitPlayer(res.data[0].url, autoplay)
+        })
+        this.loading = true
+        // 修改网页标题
+        document.title = `Music - ${curSongInfo.name}`
       })
     },
 
@@ -348,12 +364,6 @@ export default {
     // 是否循环播放 PlayerControls - emit
     loopChange (status) {
       this.audioRef.loop = status === 'on'
-    }
-  },
-
-  computed: {
-    curSongInfo () {
-      return this.$store.state.curSongInfo
     }
   },
 
